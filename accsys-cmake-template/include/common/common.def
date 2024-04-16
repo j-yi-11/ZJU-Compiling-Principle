@@ -1,0 +1,49 @@
+#ifndef TreeNodeDefine
+#define TreeNodeDefine(x)
+#endif
+
+#ifndef OpcodeDefine
+#define OpcodeDefine(x, s)
+#endif
+
+// Tree Node Define
+TreeNodeDefine(ND_UnaryExpr)
+TreeNodeDefine(ND_BinaryExpr)
+TreeNodeDefine(ND_IntegerLiteral)
+// Stmt
+TreeNodeDefine(ND_IfStmt)
+TreeNodeDefine(ND_WhileStmt)
+TreeNodeDefine(ND_BreakStmt)
+TreeNodeDefine(ND_ContinueStmt)
+TreeNodeDefine(ND_ReturnStmt)
+// Def
+TreeNodeDefine(ND_VarDef)
+TreeNodeDefine(ND_ArrayDef)
+TreeNodeDefine(ND_FuncDef)
+// function/variable/array call 
+TreeNodeDefine(ND_FunCall)
+TreeNodeDefine(ND_VarCall)
+TreeNodeDefine(ND_ArrayCall)
+
+// Binary Opcode
+OpcodeDefine(OP_Add,    "add")
+OpcodeDefine(OP_Sub,    "sub")
+OpcodeDefine(OP_Mul,    "mul")
+OpcodeDefine(OP_Div,    "div")
+OpcodeDefine(OP_Mod,    "mod")
+OpcodeDefine(OP_Lt,     "lt")
+OpcodeDefine(OP_Gt,     "gt")
+OpcodeDefine(OP_Le,     "le")
+OpcodeDefine(OP_Ge,     "ge")
+OpcodeDefine(OP_Eq,     "eq")
+OpcodeDefine(OP_Ne,     "ne")
+OpcodeDefine(OP_Land,   "and")
+OpcodeDefine(OP_Lor,    "or")
+OpcodeDefine(OP_Lxor,   "xor")
+// Unary Opcode
+OpcodeDefine(OP_Lnot,   "not")
+OpcodeDefine(OP_Neg,    "neg")
+
+
+#undef TreeNodeDefine
+#undef OpcodeDefine
