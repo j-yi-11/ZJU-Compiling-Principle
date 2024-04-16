@@ -1,0 +1,86 @@
+site_name: 浙江大学编译原理课程实验
+site_url: https://accsys.pages.zjusct.io/accipit/
+repo_url: https://git.zju.edu.cn/accsys/accipit
+repo_name: accsys/accipit
+theme:
+  name: 'material'
+  language: 'zh'
+  features:
+    - content.code.annotate
+    - content.code.copy
+    # - content.action.edit
+    - navigation.tracking
+    - navigation.top
+    # - navigation.tabs
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+  font:
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+nav:
+  - 主页: index.md
+  - Lab 0 环境配置: environment.md
+  - Lab 1 词法与语法分析: syntax.md
+  - Lab 3 中间代码生成: middle-ir-gen.md
+  - 附录:
+    - appendix/index.md
+    - 从四元组到静态单赋值形式: appendix/quads2ssa.md
+    - SysY 结构与 Accipit IR 的对应: appendix/sysy-accipit-mapping.md
+    - SysY 语言规范: appendix/sysy-spec.md
+    - SysY 运行时库: appendix/sysy-runtime.md
+    - Accipit IR 规范: appendix/accipit-spec.md
+
+plugins:
+  - search
+
+extra_javascript:
+  - https://cdn.tonycrane.cc/utils/katex.min.js
+  - javascripts/katex.js
+
+extra_css:
+  - https://cdn.tonycrane.cc/utils/katex.min.css
+  - https://fonts.googleapis.com/css?family=Roboto:500,500i,600,600i&display=fallback
+  - css/custom.css
+
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 4
+  - codehilite
+  - meta
+  - def_list
+  - attr_list
+  - md_in_html
+  - sane_lists
+  - admonition
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.snippets
+  - pymdownx.magiclink
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.arithmatex:
+      generic: true
