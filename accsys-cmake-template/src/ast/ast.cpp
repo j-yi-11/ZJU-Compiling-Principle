@@ -197,7 +197,7 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
             print_expr(stmt->block, ident + "└─ ", ident + "   ");
         }
         // return type
-        if (stmt->ReturnType->type == FuncType::Type::INT) {
+        if (stmt->ReturnType == FuncDef::Type::INT) {
             fmt::print("int\n");
         } else {
             fmt::print("void\n");

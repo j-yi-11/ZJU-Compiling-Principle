@@ -143,9 +143,10 @@ InitVal : Exp {
 
 // func def   
 // int f(int a, int b[]){...}
-FuncDef : FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block {
+// FuncType
+FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
     auto funcdef_unit = new FuncDef();
-    funcdef_unit->ReturnType = $1;
+    funcdef_unit->ReturnType = FuncDef::Type::INT;
     funcdef_unit->name = *($2);
     if($4 != nullptr){
         for(auto i : *$4)
@@ -155,18 +156,30 @@ FuncDef : FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block {
     funcdef_unit->block = $6;
     $$ = funcdef_unit;
   }
+  | VOID IDENTIFIER LPAREN FuncFParams RPAREN Block {
+		auto funcdef_unit = new FuncDef();
+		funcdef_unit->ReturnType = FuncDef::Type::VOID;
+		funcdef_unit->name = *($2);
+		if($4 != nullptr){
+				for(auto i : *$4)
+						funcdef_unit->argList.emplace_back(i);
+		}
+		else{  }
+		funcdef_unit->block = $6;
+		$$ = funcdef_unit;
+	}
   ;
 // return type
-FuncType :
-	VOID{
-		auto node = new FuncType(FuncType::Type::VOID);
-		$$ = node;
-  }
-	| INT {
-		auto node = new FuncType(FuncType::Type::INT);
-		$$ = node;
-	}
-	;
+// FuncType :
+//	VOID{
+//		auto node = new FuncType(FuncType::Type::VOID);
+//		$$ = node;
+//  }
+//	| INT {
+//		auto node = new FuncType(FuncType::Type::INT);
+//		$$ = node;
+//	}
+//	;
 FuncFParams
   : DFuncFParams {
     $$ = $1;

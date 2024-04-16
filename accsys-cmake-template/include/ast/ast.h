@@ -204,18 +204,13 @@ struct VarDef : public Node {
         //, name(name), initialValue(initialValue)
 };
 
-// struct ArrayDef : public Node {
-//     constexpr static NodeType this_type = ND_ArrayDef;
-//     std::string name = "";
-//     // type is int
-//     std::vector<int> dimensions;// array
-//     ArrayDef(std::string &name, std::vector<int> &dimensions) :
-//         Node(this_type), name(name), dimensions(dimensions){ }
-// };
 struct FuncDef : public Node {
     constexpr static NodeType this_type = ND_FuncDef;
     std::string name = "";
-    NodePtr ReturnType = nullptr;
+    enum Type {
+        VOID = 0,
+        INT = 1,
+    } ReturnType;
     std::vector<NodePtr> argList;// var , array
     NodePtr block = nullptr;
     FuncDef() : Node(this_type) { }
