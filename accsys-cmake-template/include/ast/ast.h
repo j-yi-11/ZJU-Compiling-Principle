@@ -154,6 +154,7 @@ struct LVal : public Node {
 /// statement
 struct IfStmt : public Node {
     constexpr static NodeType this_type = ND_IfStmt;
+    bool matched = false;
     NodePtr condition = nullptr;
     NodePtr then = nullptr;
     NodePtr els = nullptr;
@@ -162,6 +163,7 @@ struct IfStmt : public Node {
 
 struct WhileStmt : public Node {
     constexpr static NodeType this_type = ND_WhileStmt;
+    bool matched = false;
     NodePtr condition = nullptr;
     NodePtr then = nullptr;
     WhileStmt(): Node(this_type) { }
@@ -169,34 +171,40 @@ struct WhileStmt : public Node {
 
 struct BreakStmt : public Node {
     constexpr static NodeType this_type = ND_BreakStmt;
+    bool matched = false;
     BreakStmt(): Node(this_type){ }
 };
 
 struct ContinueStmt : public Node {
     constexpr static NodeType this_type = ND_ContinueStmt;
+    bool matched = false;
     ContinueStmt(): Node(this_type){ }
 };
 
 struct ReturnStmt : public Node {
     constexpr static NodeType this_type = ND_ReturnStmt;
+    bool matched = false;
     NodePtr result = nullptr;
     ReturnStmt(): Node(this_type){ }
 };
 
 struct BlockStmt : public Node {
     constexpr static NodeType this_type = ND_BlockStmt;
+    bool matched = false;
     NodePtr Block = nullptr;
     BlockStmt(): Node(this_type){ }
 };
 
 struct ExpStmt : public Node {
     constexpr static NodeType this_type = ND_ExpStmt;
+    bool matched = false;
     NodePtr Exp = nullptr;
     ExpStmt(): Node(this_type){ }
 };
 
 struct AssignStmt : public Node {
     constexpr static NodeType this_type = ND_AssignStmt;
+    bool matched = false;
     NodePtr Exp = nullptr;
     NodePtr LVal = nullptr;
     AssignStmt(): Node(this_type){ }
