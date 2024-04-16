@@ -18,9 +18,9 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     fmt::print(prefix);
     // print the expression type according to ast.h defines
     // exp
-    if (auto *exp = exp->as<Expr *>()) {
+    if (auto *expr = exp->as<Expr *>()) {
         fmt::print("Exp\n");
-        print_expr(exp->LgExp, ident + "└─ ", ident + "   ");
+        print_expr(expr->LgExp, ident + "└─ ", ident + "   ");
     }
     // lg_exp
     if (auto *lg_exp = exp->as<LgExp *>()) {
@@ -37,14 +37,14 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     // add_exp
     if (auto *add_exp = exp->as<AddExp *>()) {
         fmt::print("AddExp \"{}\"\n", op_str(add_exp->optype));
-        print_expr(add_exp->lhs, ident + "├─ ", ident + "│  ");
-        print_expr(add_exp->rhs, ident + "└─ ", ident + "   ");
+        print_expr(add_exp->addExp, ident + "├─ ", ident + "│  ");
+        print_expr(add_exp->mulExp, ident + "└─ ", ident + "   ");
     }
     // mul_exp
     if (auto *mul_exp = exp->as<MulExp *>()) {
         fmt::print("MulExp \"{}\"\n", op_str(mul_exp->optype));
-        print_expr(mul_exp->lhs, ident + "├─ ", ident + "│  ");
-        print_expr(mul_exp->rhs, ident + "└─ ", ident + "   ");
+        print_expr(mul_exp->mulExp, ident + "├─ ", ident + "│  ");
+        print_expr(mul_exp->unaryExp, ident + "└─ ", ident + "   ");
     }
     // primary_exp
     if (auto *primary_exp = exp->as<PrimaryExpr *>()) {
@@ -60,7 +60,7 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     }
     // unary_exp
     if (auto *unary_exp = exp->as<UnaryExpr *>()) {
-        fmt::print("UnaryExpr \"{}\"\n", op_str(unary_exp->optype));
+        fmt::print("UnaryExpr \"{}\"\n", op_str(unary_exp->opType));
         // primary_exp unary_exp params ==> select those not null to print
         if (unary_exp->primaryExp != nullptr) {
             print_expr(unary_exp->primaryExp, ident + "└─ ", ident + "   ");
@@ -82,8 +82,11 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     if (auto *lval = exp->as<LVal *>()) {
         fmt::print("LVal \"{}\"\n", lval->name);
         // array
-        if (lval->array != nullptr) {
-            print_expr(lval->array, ident + "└─ ", ident + "   ");
+        if (lval->isArray) {
+            // print array out
+            for(auto &i : lval->position){
+                fmt::print("{} ", i);
+            }
         }
     }
     // if statement
@@ -173,10 +176,10 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     // var def
     if (auto *stmt = exp->as<VarDef *>()) {
         fmt::print("VarDef\n");
-        // name initval dimension ==> print if not null
+        // name initialValue dimension ==> print if not null
         fmt::print("{}\n", stmt->name);
-        if (stmt->InitVal != nullptr) {
-            print_expr(stmt->InitVal, ident + "└─ ", ident + "   ");
+        if (stmt->initialValue != nullptr) {
+            print_expr(stmt->initialValue, ident + "└─ ", ident + "   ");
         }
         for (auto &dim : stmt->dimensions) {
             fmt::print("{}\n", dim);
@@ -194,7 +197,7 @@ void print_expr(NodePtr exp, std::string prefix, std::string ident) {
             print_expr(stmt->block, ident + "└─ ", ident + "   ");
         }
         // return type
-        if (stmt->ReturnType == FuncDef::funcReturnType::INT) {
+        if (stmt->ReturnType->type == FuncType::Type::INT) {
             fmt::print("int\n");
         } else {
             fmt::print("void\n");

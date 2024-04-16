@@ -5,12 +5,22 @@
 #ifndef OpcodeDefine
 #define OpcodeDefine(x, s)
 #endif
-
+TreeNodeDefine(ND_CompUnit)
+TreeNodeDefine(ND_PrimitiveType)
 // Tree Node Define
+TreeNodeDefine(ND_Expr)
+TreeNodeDefine(ND_LgExpr)
+TreeNodeDefine(ND_AddExpr)
+TreeNodeDefine(ND_MulExpr)
+TreeNodeDefine(ND_CompExpr)
+TreeNodeDefine(ND_PrimaryExpr)
 TreeNodeDefine(ND_UnaryExpr)
 TreeNodeDefine(ND_BinaryExpr)
 TreeNodeDefine(ND_IntegerLiteral)
 // Stmt
+TreeNodeDefine(ND_BlockStmt)
+TreeNodeDefine(ND_ExpStmt)
+TreeNodeDefine(ND_AssignStmt)
 TreeNodeDefine(ND_IfStmt)
 TreeNodeDefine(ND_WhileStmt)
 TreeNodeDefine(ND_BreakStmt)
@@ -20,10 +30,13 @@ TreeNodeDefine(ND_ReturnStmt)
 TreeNodeDefine(ND_VarDef)
 TreeNodeDefine(ND_ArrayDef)
 TreeNodeDefine(ND_FuncDef)
-// function/variable/array call 
-TreeNodeDefine(ND_FunCall)
-TreeNodeDefine(ND_VarCall)
-TreeNodeDefine(ND_ArrayCall)
+TreeNodeDefine(ND_FuncFParam)
+TreeNodeDefine(ND_Block)
+TreeNodeDefine(ND_BlockItem)
+TreeNodeDefine(ND_Decl)
+TreeNodeDefine(ND_VarDecl)
+TreeNodeDefine(ND_InitVal)
+TreeNodeDefine(ND_LVal)
 
 // Binary Opcode
 OpcodeDefine(OP_Add,    "add")

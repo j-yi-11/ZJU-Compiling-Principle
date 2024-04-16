@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <ast/ast.h>
 #include <string>
 #include <vector>
@@ -10,19 +11,19 @@ extern NodePtr root;
 
 /// types
 %union {
-    int iVal;
-    std::string *sVal;
+    int ival;
+    std::string *sval;
     NodePtr nodeVal;
     std::vector<NodePtr>* vecVal;
     std::vector<int>* iVecVal;
     OpType opVal;
 }
 
-%token <iVal> CONSTINT
-%token <sVal> IDENTIFIER
+%token <ival> CONSTINT UNARYOP BINARYOP
+%token <sval> IDENTIFIER
 %token <opVal> AND OR NOT
 %token <opVal> NEQ EQ GEQ LEQ GREAT LESS
-%type <nodeVal> FuncDef PrimitiveType Block Stmt StmtElse Exp UnaryExp PrimaryExp Number AddExp MulExp
+%type <nodeVal> FuncDef FuncType Block Stmt  Exp UnaryExp PrimaryExp Number AddExp MulExp
 %type <nodeVal> LOrExp LAndExp EqExp RelExp
 %type <nodeVal> Decl BlockItem LVal
 %type <nodeVal> VarDecl InitVal VarDef
@@ -30,40 +31,25 @@ extern NodePtr root;
 %type <nodeVal> Matched Unmatched
 %type <vecVal> BlockItems VarDefs
 %type <vecVal> FuncFParams DFuncFParams FuncRParams DExps CompUnits
-%type <nodeVal> Matched Unmatched
 %type <iVecVal> Dimensions Dimensions_funcdef Dimensions_lval
 
 
-%token  ADD SUB MUL DIV MOD
-        ASSIGN ADDEQ SUBEQ MULEQ DIVEQ MODEQ
+%token  ASSIGN ADDEQ SUBEQ MULEQ DIVEQ MODEQ
         IF ELSE FOR WHILE SWITCH CASE DEFAULT CONTINUE BREAK
         RETURN INT VOID
         COMMA SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
 %start CompUnit
-%left COMMA //逗号
-%left FUNC_CALL_ARG_LIST
-%right ASSIGN ADDEQ SUBEQ MULEQ DIVEQ MODEQ
-%left OR
-%left AND
-%left EQ NEQ
-%left GEQ GREAT LEQ LESS
-%left ADD SUB
-%left MUL DIV MOD
-%right NOT
-%left UMINUS UPLUS
-
 
 // JY write
 %%
-CompUnit : 
-        CompUnits {  
+CompUnit : CompUnits {
                 auto comp_unit = new CompUnit();       
                 for(auto a : *$1) 
                         comp_unit->all.emplace_back(a);
                 root = comp_unit;
         };
-CompUnits:
+CompUnits: {}
         | CompUnits Decl { 
                 $1->emplace_back($2);
                 $$ = $1; 
@@ -148,16 +134,7 @@ Dimensions : LBRACKET CONSTINT RBRACKET {
                 $4->insert($4->begin(), $2);
                 $$ = $4;
         };
-// // [3]
-// // [3][4][5]
-// VarDefTail : LBRACKET CONSTINT RBRACKET {       $$ = new std::vector<int>;
-//                                                 $$->push_back($2);  // $2 表示匹配的 CONSTINT 值
-//                                         }
-//         | LBRACKET CONSTINT RBRACKET VarDefTail {
-//                                                 $$ = $4;  // $4 表示 VarDefTail 的返回值
-//                                                 $$->push_back($2);
-//                                         }
-//         ;
+
 InitVal : Exp {
                 auto val = new InitVal();
                 val->Exp = $1;
@@ -168,9 +145,7 @@ InitVal : Exp {
 // int f(int a, int b[]){...}
 FuncDef : FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block {
     auto funcdef_unit = new FuncDef();
-    //judge returnType
-    if($1 == VOID) funcdef_unit->ReturnType = 0;
-    if($1 == INT) funcdef_unit->ReturnType = 1;
+    funcdef_unit->ReturnType = $1;
     funcdef_unit->name = *($2);
     if($4 != nullptr){
         for(auto i : *$4)
@@ -182,7 +157,16 @@ FuncDef : FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block {
   }
   ;
 // return type
-FuncType : VOID | INT ;
+FuncType :
+	VOID{
+		auto node = new FuncType(FuncType::Type::VOID);
+		$$ = node;
+  }
+	| INT {
+		auto node = new FuncType(FuncType::Type::INT);
+		$$ = node;
+	}
+	;
 FuncFParams
   : DFuncFParams {
     $$ = $1;
@@ -190,7 +174,7 @@ FuncFParams
   | { $$ = nullptr; }
   ;
 DFuncFParams
-  : DFuncFParams ',' FuncFParam {
+  : DFuncFParams COMMA FuncFParam {
     $1->emplace_back($3);
     $$ = $1;
   }
@@ -206,45 +190,29 @@ FuncFParam
     para->name = *($2);
     $$ = para;
   }
-  | INT IDENTIFIER '[' ']' Dimensions_funcdef {
+  | INT IDENTIFIER LBRACKET RBRACKET Dimensions_funcdef {
     auto para = new FuncFParam();
     para->name = *($2);
     para->isArray = true;
-    para->dimensions = *$3;
+    para->dimensions = *$5;
     $$ = para;    
   };
 Dimensions_funcdef 
-  : LBRAKET RBRACKET {
+  : LBRACKET RBRACKET {
      auto vec = new std::vector<int>;
      vec->emplace_back(-1);// [][2] ==> -1, 2
      $$ = vec;
   }
-  | Dimensions_funcdef '[' CONSTINT ']' { 
+  | Dimensions_funcdef LBRACKET CONSTINT RBRACKET {
       auto dims = $1;
       dims->emplace_back($3);
       $$ = dims; 
     }
   ;
-// FuncFParams : FuncFParam FuncFParamsTail { 
-//         ; }
-//         ;
-// FuncFParamsTail : /*empty*/
-//         | COMMA FuncFParam FuncFParamsTail
-//         ;
-// int a
-// int a[]
-// int a[4]
-// int a[][3][4]
-// FuncFParam : BType IDENTIFIER FuncFParamTail { printf("FuncFParam -> BType IDENTIFIER FuncFParamTail\n"); }
-//         ;
-// FuncFParamTail : /*empty*/
-//         |  LBRACKET RBRACKET
-//         |  FuncFParamTail LBRACKET CONSTINT RBRACKET
-//         ;
 
 // {......}
 Block: LBRACE BlockItems RBRACE 
-  : {
+  {
     auto block = new Block();
     if($2 == nullptr)// 可能是空块
         $$ = block;
@@ -284,64 +252,74 @@ BlockItem: Decl {
 
 Stmt:
 	Matched {
-				dynamic_cast<NodePtr>($1)->matched = true;
+				//dynamic_cast<NodePtr>($1)->matched = true;
 				$$ = $1;
 		}
   | Unmatched {
-				dynamic_cast<NodePtr>($1)->matched = false;
+				//dynamic_cast<NodePtr>($1)->matched = false;
 				$$ = $1;
  };
 Matched:
 		LVal ASSIGN Exp SEMI {
 		    auto stmt = new AssignStmt();
 		    stmt->LVal = ($1);
+		    stmt->matched = true;
 		    stmt->Exp = ($3);
 		    $$ = stmt;
 		}
 		| Exp SEMI {
 		    auto stmt = new ExpStmt();
+		    stmt->matched = true;
 		    stmt->Exp = ($1);
 		    $$ = stmt;
 		}
 		| SEMI { // include " ;"
 		    auto stmt = new ExpStmt();
+		    stmt->matched = true;
 		    $$ = stmt;
 		}
 		| Block {
 		    auto stmt = new BlockStmt();
 		    stmt->Block = ($1);
+		    stmt->matched = true;
 		    $$ = stmt;
 		 }
 		| IF LPAREN Exp RPAREN Matched ELSE Matched {
-		    dynamic_cast<IfStmt*>($5)->matched = true;
-		    dynamic_cast<IfStmt*>($7)->matched = true;
+		    //dynamic_cast<IfStmt*>($5)->matched = true;
+		    //dynamic_cast<IfStmt*>($7)->matched = true;
 		    auto stmt = new IfStmt();
 		    stmt->condition = ($3);
+		    stmt->matched = true;
 		    stmt->then = ($5);
-		    stmt->else_stmt = ($7);
+		    stmt->els = ($7);
 		    $$ = stmt;
 		 }
 		| WHILE LPAREN Exp RPAREN Stmt {
 		    auto stmt = new WhileStmt();
 		    stmt->condition = ($3);
+		    stmt->matched = true;
 		    stmt->then = ($5);
 		    $$ = stmt;
 		 }
 		| BREAK SEMI {
 		    auto stmt = new BreakStmt();
+		    stmt->matched = true;
 		    $$ = stmt;
 		}
 		| CONTINUE SEMI {
 		    auto stmt = new ContinueStmt();
+		    stmt->matched = true;
 		    $$ = stmt;
 		 }
 		| RETURN Exp SEMI {
 		    auto stmt = new ReturnStmt();
 		    stmt->result = $2;
+		    stmt->matched = true;
 		    $$ = stmt;
 		 }
 		| RETURN SEMI {
 		    auto stmt = new ReturnStmt();
+		    stmt->matched = true;
 		    $$ = stmt;
 		}
 		;
@@ -349,32 +327,34 @@ Unmatched:
 		IF LPAREN Exp RPAREN Stmt {
 		    auto stmt = new IfStmt();
 		    stmt->condition = ($3);
+		    stmt->matched = false;
 		    stmt->then = ($5);
 		    $$ = stmt;
 		}
 		| IF LPAREN Exp RPAREN Matched ELSE Unmatched {
-		    dynamic_cast<IfStmt*>($5)->matched = true;
-		    dynamic_cast<IfStmt*>($7)->matched = false;
+		    //dynamic_cast<IfStmt*>($5)->matched = true;
+		    //dynamic_cast<IfStmt*>($7)->matched = false;
 		    auto stmt = new IfStmt();
 		    stmt->condition = ($3);
+		    stmt->matched = false;
 		    stmt->then = ($5);
-		    stmt->else_stmt = ($7);
+		    stmt->els = ($7);
 		    $$ = stmt;
 		}
 		;
 
 Exp : LOrExp { 
-            auto exp = new Exp();
+            auto exp = new Expr();
             exp->LgExp = ($1);
             $$ = exp;
         };
 
 LVal :
 	IDENTIFIER {
-					auto l_val = new LVal();
-					l_val->name = *$1;
-					$$ = l_val;
-        }
+			auto l_val = new LVal();
+			l_val->name = *$1;
+			$$ = l_val;
+		}
 		| IDENTIFIER Dimensions_lval {
 			auto l_val = new LVal();
 			l_val->name = *$1;
@@ -428,22 +408,16 @@ UnaryExp: PrimaryExp {
         $$ = unary;
 		}
 	}
-	| UMINUS UnaryExp { 
+	| UNARYOP UnaryExp {
 		auto unary = new UnaryExpr();
-    unary->primaryExp = ($1);
-		unary->optype = OpType::UMINUS;//todo
-    $$ = unary;
-	}
-	| UPLUS UnaryExp { 
-		auto unary = new UnaryExpr();
-    unary->primaryExp = ($1);
-		unary->optype = OpType::UPLUS;//todo
-    $$ = unary;
-	}
-	| NOT UnaryExp { 
-		auto unary = new UnaryExpr();
-    unary->primaryExp = ($1);
-		unary->optype = OpType::NOT;//todo
+    unary->unaryExp = $2;
+    if($1 == '+'){
+        unary->opType = OpType::OP_Add;
+    }else if($1 == '-'){
+        unary->opType = OpType::OP_Neg;
+    }else if($1 == '!'){
+		     unary->opType = OpType::OP_Lnot;
+		}
     $$ = unary;
 	};
 
@@ -471,28 +445,20 @@ DExps
 
 MulExp: UnaryExp { 
 		auto mul_exp = new MulExp();
-    mul_exp->UnaryExp = ($1);
+    mul_exp->unaryExp = ($1);
     $$ = mul_exp;
  }
-	| MulExp MUL UnaryExp { 
+	| MulExp BINARYOP UnaryExp {
 		auto mul_exp = new MulExp();
     mul_exp->mulExp = ($1);
-    mul_exp->optype = OpType::MUL;// todo
-    mul_exp->unaryExp = ($3);
-    $$ = mul_exp;
-	}
-	| MulExp DIV UnaryExp { 
-		auto mul_exp = new MulExp();
-    mul_exp->mulExp = ($1);
-    mul_exp->optype = OpType::DIV;// todo
-    mul_exp->unaryExp = ($3);
-    $$ = mul_exp;
-	}
-	| MulExp MOD UnaryExp { 
-		auto mul_exp = new MulExp();
-    mul_exp->mulExp = ($1);
-    mul_exp->optype = OpType::MOD;// todo
-    mul_exp->unaryExp = ($3);
+    if($2 == '*'){
+		    mul_exp->optype = OpType::OP_Mul;
+    }else if($2 == '/'){
+        mul_exp->optype = OpType::OP_Div;
+    }else if($2 == '%'){
+        mul_exp->optype = OpType::OP_Mod;
+    }
+    mul_exp->unaryExp = $3;
     $$ = mul_exp;
 	};
 
@@ -501,71 +467,68 @@ AddExp: MulExp {
     add_exp->mulExp = ($1);
     $$ = add_exp;
  }
-	| AddExp ADD MulExp { 
+	| AddExp UNARYOP MulExp {
 		auto add_exp = new AddExp();
-    add_exp->addExp = ($1);
-    add_exp->type = OpType::ADD;// todo
-    add_exp->mulExp = ($3);
-    $$ = add_exp;
-	}
-	| AddExp SUB MulExp { 
-		auto add_exp = new AddExp();
-    add_exp->addExp = ($1);
-    add_exp->type = OpType::SUB;// todo
-    add_exp->mulExp = ($3);
+    add_exp->addExp = $1;
+    if($2 == '+'){
+        add_exp->optype = OpType::OP_Add;
+    }else if($2 == '-'){
+        add_exp->optype = OpType::OP_Sub;
+    }
+    add_exp->mulExp = $3;
     $$ = add_exp;
 	};
 
 RelExp: AddExp { 
 		auto rel_exp = new CompExp();
-    rel_exp->lhs = ($1);
+    rel_exp->lhs = $1;
     $$ = rel_exp;
  }
 	| RelExp LESS AddExp { 
 		auto rel_exp = new CompExp();
     rel_exp->lhs = ($1);
-		rel_exp->optype = OpType::LESS;// todo
+		rel_exp->optype = OpType::OP_Lt;
 		rel_exp->rhs = $3;
     $$ = rel_exp;	
 	}
 	| RelExp GREAT AddExp { 
 		auto rel_exp = new CompExp();
-    rel_exp->lhs = ($1);
-		rel_exp->optype = OpType::GREAT;// todo
+    rel_exp->lhs = $1;
+		rel_exp->optype = OpType::OP_Gt;
 		rel_exp->rhs = $3;
     $$ = rel_exp;	
 	}
 	| RelExp LEQ AddExp { 
 		auto rel_exp = new CompExp();
-    rel_exp->lhs = ($1);
-		rel_exp->optype = OpType::LEQ;// todo
+    rel_exp->lhs = $1;
+		rel_exp->optype = OpType::OP_Le;
 		rel_exp->rhs = $3;
     $$ = rel_exp;	
 	}
 	| RelExp GEQ AddExp { 
 		auto rel_exp = new CompExp();
-    rel_exp->lhs = ($1);
-		rel_exp->optype = OpType::GEQ;// todo
+    rel_exp->lhs = $1;
+		rel_exp->optype = OpType::OP_Ge;
 		rel_exp->rhs = $3;
     $$ = rel_exp;	
 	};
 
 EqExp: RelExp { 
 		auto comp_exp = new CompExp();
-    comp_exp->lhs = ($1);
+    comp_exp->lhs = $1;
     $$ = comp_exp;	
  }
 	| EqExp EQ RelExp { 
 		auto comp_exp = new CompExp();
-    comp_exp->lhs = ($1);
-		comp_exp->optype = OpType::EQ;// todo
+    comp_exp->lhs = $1;
+		comp_exp->optype = OpType::OP_Eq;
 		comp_exp->rhs = $3;
     $$ = comp_exp;	
 	}
 	| EqExp NEQ RelExp { 
 		auto comp_exp = new CompExp();
-    comp_exp->lhs = ($1);
-		comp_exp->optype = OpType::NEQ;// todo
+    comp_exp->lhs = $1;
+		comp_exp->optype = OpType::OP_Ne;
 		comp_exp->rhs = $3;
     $$ = comp_exp;	
 	};
@@ -577,9 +540,9 @@ LAndExp: EqExp {
  }
 	| LAndExp AND EqExp { 
 		auto lg_exp = new LgExp();
-    lg_exp->lhs = ($1);
-    lg_exp->optype = OpType::AND;// todo
-    lg_exp->rhs = ($3);
+    lg_exp->lhs = $1;
+    lg_exp->optype = OpType::OP_Land;
+    lg_exp->rhs = $3;
     $$ = lg_exp;
 	 };
 
@@ -590,9 +553,9 @@ LOrExp: LAndExp {
 }
   | LOrExp OR LAndExp { 
 		auto lg_exp = new LgExp();
-    lg_exp->lhs = ($1);
-    lg_exp->optype = OpType::OR;// todo
-    lg_exp->rhs = ($3);
+    lg_exp->lhs = $1;
+    lg_exp->optype = OpType::OP_Lor;
+    lg_exp->rhs = $3;
     $$ = lg_exp;
 	};
 

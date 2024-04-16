@@ -41,6 +41,17 @@ struct CompUnit : public Node {
     CompUnit() : Node(this_type) { }
 };
 
+/// primitive type
+struct FuncType : public Node {
+    constexpr static NodeType this_type = ND_PrimitiveType;
+    enum Type {
+        VOID = 0,
+        INT = 1,
+    };
+    Type type;
+    FuncType(Type type) : Node(this_type), type(type) {}
+};
+
 /// Expr
 struct Expr : public Node {
     constexpr static NodeType this_type = ND_Expr;
@@ -49,7 +60,7 @@ struct Expr : public Node {
 };
 
 struct LgExp : public Node {
-    constexpr static NodeType this_type = ND_LgExp;
+    constexpr static NodeType this_type = ND_LgExpr;
     NodePtr lhs = nullptr;
     NodePtr rhs = nullptr;
     OpType optype;
@@ -57,7 +68,7 @@ struct LgExp : public Node {
 };
 
 struct CompExp : public Node {
-    constexpr static NodeType this_type = ND_CompExp;
+    constexpr static NodeType this_type = ND_CompExpr;
     NodePtr lhs = nullptr;
     NodePtr rhs = nullptr;
     OpType optype;
@@ -65,7 +76,7 @@ struct CompExp : public Node {
 };
 
 struct AddExp : public Node {
-    constexpr static NodeType this_type = ND_AddExp;
+    constexpr static NodeType this_type = ND_AddExpr;
     NodePtr mulExp = nullptr;
     NodePtr addExp = nullptr;
     OpType optype;
@@ -73,7 +84,7 @@ struct AddExp : public Node {
 };
 
 struct MulExp : public Node {
-    constexpr static NodeType this_type = ND_MulExp;
+    constexpr static NodeType this_type = ND_MulExpr;
     NodePtr mulExp = nullptr;
     NodePtr unaryExp = nullptr;
     OpType optype;
@@ -99,7 +110,7 @@ struct TreeBinaryExpr : public Node {
 
 struct UnaryExpr : public Node {
     constexpr static NodeType this_type = ND_UnaryExpr;
-    OpType optype;
+    OpType opType;
     NodePtr primaryExp = nullptr;
     NodePtr unaryExp = nullptr;
     std::vector<NodePtr> params;
@@ -114,35 +125,7 @@ struct IntegerLiteral : public Node {
     IntegerLiteral(int64_t value) : Node(this_type), value(value) {}
 };
 
-//// add func/var/array call
-//struct TreeArrayCall : public Node {
-//    constexpr static NodeType this_type = ND_ArrayCall;
-//    std::string name = "";
-//    // type is int
-//    std::vector<int> positions;// array
-//    TreeArrayCall(std::string &name, std::vector<int> &positions)
-//        : Node(this_type), name(name), positions(positions) {
-//    }
-//};
 
-//struct TreeVarCall : public Node {
-//    constexpr static NodeType this_type = ND_VarCall;
-//    std::string name = "";
-//    // type is int
-//    TreeVarCall(std::string &name)
-//        : Node(this_type), name(name) {
-//    }
-//};
-
-//struct TreeFunCall : public Node {
-//    constexpr static NodeType this_type = ND_FunCall;
-//    std::string name = "";
-//    std::vector<Node *> argList;
-//    int funReturnType = 0;// 0 is void, 1 is int
-//    TreeFunCall(std::string &name, std::vector<Node *> &argList, int funReturnType)
-//        : Node(this_type), name(name), argList(argList), funReturnType(funReturnType) {
-//    }
-//};
 /// lval
 struct LVal : public Node {
     constexpr static NodeType this_type = ND_LVal;
@@ -150,7 +133,7 @@ struct LVal : public Node {
     bool isArray = false;
     std::vector<int> position; // array
     LVal() : Node(this_type) {}
-}
+};
 /// statement
 struct IfStmt : public Node {
     constexpr static NodeType this_type = ND_IfStmt;
@@ -232,10 +215,7 @@ struct VarDef : public Node {
 struct FuncDef : public Node {
     constexpr static NodeType this_type = ND_FuncDef;
     std::string name = "";
-    enum funcReturnType{
-        VOID = 0, INT = 1
-    };
-    funcReturnType ReturnType = funcReturnType::VOID;
+    NodePtr ReturnType = nullptr;
     std::vector<NodePtr> argList;// var , array
     NodePtr block = nullptr;
     FuncDef() : Node(this_type) { }

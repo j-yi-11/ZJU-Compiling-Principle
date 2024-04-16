@@ -11,22 +11,18 @@
 digit [1-9][0-9]*|0
 blank [ \t\n]
 identifier [a-zA-Z_][a-zA-Z0-9_]*
-// calculation
-binary_operator [*/%]
+
+binary_operator [\*/%]
 unary_operator [!+-]
 %%
 
-{digit}         { yylval.ival = atoi(yytext); return CONSTINT; }
-"+"             { return ADD; }
+{digit}           { yylval.ival = atoi(yytext); return CONSTINT; }
+{unary_operator}  { yylval.ival = (int)yytext[0]; return UNARYOP; }
+{binary_operator} { yylval.ival = (int)yytext[0]; return BINARYOP; }
 "+="            { return ADDEQ; }
-"-"             { return SUB; }
-
 "-="            { return SUBEQ; }
-"*"             { return MUL; }
 "*="            { return MULEQ; }
-"/"             { return DIV; }
 "/="            { return DIVEQ; }
-"%"             { return MOD; }
 "%="            { return MODEQ; }
 "="             { return ASSIGN; }
 "=="            { return EQ; }
@@ -35,7 +31,6 @@ unary_operator [!+-]
 "<="            { return LEQ; }
 ">"             { return GREAT; }
 "<"             { return LESS; }
-"!"             { return NOT; }
 "&&"            { return AND; }
 "||"            { return OR; }
 
@@ -52,8 +47,7 @@ unary_operator [!+-]
 "int"			{ return INT; }
 "void"			{ return VOID; }
 
-","             { return COMMA; }
-":"             { return COLON; }
+","       { return COMMA; }
 ";"				{ return SEMI; }
 "("				{ return LPAREN; }
 ")"				{ return RPAREN; }
@@ -65,9 +59,9 @@ unary_operator [!+-]
 "/*"[^*]*[*]+([^*/][^*]*[*]+)*"/"           { ; }
 "//".*	        { ; }
 {identifier}        { 
-                         yylval.sVal = new std::string(yytext, yyleng);
+                         yylval.sval = new std::string(yytext, yyleng);
                          return IDENTIFIER; 
-				} 
+										}
 {blank}         { }
 .               { printf("ERROR(%s)\n", yytext); }
 
