@@ -66,12 +66,15 @@ return语句的返回类型与函数定义的返回类型不匹配
 
 
 */
+using funcSymbolPtr = struct funcSymbol*;
+using funcSymbolTablePtr = struct funcSymbolTable*;
+using varSymbolTypePtr = struct varSymbolType*;
 
 struct funcSymbol {
     enum Type{
         INT, VOID
     } returnType;
-    std::vector<varSymbolType> arglist;
+    std::vector<varSymbolTypePtr> arglist;
     std::string name = "";
     funcSymbol(){}
 };
@@ -79,11 +82,8 @@ struct funcSymbolTable {
     std::vector<funcSymbolPtr> funcTable;
     funcSymbolTable(){}
 };
-using funcSymbolPtr = struct funcSymbol*;
-using funcSymbolTablePtr = struct funcSymbolTable*;
-using varSymbolTypePtr = struct varSymbolType*;
-
 struct varSymbolType {
+    std::string name = "";
     // only int
     bool isArray = false;
     std::vector<int> dimension;

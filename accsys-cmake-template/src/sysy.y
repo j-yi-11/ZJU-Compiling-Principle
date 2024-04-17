@@ -4,7 +4,6 @@
 #include <ast/ast.h>
 #include <string>
 #include <vector>
-#include <map>
 void yyerror(const char *s);
 extern int yylex(void);
 extern NodePtr root;
@@ -53,30 +52,30 @@ CompUnit : CompUnits {
                 for(auto a : *$1) 
                         comp_unit->all.emplace_back(a);
                 root = comp_unit;
-                printf("root is initialized\n");
+                //printf("root is initialized\n");
         };
 CompUnits: //{}|
         CompUnits Decl {
                 $1->emplace_back($2);
                 $$ = $1;
-                printf("CompUnits Decl\n");
+                // printf("CompUnits Decl\n");
         }
         | CompUnits FuncDef { 
                 $1->emplace_back($2);
                 $$ = $1;
-                printf("CompUnits FuncDef\n");
+                // printf("CompUnits FuncDef\n");
         }
         | Decl {
                 auto decl_units = new std::vector<NodePtr>;
                 decl_units->emplace_back($1);
                 $$ = decl_units;
-                printf("Decl\n");
+                // printf("Decl\n");
         }
         | FuncDef {
                 auto funcdef_units = new std::vector<NodePtr>;
                 funcdef_units->emplace_back($1);
                 $$ = funcdef_units;
-                printf("FuncDef\n");
+                // printf("FuncDef\n");
         }
         ;
 Decl : VarDecl {
@@ -155,7 +154,7 @@ InitVal : Exp {
 // int f(int a, int b[]){...}
 // FuncType
 FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
-		printf("int FuncDef\n");
+		// ("int FuncDef\n");
     auto funcdef_unit = new FuncDef();
     funcdef_unit->ReturnType = FuncDef::Type::INT;
     funcdef_unit->name = *($2);
@@ -168,7 +167,7 @@ FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
     $$ = funcdef_unit;
   }
   | VOID IDENTIFIER LPAREN FuncFParams RPAREN Block {
-  printf("void FuncDef\n");
+  // printf("void FuncDef\n");
 		auto funcdef_unit = new FuncDef();
 		funcdef_unit->ReturnType = FuncDef::Type::VOID;
 		funcdef_unit->name = *($2);
@@ -198,7 +197,7 @@ FuncFParams
   }
   | {
     $$ = nullptr;
-    printf("FuncFParams is void\n");
+    // printf("FuncFParams is void\n");
   }
   ;
 DFuncFParams
@@ -244,12 +243,12 @@ Block: LBRACE BlockItems RBRACE
     auto block = new Block();
     if($2 == nullptr){
 		    $$ = block;
-		    printf("Block is empty\n");
+		    // printf("Block is empty\n");
     }else{
         for(auto i: *$2){
             block->BlockItems.emplace_back(i);
         }
-        printf("BlockItem.size = %d\n", block->BlockItems.size());
+        // printf("BlockItem.size = %d\n", block->BlockItems.size());
         $$ = block;
     }
   }

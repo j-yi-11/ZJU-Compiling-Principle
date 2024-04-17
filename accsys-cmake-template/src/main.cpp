@@ -1,6 +1,6 @@
 #include "ast/ast.h"
 #include "semantic/semantic.h"
-
+#include <cstdio>
 #include <fmt/core.h>
 
 extern int yyparse();
@@ -19,11 +19,13 @@ int main(int argc, char **argv) {
         fmt::print("res: {}\n", res);
         return 1;
     }
+    bool printAST = false;
     if(root == nullptr){
         fmt::print("root is nullptr\n");
     }else{
         fmt::print("root is not nullptr\n");
-        print_expr((root));
+        if(printAST)
+            print_expr((root));
     }
     // semantic anaylsis
     funcSymbolTablePtr funTablePtr = GenerateFuncSymTable(root);
