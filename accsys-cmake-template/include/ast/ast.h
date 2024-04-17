@@ -256,3 +256,8 @@ struct BlockItem : public Node {
 };
 /// A possible helper function dipatch based on the type of `NodePtr`
 void print_expr(NodePtr exp, std::string prefix = "", std::string ident = "");
+
+/// A possible helper function to print the AST
+void print_vector_data(std::vector<NodePtr> &vec, std::string &prefix, std::string &ident);
+
+void print_vector_data(std::vector<int> &vec, std::string &prefix, std::string &ident);
