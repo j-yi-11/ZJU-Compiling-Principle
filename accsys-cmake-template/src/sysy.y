@@ -218,11 +218,11 @@ FuncFParam
     para->name = *($2);
     $$ = para;
   }
-  | INT IDENTIFIER LBRACKET RBRACKET Dimensions_funcdef {
+  | INT IDENTIFIER Dimensions_funcdef { // LBRACKET RBRACKET
     auto para = new FuncFParam();
     para->name = *($2);
     para->isArray = true;
-    para->dimensions = *$5;
+    para->dimensions = *$3;
     $$ = para;    
   };
 Dimensions_funcdef 
