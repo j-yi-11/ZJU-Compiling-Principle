@@ -4,9 +4,14 @@
 #include <ast/ast.h>
 #include <string>
 #include <vector>
+#include <map>
 void yyerror(const char *s);
 extern int yylex(void);
 extern NodePtr root;
+
+
+
+
 %}
 
 /// types

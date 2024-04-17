@@ -1,4 +1,5 @@
 #include "ast/ast.h"
+#include "semantic/semantic.h"
 
 #include <fmt/core.h>
 
@@ -20,5 +21,7 @@ int main(int argc, char **argv) {
         fmt::print("root is not nullptr\n");
         print_expr((root));
     }
+    // semantic anaylsis
+    funcSymbolTablePtr funTablePtr = GenerateFuncSymTable(root);
     return 0;
 }
