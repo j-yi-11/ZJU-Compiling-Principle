@@ -19,12 +19,12 @@ void print_vector_data(std::vector<NodePtr> &vec, std::string &prefix, std::stri
     }
 }
 
-void print_vector_data(std::vector<int> &vec, std::string &prefix, std::string &ident) {
-    for (int i = 0; i < vec.size(); i++) {
-        bool is_last = i == vec.size() - 1;
-        print_expr(vec[i], prefix + (is_last ? "\n└─ " : "\n├─ "), ident + " ");
-    }
-}
+//void print_vector_data(std::vector<int> &vec, std::string &prefix, std::string &ident) {
+//    for (int i = 0; i < vec.size(); i++) {
+//        bool is_last = i == vec.size() - 1;
+//        print_expr(vec[i], prefix + (is_last ? "\n└─ " : "\n├─ "), ident + " ");
+//    }
+//}
 
 void print_expr(NodePtr exp, std::string prefix, std::string ident) {
     bool debug = false;
