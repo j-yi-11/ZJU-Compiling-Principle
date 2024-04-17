@@ -23,7 +23,7 @@ extern NodePtr root;
 %token <sval> IDENTIFIER
 %token <opVal> AND OR NOT
 %token <opVal> NEQ EQ GEQ LEQ GREAT LESS
-%type <nodeVal> FuncDef FuncType Block Stmt  Exp UnaryExp PrimaryExp Number AddExp MulExp
+%type <nodeVal> FuncDef Block Stmt  Exp UnaryExp PrimaryExp Number AddExp MulExp
 %type <nodeVal> LOrExp LAndExp EqExp RelExp
 %type <nodeVal> Decl BlockItem LVal
 %type <nodeVal> VarDecl InitVal VarDef
@@ -50,8 +50,8 @@ CompUnit : CompUnits {
                 root = comp_unit;
                 printf("root is initialized\n");
         };
-CompUnits: {}
-        | CompUnits Decl { 
+CompUnits: //{}|
+        CompUnits Decl {
                 $1->emplace_back($2);
                 $$ = $1;
                 printf("CompUnits Decl\n");

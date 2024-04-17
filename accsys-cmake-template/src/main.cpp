@@ -13,7 +13,11 @@ int main(int argc, char **argv) {
         return 1;
     }
     int res = yyparse();
-    fmt::print("res: {}\n", res);
+    if(res != 0){
+        fmt::print("parse failed\n");
+        fmt::print("res: {}\n", res);
+        return 1;
+    }
     if(root == nullptr){
         fmt::print("root is nullptr\n");
     }else{
