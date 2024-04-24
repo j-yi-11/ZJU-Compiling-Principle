@@ -1,0 +1,7 @@
+void f(){return;}
+int g(){return 1;}
+int main() {
+  f();
+  int a = g();
+  return 0;
+}

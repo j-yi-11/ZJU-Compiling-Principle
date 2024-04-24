@@ -261,8 +261,47 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
         if(debug){
             fmt::print("encounter ExpStmt\n");
         }
-        bool shouldReturnInt = true;
-        if(checkExp(expstmt->Exp, currentTable, funcTable)==false){//, shouldReturnInt
+        // only in this part can use void f(): f();
+        // expstmt->Exp->LgExp->
+        bool callVoidFunc = false;
+//        auto *unaryexp;
+        if(auto *exp = expstmt->Exp->as<Expr*>()){
+            if(auto *lgexp = exp->LgExp->as<LgExp*>()){
+                if(lgexp->rhs== nullptr && lgexp->lhs != nullptr){
+                    if(auto *lglgexp = lgexp->lhs->as<LgExp*>()) {
+                        if(lglgexp->rhs == nullptr && lglgexp->lhs != nullptr) {
+                            if(auto *compexp = lglgexp->lhs->as<CompExp*>()){
+                                if(compexp->rhs == nullptr && compexp->lhs != nullptr) {
+                                    if(auto *compcompexp = compexp->lhs->as<CompExp*>()){
+                                        if(compcompexp->rhs== nullptr && compcompexp->lhs != nullptr){
+                                            if(auto *addexp = compcompexp->lhs->as<AddExp*>()){
+                                                if(addexp->addExp == nullptr && addexp->mulExp != nullptr){
+                                                    if(auto *mulexp = addexp->mulExp->as<MulExp*>()){
+                                                        if(mulexp->mulExp == nullptr && mulexp->unaryExp != nullptr){
+                                                            if(auto *unaryexp = mulexp->unaryExp->as<UnaryExpr*>()){
+                                                                if(unaryexp->unaryExp == nullptr && unaryexp->primaryExp == nullptr && unaryexp->name != ""){
+                                                                    fmt::print("success\n");
+                                                                    callVoidFunc = true;
+                                                                    checkFuncCall(unaryexp,currentTable,funcTable,false);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+//        if(callVoidFunc){
+//            checkFuncCall(expstmt->Exp,currentTable,funcTable,false);
+//        }
+        if(!callVoidFunc && checkExp(expstmt->Exp, currentTable, funcTable)==false){
             fmt::print("expression statement has invalid expression\n");
             exit(1);
         }
@@ -304,7 +343,7 @@ bool checkExp(NodePtr exp, symbolTablePtr currentTable,
     if(exp == nullptr)  return true;
     // TODO : implement this function
     fmt::print("encounter checkExp\n");
-    bool debug = true;
+    bool debug = false;
     if(auto* expr = exp->as<Expr*>()){
         if(debug)
             fmt::print("[checkExp]: expr\n");
@@ -507,7 +546,7 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
         params = unaryexp->params;
     }
     if(name == ""){
-        fmt::print("[checkFuncCall]:: function call name is empty\n");
+        fmt::print("[checkFuncCall]: function call name is empty\n");
         return false;// todo
     }
     // find func by name
@@ -547,5 +586,6 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
             return false;
         }
     }
+    fmt::print("[checkFuncCall]: func Call valid\n");
     return true;
 }

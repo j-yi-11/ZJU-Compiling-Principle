@@ -232,60 +232,56 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         fmt::print(ident);
         return;
     }
-    // vardecl
-    if (auto *stmt = exp->as<VarDecl *>()) {
+    if (auto *vardecl = exp->as<VarDecl *>()) {
         fmt::print("VarDecl\n");
         // vardefs ==> print if not null
-        for (auto &vardef : stmt->VarDefs) {
+        for (auto &vardef : vardecl->VarDefs) {
             printAST(vardef, ident + "└─ ", ident);
         }
         fmt::print(ident);
         return;
     }
     // vardef
-    if (auto *stmt = exp->as<VarDef *>()) {
+    if (auto *vardef = exp->as<VarDef *>()) {
         fmt::print("VarDef");
         // name initialValue dimension ==> print if not null
-        fmt::print(" {} ", stmt->name);
-        if (stmt->initialValue != nullptr) {
-            printAST(stmt->initialValue, ident + "└─ ", ident);
+        fmt::print(" {} ", vardef->name);
+        if (vardef->initialValue != nullptr) {
+            printAST(vardef->initialValue, ident + "└─ ", ident);
         }
-        for (auto &dim : stmt->dimensions) {
-            fmt::print("{}\n", dim);
+        for (auto &dim : vardef->dimensions) {
+            fmt::print(" {} ", dim);
         }
         fmt::print(ident);
         return;
     }
-    // func def
-    if (auto *stmt = exp->as<FuncDef *>()) {
+    if (auto *funcdef = exp->as<FuncDef *>()) {
         fmt::print("FuncDef ");
         // return type
-        if (stmt->ReturnType == FuncDef::Type::INT) {
+        if (funcdef->ReturnType == FuncDef::Type::INT) {
             fmt::print("int ");
         } else {
             fmt::print("void ");
         }
         // name arglist block  ==> print if not null
-        fmt::print("{}", stmt->name);
-        if (stmt->argList.size() > 0) {
-            fmt::print(" size {}\n", stmt->argList.size());
-            for (auto &arg : stmt->argList) {
+        fmt::print("{}", funcdef->name);
+        if (funcdef->argList.size() > 0) {
+            fmt::print(" size {}\n", funcdef->argList.size());
+            for (auto &arg : funcdef->argList) {
                 printAST(arg, ident + "└─ ", ident + "   ");
             }
         } else {
             fmt::print(" void ");
         }
-        if (stmt->block != nullptr) {
-            printAST(stmt->block, ident + "└─ ", ident);
+        if (funcdef->block != nullptr) {
+            printAST(funcdef->block, ident + "└─ ", ident);
         }
         fmt::print(ident);
         return;
     }
-    // Func FParam
     if (auto *funcfparam = exp->as<FuncFParam *>()) {
         fmt::print("FuncFParam ");
-        // name isArray dimension ==> print if not null
-        fmt::print("{} ", funcfparam->name);
+        fmt::print("name is {} ", funcfparam->name);
         if (funcfparam->isArray) {
             fmt::print("dimension ");
             for (auto &dim : funcfparam->dimensions) {
@@ -295,20 +291,16 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         fmt::print(ident);
         return;
     }
-    //block
     if (auto *block = exp->as<Block *>()) {
         fmt::print("Block ");
-        // blockitems ==> print if not null
         for (auto &blockitem : block->BlockItems) {
             printAST(blockitem, ident + "└─ ", ident);
         }
         fmt::print(ident);
         return;
     }
-    // block item
     if (auto *blockitem = exp->as<BlockItem *>()) {
         fmt::print("BlockItem ");
-        // decl stmt ==> print if not null
         if (blockitem->Decl != nullptr) {
             printAST(blockitem->Decl, ident + "└─ ", ident);
         }
