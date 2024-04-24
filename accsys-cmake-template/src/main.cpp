@@ -19,15 +19,18 @@ int main(int argc, char **argv) {
         fmt::print("res: {}\n", res);
         return 1;
     }
-    bool printAST = false;
+    bool printAST_flag = false;
     if(root == nullptr){
         fmt::print("root is nullptr\n");
     }else{
         fmt::print("root is not nullptr\n");
-        if(printAST)
-            print_expr((root));
+        if(printAST_flag)
+            printAST((root));
     }
     // semantic anaylsis
     funcSymbolTablePtr funTablePtr = GenerateFuncSymTable(root);
+
+    symbolTablePtr rootTablePtr = new SymbolTable();
+    GenerateVarSymTable(root, rootTablePtr, funTablePtr,"");
     return 0;
 }

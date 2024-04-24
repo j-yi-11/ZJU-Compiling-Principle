@@ -99,20 +99,12 @@ struct PrimaryExpr : public Node {
     PrimaryExpr() : Node(this_type) {}
 };
 
-struct TreeBinaryExpr : public Node {
-    constexpr static NodeType this_type = ND_BinaryExpr;
-    OpType op;
-    NodePtr lhs, rhs;
-    TreeBinaryExpr(OpType op, NodePtr lhs, NodePtr rhs)
-        : Node(this_type), op(op), lhs(lhs), rhs(rhs) {
-    }
-};
-
 struct UnaryExpr : public Node {
     constexpr static NodeType this_type = ND_UnaryExpr;
     OpType opType;
     NodePtr primaryExp = nullptr;
     NodePtr unaryExp = nullptr;
+    bool isFunCall = false;
     std::vector<NodePtr> params;
     std::string name = "";
     UnaryExpr() : Node(this_type) { }
@@ -255,7 +247,7 @@ struct BlockItem : public Node {
     BlockItem() : Node(this_type) {}
 };
 /// A possible helper function dipatch based on the type of `NodePtr`
-void print_expr(NodePtr exp, std::string prefix = "", std::string ident = "");
+void printAST(NodePtr exp, std::string prefix = "", std::string ident = "");
 
 /// A possible helper function to print the AST
 void print_vector_data(std::vector<NodePtr> &vec, std::string &prefix, std::string &ident);

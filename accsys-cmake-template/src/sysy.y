@@ -291,15 +291,15 @@ Stmt:
 Matched:
 		LVal ASSIGN Exp SEMI {
 		    auto stmt = new AssignStmt();
-		    stmt->LVal = ($1);
+		    stmt->LVal = $1;
 		    stmt->matched = true;
-		    stmt->Exp = ($3);
+		    stmt->Exp = $3;
 		    $$ = stmt;
 		}
 		| Exp SEMI {
 		    auto stmt = new ExpStmt();
 		    stmt->matched = true;
-		    stmt->Exp = ($1);
+		    stmt->Exp = $1;
 		    $$ = stmt;
 		}
 		| SEMI { // include " ;"
@@ -309,13 +309,11 @@ Matched:
 		}
 		| Block {
 		    auto stmt = new BlockStmt();
-		    stmt->Block = ($1);
+		    stmt->Block = $1;
 		    stmt->matched = true;
 		    $$ = stmt;
 		 }
 		| IF LPAREN Exp RPAREN Matched ELSE Matched {
-		    //dynamic_cast<IfStmt*>($5)->matched = true;
-		    //dynamic_cast<IfStmt*>($7)->matched = true;
 		    auto stmt = new IfStmt();
 		    stmt->condition = ($3);
 		    stmt->matched = true;
@@ -429,6 +427,7 @@ UnaryExp: PrimaryExp {
 	| IDENTIFIER LPAREN FuncRParams RPAREN { 
 		auto unary = new UnaryExpr();
 		unary->name = *$1;
+		unary->isFunCall = true;
 		if($3 == nullptr)
 			$$ = unary;
 		else{

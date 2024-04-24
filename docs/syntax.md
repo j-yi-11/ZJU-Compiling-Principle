@@ -201,7 +201,7 @@ int main(){
         void print_stmt(struct Stmt *stmt) {
             switch (stmt->kind) {
                 case STMT_EXPR:
-                    print_expr(stmt->expr);
+                    printAST(stmt->expr);
                     break;
                 case STMT_IF:
                     print_if_stmt(stmt->if_stmt);
@@ -321,7 +321,7 @@ int main(){
         ```rust
         fn print_node(node: &Node) {
             match node {
-                Node::Expr(expr) => print_expr(expr),
+                Node::Expr(expr) => printAST(expr),
                 Node::IfStmt(if_stmt) => print_if_stmt(if_stmt),
                 Node::WhileStmt(while_stmt) => print_while_stmt(while_stmt),
                 Node::ReturnStmt(return_stmt) => print_return_stmt(return_stmt),

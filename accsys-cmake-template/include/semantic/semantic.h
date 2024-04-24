@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include "ast/ast.h"
 /*
 Part 1
 变量在使用时未经定义
@@ -69,7 +69,7 @@ return语句的返回类型与函数定义的返回类型不匹配
 using funcSymbolPtr = struct funcSymbol*;
 using funcSymbolTablePtr = struct funcSymbolTable*;
 using varSymbolTypePtr = struct varSymbolType*;
-
+using symbolTablePtr = struct SymbolTable*;
 struct funcSymbol {
     enum Type{
         INT, VOID
@@ -92,9 +92,33 @@ struct varSymbolType {
 struct SymbolTable {
     struct SymbolTable * highLevelTable = nullptr;
     //std::vector<std::map<std::string, funcSymbolType>> funcTable;
-    std::vector<std::map<std::string, varSymbolType>> varTable;
+    std::map<std::string, varSymbolTypePtr> varTable;
     SymbolTable(){}
 };
 
-
+/// generate func symbol table
 funcSymbolTablePtr GenerateFuncSymTable(NodePtr root);
+
+/// find return type from func table according to funcName
+funcSymbol::Type findFuncReturnType(funcSymbolTablePtr TablePtr, std::string funcName);
+
+/// traverse the AST to get var symbol table
+void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable, funcSymbolTablePtr funcTable, std::string funcName);
+
+/// checkExp valid or not(between int)
+bool checkExp(NodePtr exp, symbolTablePtr currentTable, funcSymbolTablePtr funcTablePtr);//, bool shouldReturnInt
+
+/// check Lval valid or not
+bool checkLval(NodePtr exp, symbolTablePtr currentTable, funcSymbolTablePtr funcTablePtr);
+
+/// find varSymbolType from currentTable according to name
+varSymbolTypePtr findVarByName(symbolTablePtr currentTable, std::string name);
+
+/// find var by name to check redefine
+bool findVarRedefineByName(symbolTablePtr currentTable, std::string name);
+
+/// check func call valid or not
+bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable, funcSymbolTablePtr funcTablePtr, bool shouldReturnInt);
+
+/// find function by name
+funcSymbolPtr findFuncByName(funcSymbolTablePtr currentTable, std::string name);
