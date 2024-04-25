@@ -38,8 +38,8 @@ extern NodePtr root;
 %type <iVecVal> Dimensions Dimensions_funcdef Dimensions_lval
 
 
-%token  ASSIGN ADDEQ SUBEQ MULEQ DIVEQ MODEQ
-        IF ELSE FOR WHILE SWITCH CASE DEFAULT CONTINUE BREAK
+%token  ASSIGN
+        IF ELSE WHILE CONTINUE BREAK
         RETURN INT VOID
         COMMA SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 

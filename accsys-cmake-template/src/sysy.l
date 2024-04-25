@@ -19,11 +19,7 @@ unary_operator [!+-]
 {digit}           { yylval.ival = atoi(yytext); return CONSTINT; }
 {unary_operator}  { yylval.ival = (int)yytext[0]; return UNARYOP; }
 {binary_operator} { yylval.ival = (int)yytext[0]; return BINARYOP; }
-"+="            { return ADDEQ; }
-"-="            { return SUBEQ; }
-"*="            { return MULEQ; }
-"/="            { return DIVEQ; }
-"%="            { return MODEQ; }
+
 "="             { return ASSIGN; }
 "=="            { return EQ; }
 "!="            { return NEQ; }
@@ -36,11 +32,7 @@ unary_operator [!+-]
 
 "if"			{ return IF; }
 "else"			{ return ELSE; }
-"for"			{ return FOR; }
 "while"			{ return WHILE; }
-"switch"		{ return SWITCH; }
-"case"			{ return CASE; }
-"default"		{ return DEFAULT; }
 "continue"		{ return CONTINUE; }
 "return"		{ return RETURN; }
 "break"			{ return BREAK; }
@@ -63,6 +55,6 @@ unary_operator [!+-]
                          return IDENTIFIER; 
 										}
 {blank}         { }
-.               { printf("ERROR(%s)\n", yytext); }
+.               { /*printf("ERROR(%s)\n", yytext);*/ }
 
 %%

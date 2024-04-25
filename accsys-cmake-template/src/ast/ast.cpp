@@ -12,302 +12,257 @@ static std::string op_str(OpType op_type) {
         return "<unknown>";
     }
 }
-void print_vector_data(std::vector<NodePtr> &vec, std::string &prefix, std::string &ident) {
-    for (size_t i = 0; i < vec.size(); i++) {
-        bool is_last = i == vec.size() - 1;
-        printAST(vec[i], prefix + (is_last ? "\n└─ " : "\n├─ "), ident + " ");
-    }
-}
+
 
 void printAST(NodePtr exp, std::string prefix, std::string ident) {
     bool debug = false;
-    if(debug)
-        fmt::print("printAST called\n");
-    if(exp==nullptr){
-        return;
-    }
-    if(debug){
-        fmt::print("Address of exp: {0}\n", (void*) exp);
-        fmt::print("length of prefix: {0}\n", prefix.length());
-        fmt::print("length of ident: {0}\n", ident.length());
-    }
-    fmt::print(prefix);
+    if(debug) fmt::print("printAST called\n");
+    if(exp==nullptr) return;
+//    fmt::print(prefix);
     // print the expression type according to ast.h defines
     // comp unit
     if (auto *comp_unit = exp->as<CompUnit *>()) {
+        fmt::print(prefix);
         fmt::print("CompUnit\n");
-        // all ==> print if not null
-        //print_vector_data(comp_unit->all, prefix, ident);
         for (size_t i = 0; i < comp_unit->all.size(); i++) {
-            bool is_last = i == comp_unit->all.size() - 1;
-            printAST(comp_unit->all[i], prefix + (is_last ? "\n└─ " : "\n├─ "), ident + " ");
+            printAST(comp_unit->all[i], " ", "");
         }
-        fmt::print(ident);
         return;
     }
-    // exp
     if (auto *expr = exp->as<Expr *>()) {
-        //fmt::print("Expr\n");
-        //printAST(expr->LgExp, ident + "└─ ", ident + "   ");
+//        fmt::print(prefix);
         printAST(expr->LgExp, prefix, ident);
-        fmt::print(ident);
+//        fmt::print(ident);
         return;
     }
     // lg_exp
     if (auto *lg_exp = exp->as<LgExp *>()) {
+        fmt::print(prefix);
         fmt::print("LgExp \"{}\"\n", op_str(lg_exp->optype));
-        printAST(lg_exp->lhs, ident + "├─ ", ident + "   ");
-        printAST(lg_exp->rhs, ident + "└─ ", ident + "   ");
-        fmt::print(ident);
+        if(lg_exp->rhs == nullptr){
+            printAST(lg_exp->lhs, prefix, ident);
+        }else{
+            printAST(lg_exp->lhs, prefix+" ", ident);
+            printAST(lg_exp->rhs, prefix+" ", ident);
+        }
         return;
     }
     // comp_exp
     if (auto *comp_exp = exp->as<CompExp *>()) {
+        fmt::print(prefix);
         fmt::print("CompExp \"{}\"\n", op_str(comp_exp->optype));
-        printAST(comp_exp->lhs, ident + "├─ ", ident);
-        printAST(comp_exp->rhs, ident + "└─ ", ident);
-        fmt::print(ident);
+        if(comp_exp->rhs == nullptr){
+            printAST(comp_exp->lhs, prefix, ident);
+        }else{
+            printAST(comp_exp->lhs, prefix+" ", ident);
+            printAST(comp_exp->rhs, prefix+" ", ident);
+        }
         return;
     }
     // add_exp
     if (auto *add_exp = exp->as<AddExp *>()) {
+        fmt::print(prefix);
         fmt::print("AddExp \"{}\"\n", op_str(add_exp->optype));
-        printAST(add_exp->addExp, ident + "├─ ", ident);
-        printAST(add_exp->mulExp, ident + "└─ ", ident);
-        fmt::print(ident);
+        printAST(add_exp->addExp, prefix+" ", ident);
+        printAST(add_exp->mulExp, prefix+" ", ident);
+//        fmt::print(ident);
         return;
     }
     // mul_exp
     if (auto *mul_exp = exp->as<MulExp *>()) {
+        fmt::print(prefix);
         fmt::print("MulExp \"{}\"\n", op_str(mul_exp->optype));
-        printAST(mul_exp->mulExp, ident + "├─ ", ident);
-        printAST(mul_exp->unaryExp, ident + "└─ ", ident);
-        fmt::print(ident);
+        printAST(mul_exp->mulExp, prefix+" ", ident);
+        printAST(mul_exp->unaryExp, prefix+" ", ident);
+//        fmt::print(ident);
         return;
     }
     // primary_exp
     if (auto *primary_exp = exp->as<PrimaryExpr *>()) {
+        fmt::print(prefix);
         fmt::print("PrimaryExpr\n");
-        // exp lval number ==> select the not null one to print
         if (primary_exp->Exp != nullptr) {
-            printAST(primary_exp->Exp, ident + "└─ ", ident);
+            printAST(primary_exp->Exp, prefix+" ", ident);
         } else if (primary_exp->LVal != nullptr) {
-            printAST(primary_exp->LVal, ident + "└─ ", ident);
+            printAST(primary_exp->LVal, prefix+" ", ident);
         } else if (primary_exp->Number != nullptr) {
-            printAST(primary_exp->Number, ident + "└─ ", ident);
+            printAST(primary_exp->Number, prefix+" ", ident);
         }
-        fmt::print(ident);
+//        fmt::print(ident);
         return;
     }
-    // unary_exp
     if (auto *unary_exp = exp->as<UnaryExpr *>()) {
+        fmt::print(prefix);
         fmt::print("UnaryExpr \"{}\"\n", op_str(unary_exp->opType));
-        // primary_exp unary_exp params ==> select those not null to print
         if (unary_exp->primaryExp != nullptr) {
-            printAST(unary_exp->primaryExp, ident + "└─ ", ident);
+            printAST(unary_exp->primaryExp, prefix+" ", ident);
         } else if (unary_exp->unaryExp != nullptr) {
-            printAST(unary_exp->unaryExp, ident + "└─ ", ident);
+            printAST(unary_exp->unaryExp, prefix+" ", ident);
         } else {
-            // params and name(for func call)
+            fmt::print(prefix+" "+"{}\n", unary_exp->name);
             for (auto &param : unary_exp->params) {
-                printAST(param, ident + "└─ ", ident);
+                printAST(param, prefix+" ", ident);
             }
-            fmt::print("{}\n", unary_exp->name);
         }
-        fmt::print(ident);
+//        fmt::print(ident);
         return;
     }
     // integer literal
     if (auto *lit = exp->as<IntegerLiteral *>()) {
+        fmt::print(prefix);
         fmt::print("Int {}\n", lit->value);
-        fmt::print(ident);
+//        fmt::print(ident);
         return;
     }
-    // lval  for left value
     if (auto *lval = exp->as<LVal *>()) {
-        fmt::print("LVal \"{}\"\n", lval->name);
+        fmt::print(prefix);
+        fmt::print("LVal: {}", lval->name);
         // array
         if (lval->isArray) {
             // print array out
             for(auto &i : lval->position){
-                fmt::print("{} ", i);
+                fmt::print("[{}]", i);
             }
         }
-        fmt::print(ident);
+        fmt::print("\n");
         return;
     }
-    // if statement
-    if (auto *stmt = exp->as<IfStmt *>()) {
+    if (auto *ifstmt = exp->as<IfStmt *>()) {
+        fmt::print(prefix);
         fmt::print("IfStmt\n");
-        // condition then else ==> print those not null
-        printAST(stmt->condition, ident + "├─ ", ident);
-        printAST(stmt->then, ident + "├─ ", ident);
-        if (stmt->els != nullptr) {
-            printAST(stmt->els, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+        printAST(ifstmt->condition, prefix+" ", ident);
+        printAST(ifstmt->then, prefix+" ", ident);
+        printAST(ifstmt->els, prefix+" ", ident);
         return;
     }
     // while statement
-    if (auto *stmt = exp->as<WhileStmt *>()) {
+    if (auto *whilestmt = exp->as<WhileStmt *>()) {
+        fmt::print(prefix);
         fmt::print("WhileStmt\n");
-        // condition then ==> print those not null
-        printAST(stmt->condition, ident + "├─ ", ident);
-        printAST(stmt->then, ident + "└─ ", ident);
-        fmt::print(ident);
+        printAST(whilestmt->condition, prefix+" ", ident);
+        printAST(whilestmt->then, prefix+" ", ident);
+//        fmt::print(ident);
         return;
     }
-    // break statement
-    if (auto *stmt = exp->as<BreakStmt *>()) {
+    if (auto *breakstmt = exp->as<BreakStmt *>()) {
+        fmt::print(prefix);
         fmt::print("BreakStmt\n");
-        fmt::print(ident);
         return;
     }
-    // continue statement
-    if (auto *stmt = exp->as<ContinueStmt *>()) {
+    if (auto *continuestmt = exp->as<ContinueStmt *>()) {
+        fmt::print(prefix);
         fmt::print("ContinueStmt\n");
-        fmt::print(ident);
         return;
     }
-    // return statement
-    if (auto *stmt = exp->as<ReturnStmt *>()) {
+    if (auto *returnstmt = exp->as<ReturnStmt *>()) {
+        fmt::print(prefix);
         fmt::print("ReturnStmt\n");
-        // result ==> print if not null
-        if (stmt->result != nullptr) {
-            printAST(stmt->result, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+        printAST(returnstmt->result, prefix+" ", ident);
         return;
     }
-    // block statement
-    if (auto *stmt = exp->as<BlockStmt *>()) {
-        fmt::print("BlockStmt\n");
-        // block ==> print if not null
-        if (stmt->Block != nullptr) {
-            printAST(stmt->Block, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+    if (auto *blockstmt = exp->as<BlockStmt *>()) {
+        fmt::print(prefix);
+        printAST(blockstmt->Block, prefix, ident);
         return;
     }
     // exp statement
     if (auto *stmt = exp->as<ExpStmt *>()) {
-        fmt::print("ExpStmt\n");
-        // exp ==> print if not null
-        if (stmt->Exp != nullptr) {
-            printAST(stmt->Exp, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+//        fmt::print(prefix);
+//        fmt::print("ExpStmt\n");
+        printAST(stmt->Exp, prefix, ident);
         return;
     }
     // assign statement
-    if (auto *stmt = exp->as<AssignStmt *>()) {
+    if (auto *assignstmt = exp->as<AssignStmt *>()) {
+        fmt::print(prefix);
         fmt::print("AssignStmt\n");
-        // exp lval ==> print if not null
-        if (stmt->Exp != nullptr) {
-            printAST(stmt->Exp, ident + "├─ ", ident);
-        }
-        if (stmt->LVal != nullptr) {
-            printAST(stmt->LVal, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+        printAST(assignstmt->Exp, prefix+" ", ident);
+        printAST(assignstmt->LVal, prefix+" ", ident);
         return;
     }
-    // initial value
-    if (auto *stmt = exp->as<InitVal *>()) {
-        fmt::print("InitialValue\n");
-        // exp ==> print if not null
-        if (stmt->Exp != nullptr) {
-            printAST(stmt->Exp, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+    if (auto *initialvalue = exp->as<InitVal *>()) {
+        fmt::print(prefix);
+        fmt::print("InitialValue:\n");
+        printAST(initialvalue->Exp, prefix+" ", ident);
         return;
     }
-    // decl
-    if (auto *stmt = exp->as<Decl *>()) {
-        fmt::print("Decl\n");
-        // vardecl ==> print if not null
-        if (stmt->VarDecl != nullptr) {
-            printAST(stmt->VarDecl, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+    if (auto *decl = exp->as<Decl *>()) {
+//        fmt::print(prefix);
+        printAST(decl->VarDecl, prefix, ident);
         return;
     }
     if (auto *vardecl = exp->as<VarDecl *>()) {
-        fmt::print("VarDecl\n");
-        // vardefs ==> print if not null
+        fmt::print(prefix);
+        fmt::print("VarDecl:\n");
         for (auto &vardef : vardecl->VarDefs) {
-            printAST(vardef, ident + "└─ ", ident);
+            printAST(vardef, prefix+" ", ident);
         }
-        fmt::print(ident);
         return;
     }
-    // vardef
     if (auto *vardef = exp->as<VarDef *>()) {
-        fmt::print("VarDef");
-        // name initialValue dimension ==> print if not null
-        fmt::print(" {} ", vardef->name);
-        if (vardef->initialValue != nullptr) {
-            printAST(vardef->initialValue, ident + "└─ ", ident);
-        }
+        fmt::print(prefix);
+//        fmt::print("VarDef");
+        fmt::print("{}\n", vardef->name);
+        printAST(vardef->initialValue, prefix+" ", ident);
         for (auto &dim : vardef->dimensions) {
-            fmt::print(" {} ", dim);
+            fmt::print("[{}]", dim);
         }
-        fmt::print(ident);
         return;
     }
     if (auto *funcdef = exp->as<FuncDef *>()) {
-        fmt::print("FuncDef ");
+        fmt::print(prefix);
+        fmt::print("FuncDef: ");
         // return type
         if (funcdef->ReturnType == FuncDef::Type::INT) {
             fmt::print("int ");
         } else {
             fmt::print("void ");
         }
-        // name arglist block  ==> print if not null
-        fmt::print("{}", funcdef->name);
+        fmt::print("{}\n", funcdef->name);
+        fmt::print(prefix+" "+"FuncFParam: ");
         if (funcdef->argList.size() > 0) {
-            fmt::print(" size {}\n", funcdef->argList.size());
             for (auto &arg : funcdef->argList) {
-                printAST(arg, ident + "└─ ", ident + "   ");
+                // FuncFParam
+                if(auto *funcfparam = arg->as<FuncFParam*>()){
+                    fmt::print(" {} 'int'", funcfparam->name);
+                    if (funcfparam->isArray) {
+                        for (auto &dim : funcfparam->dimensions) {
+                            fmt::print("[{}]", dim);
+                        }
+                    }
+                }
             }
         } else {
-            fmt::print(" void ");
+            fmt::print("void");
         }
-        if (funcdef->block != nullptr) {
-            printAST(funcdef->block, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+        fmt::print("\n");
+        printAST(funcdef->block, prefix+" ", ident);
         return;
     }
     if (auto *funcfparam = exp->as<FuncFParam *>()) {
-        fmt::print("FuncFParam ");
-        fmt::print("name is {} ", funcfparam->name);
+        fmt::print(prefix);
+//        fmt::print("FuncFParam ");
+        fmt::print(" {} int", funcfparam->name);
         if (funcfparam->isArray) {
-            fmt::print("dimension ");
+//            fmt::print("dimension ");
             for (auto &dim : funcfparam->dimensions) {
-                fmt::print("{} ", dim);
+                fmt::print("[{}]", dim);
             }
         }
-        fmt::print(ident);
         return;
     }
     if (auto *block = exp->as<Block *>()) {
-        fmt::print("Block ");
+        fmt::print(prefix);
+        fmt::print("Block\n");
         for (auto &blockitem : block->BlockItems) {
-            printAST(blockitem, ident + "└─ ", ident);
+            printAST(blockitem, prefix, ident);
         }
-        fmt::print(ident);
         return;
     }
     if (auto *blockitem = exp->as<BlockItem *>()) {
-        fmt::print("BlockItem ");
-        if (blockitem->Decl != nullptr) {
-            printAST(blockitem->Decl, ident + "└─ ", ident);
-        }
-        if (blockitem->Stmt != nullptr) {
-            printAST(blockitem->Stmt, ident + "└─ ", ident);
-        }
-        fmt::print(ident);
+//        fmt::print(prefix);
+        printAST(blockitem->Decl, prefix+" ", ident);
+        printAST(blockitem->Stmt, prefix+" ", ident);
         return;
     }
     return;

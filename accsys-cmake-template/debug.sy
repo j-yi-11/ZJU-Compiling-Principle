@@ -1,7 +1,7 @@
 void f(){return;}
-int g(){return 1;}
+int g(int a){return 1;}
 int main() {
   f();
-  int a = g();
+  int a = g(2);
   return 0;
 }
