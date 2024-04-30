@@ -66,20 +66,55 @@ funcSymbolTablePtr GenerateFuncSymTable(NodePtr root)
             }
         }
         funcSymbolPtr symbol = new funcSymbol();
-        // putint
+        // void putint()
         symbol->returnType = funcSymbol::Type::VOID;
         symbol->name = "putint";
         varSymbolTypePtr argPtr = new varSymbolType();
         argPtr->isArray = false;
         symbol->arglist.emplace_back(argPtr);
         tablePtr->funcTable.emplace_back(symbol);
-//        fmt::print("putint added\n");
-        // getint
+        if(debug) fmt::print("putint added\n");
+        // int getint()
         symbol = new funcSymbol();
         symbol->returnType = funcSymbol::Type::INT;
         symbol->name = "getint";
         tablePtr->funcTable.emplace_back(symbol);
-//        fmt::print("getint added\n");
+        if(debug) fmt::print("getint added\n");
+        // void starttime()
+        symbol = new funcSymbol();
+        symbol->returnType = funcSymbol::Type::VOID;
+        symbol->name = "starttime";
+        tablePtr->funcTable.emplace_back(symbol);
+        if(debug) fmt::print("starttime added\n");
+        // void stoptime()
+        symbol = new funcSymbol();
+        symbol->returnType = funcSymbol::Type::VOID;
+        symbol->name = "stoptime";
+        tablePtr->funcTable.emplace_back(symbol);
+        if(debug) fmt::print("stoptime added\n");
+        // int getarray(int[])
+        symbol = new funcSymbol();
+        symbol->returnType = funcSymbol::Type::INT;
+        symbol->name = "getarray";
+        argPtr = new varSymbolType();
+        argPtr->isArray = true;
+        argPtr->dimension.emplace_back(-1);// int[]
+        symbol->arglist.emplace_back(argPtr);
+        tablePtr->funcTable.emplace_back(symbol);
+        if(debug) fmt::print("getarray added\n");
+        // void putarray(int,int[])
+        symbol = new funcSymbol();
+        symbol->returnType = funcSymbol::Type::VOID;
+        symbol->name = "putarray";
+        argPtr = new varSymbolType();
+        argPtr->isArray = false;
+        symbol->arglist.emplace_back(argPtr);
+        argPtr = new varSymbolType();
+        argPtr->isArray = true;
+        argPtr->dimension.emplace_back(-1);// int[]
+        symbol->arglist.emplace_back(argPtr);
+        tablePtr->funcTable.emplace_back(symbol);
+        if(debug) fmt::print("putarray added\n");
     }
     return tablePtr;
 }
@@ -96,7 +131,7 @@ funcSymbol::Type findFuncReturnType(funcSymbolTablePtr TablePtr, std::string fun
 void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
                          funcSymbolTablePtr funcTable, std::string funcName) {
     if(root == nullptr) return;
-    bool debug = true;
+    bool debug = false;
     if(auto *comp_unit = root->as<CompUnit*>()){
         if(debug) fmt::print("comp_unit->all.size(): {}\n", comp_unit->all.size());
         for(size_t i = 0; i < comp_unit->all.size(); i++){
@@ -145,7 +180,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
 //                        if(debug) {
 //                            fmt::print("initial value check");
 //                        }
-                        bool shouldReturnInt = true;
+//                        bool shouldReturnInt = true;
                         if (checkExp(varDef->initialValue, currentTable, funcTable)) {//, shouldReturnInt
                             // valid pass
                         } else {
@@ -190,7 +225,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
                 newTable->varTable.insert(std::make_pair(argPtr->name,argPtr));
             }
         }
-        fmt::print("[FuncDef]: newTable->varTable.size() = {}\n",newTable->varTable.size());
+        if(debug) fmt::print("[FuncDef]: newTable->varTable.size() = {}\n",newTable->varTable.size());
         GenerateVarSymTable(funcdef->block, newTable, funcTable,funcName);
     }
     else if(auto *block = root->as<Block*>()){
@@ -229,7 +264,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
                 fmt::print("return type is int, but return statement has no expression\n");
                 exit(1);
             }
-            bool shouldReturnInt = true;// return int
+//            bool shouldReturnInt = true;// return int
             if(checkExp(returnstmt->result, currentTable, funcTable)==false){//, shouldReturnInt
                 fmt::print("return type is int, but return statement has invalid expression\n");
                 exit(1);
@@ -240,7 +275,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
         if(debug){
             fmt::print("encounter WhileStmt\n");
         }
-        bool shouldReturnInt = true;// while(int)
+//        bool shouldReturnInt = true;// while(int)
         if(checkExp(whilestmt->condition, currentTable, funcTable)==false){//, shouldReturnInt
             fmt::print("while statement has invalid condition expression\n");
             exit(1);
@@ -280,7 +315,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
                                                         if(mulexp->mulExp == nullptr && mulexp->unaryExp != nullptr){
                                                             if(auto *unaryexp = mulexp->unaryExp->as<UnaryExpr*>()){
                                                                 if(unaryexp->unaryExp == nullptr && unaryexp->primaryExp == nullptr && unaryexp->name != ""){
-                                                                    fmt::print("success\n");
+                                                                    fmt::print("void function call within a line\n");
                                                                     callVoidFunc = true;
                                                                     checkFuncCall(unaryexp,currentTable,funcTable,false);
                                                                 }
@@ -310,12 +345,12 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
         if(debug){
             fmt::print("encounter AssignStmt\n");
         }
-        bool shouldReturnInt = true;// a = (int)
+//        bool shouldReturnInt = true;// a = (int)
         if(checkExp(assignstmt->Exp, currentTable, funcTable)==false){//, shouldReturnInt
             fmt::print("assign statement has invalid expression\n");
             exit(1);
         }
-        shouldReturnInt = false;// lval can not be fun call
+//        shouldReturnInt = false;// lval can not be fun call
         if(checkExp(assignstmt->LVal, currentTable, funcTable)==false){//, shouldReturnInt
             fmt::print("assign statement has invalid lvalue\n");
             exit(1);
@@ -325,7 +360,7 @@ void GenerateVarSymTable(NodePtr root, symbolTablePtr currentTable,
         if(debug){
             fmt::print("encounter IfStmt\n");
         }
-        bool shouldReturnInt = true;// if(int)
+//        bool shouldReturnInt = true;// if(int)
         if(checkExp(ifstmt->condition, currentTable, funcTable)==false){//, shouldReturnInt
             fmt::print("if statement has invalid condition expression\n");
             exit(1);
@@ -342,7 +377,7 @@ bool checkExp(NodePtr exp, symbolTablePtr currentTable,
               funcSymbolTablePtr funcTablePtr) {//, bool shouldReturnInt
     if(exp == nullptr)  return true;
     // TODO : implement this function
-    fmt::print("encounter checkExp\n");
+    // fmt::print("encounter checkExp\n");
     bool debug = false;
     if(auto* expr = exp->as<Expr*>()){
         if(debug)
@@ -386,30 +421,29 @@ bool checkExp(NodePtr exp, symbolTablePtr currentTable,
             result = result && checkFuncCall(unaryexp, currentTable, funcTablePtr, shouldReturnInt);
         }
         if(unaryexp->unaryExp != nullptr) {
-            fmt::print("unaryExp\n");
+            if(debug) fmt::print("unaryExp\n");
             result = result && checkExp(unaryexp->unaryExp, currentTable, funcTablePtr);//,shouldReturnInt
         }
         if(unaryexp->primaryExp != nullptr) {
-            fmt::print("primaryExp\n");
+            if(debug) fmt::print("primaryExp\n");
             result = result && checkExp(unaryexp->primaryExp, currentTable, funcTablePtr);//, shouldReturnInt
         }
         return result;
     }
     if(auto *primaryexp = exp->as<PrimaryExpr*>()){
         // todo check lval
-        if(debug)
-            fmt::print("[checkExp]: primaryexp ");
+        if(debug) fmt::print("[checkExp]: primaryexp ");
         bool result = true;
         if(primaryexp->Exp != nullptr) {
-            fmt::print("Exp\n");
+            if(debug) fmt::print("Exp\n");
             result = result && checkExp(primaryexp->Exp, currentTable, funcTablePtr);//, shouldReturnInt
         }
         if(primaryexp->Number != nullptr) {
-            fmt::print("Number\n");
+            if(debug) fmt::print("Number\n");
             result = result && checkExp(primaryexp->Number, currentTable, funcTablePtr);//, shouldReturnInt
         }
         if(primaryexp->LVal != nullptr) {
-            fmt::print("LVal\n");
+            if(debug) fmt::print("LVal\n");
             result = result && checkLval(primaryexp->LVal->as<LVal*>(), currentTable, funcTablePtr);
         }
         return  result;
@@ -438,26 +472,28 @@ bool checkExp(NodePtr exp, symbolTablePtr currentTable,
 
 varSymbolTypePtr findVarByName(symbolTablePtr currentTable, std::string name) {
 //    std::map<std::string, varSymbolTypePtr> varTable
-    fmt::print("[findVarByName]: ");
+    bool debug = true;
+    if(debug) fmt::print("[findVarByName]: ");
     while(currentTable != nullptr){
         for(auto &element : currentTable->varTable){
             if(element.first == name) {
-                fmt::print("found");
+                if(debug) fmt::print("var {} found\n",name);
                 return element.second;
             }
         }
         currentTable = currentTable->highLevelTable;
     }
-    fmt::print("var {} not found\n", name);
+    if(debug) fmt::print("var {} not found\n", name);
     exit(1);
 }
 
 bool findVarRedefineByName(symbolTablePtr currentTable, std::string name) {
-    fmt::print("[findVarRedefineByName]: ");
+    bool debug = false;
+    if(debug) fmt::print("[findVarRedefineByName]: ");
     // redefine means define in same block
     for(auto &element : currentTable->varTable){
         if(element.first == name) {
-            fmt::print("found\n");
+            if(debug) fmt::print("var {} redefine found\n",name);
             return true;
         }
     }
@@ -500,8 +536,11 @@ bool checkLval(NodePtr exp, symbolTablePtr currentTable, funcSymbolTablePtr func
                     return false;
                 }
                 for (size_t i = 0; i < position.size(); i++) {
-                    if (position[i] >= symbol->dimension[i]) {
+                    if (position[i] >= symbol->dimension[i] && i != 0) {
                         fmt::print("lvalue array index out of range\n");
+                        fmt::print("position[{}]: {}\n", i, position[i]);
+                        fmt::print("dimension[{}]: {}\n", i, symbol->dimension[i]);
+                        exit(1);
                         return false;
                     }
                 }
@@ -525,7 +564,7 @@ funcSymbolPtr findFuncByName(funcSymbolTablePtr funcTablePtr, std::string name) 
             return i;
         }
     }
-    fmt::print("function {} not found\n", name);
+    fmt::print("[ERROR]: function {} not found\n", name);
     exit(1);
 }
 
@@ -545,45 +584,152 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
         name = unaryexp->name;
         params = unaryexp->params;
     }
+    if(debug) {
+//        fmt::print("[checkFuncCall]: func name: {}\n", name);
+//        fmt::print("[checkFuncCall]: func params.size(): {}\n", params.size());
+        // for all params, print their name, type, dimension
+    }
     if(name == ""){
-        fmt::print("[checkFuncCall]: function call name is empty\n");
+        fmt::print("[ERROR]: function call name is empty\n");
         return false;// todo
     }
     // find func by name
     funcSymbolPtr symbol = findFuncByName(funcTablePtr, name);
+    // print all thing in symbol->arglist
+//    if(debug) {
+//        fmt::print("[checkFuncCall]: symbol->arglist.size(): {}\n", symbol->arglist.size());
+//        for(auto i : symbol->arglist){
+//            if(i->isArray){
+//                fmt::print("[checkFuncCall]: arg name: {} is array with ", i->name);
+//                fmt::print("dimension size: {}\n", i->dimension.size());
+//                for(auto j : i->dimension){
+//                    fmt::print("[{}]", j);
+//                }
+//                fmt::print("\n");
+//            }else{
+//                fmt::print("[checkFuncCall]: arg name: {} is variable\n", i->name);
+//            }
+//        }
+//    }
     // compare return type
     if(shouldReturnInt && symbol->returnType != funcSymbol::Type::INT) {
-        fmt::print("return type mismatch\n");
+        fmt::print("[ERROR]: return type mismatch\n");
         exit(1);
     }
     // compare parameters
     if(params.size() != symbol->arglist.size()){
-        fmt::print("[checkFuncCall]: parameter number not match\n");
+        fmt::print("[ERROR]: parameter number not match\n");
         return false;
     }
     for(size_t i = 0; i < params.size(); i++){
-        if(symbol->arglist[i]->isArray == false && params[i]->as<LVal*>() == nullptr){
+        if(debug) fmt::print("[checkFuncCall]: i: {}\n", i);
+        // symbol is formal parameter
+        // params[i] is actual parameter
+        // todo check param[i] is int exp
+        // todo check params[i] is variable call
+//        if(auto* temp = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>()){
+//            fmt::print("get actual parameter name: {}\n",temp->name);
+//            varSymbolTypePtr tmp = findVarByName(currentTable, temp->name);
+//            // print info of tmp
+//            if(tmp->isArray){
+//                fmt::print("{} is array with ",tmp->name);
+//                //print dimension
+//                for(auto j:tmp->dimension){
+//                    fmt::print("[{}]",j);
+//                }
+//                fmt::print("\n");
+//            }else{
+//                fmt::print("{} is variable\n",tmp->name);
+//            }
+//        }
+        if(symbol->arglist[i]->isArray == false){// && params[i]->as<LVal*>() == nullptr
             // valid: not array, all int, check params[i] is int exp
             if(checkExp(params[i], currentTable, funcTablePtr) == false){// shouldReturnInt
-                fmt::print("function call parameter type not match int\n");
+                fmt::print("[ERROR]: function call parameter type not match int\n");
                 return false;
             }
-        }else if(symbol->arglist[i]->isArray == true && params[i]->as<LVal*>() != nullptr) {
+        }else if(symbol->arglist[i]->isArray == true) {// && params[i]->as<LVal*>() != nullptr
             // valid: all array, compare dimension
-            auto *lval = params[i]->as<LVal*>();
-            if(lval->position.size() != symbol->arglist[i]->dimension.size()){
-                fmt::print("function call parameter array dimension size not match\n");
-                return false;
-            }
-            for(size_t j = 0; j < lval->position.size(); j++){
-                if(lval->position[j] != symbol->arglist[i]->dimension[j] && j != 0){
-                    fmt::print("function call parameter array {}th dimension not match\n", j+1);
-                    return false;
+            // auto *lval = params[i]->as<LVal*>();
+//            if(lval->position.size() != symbol->arglist[i]->dimension.size()){
+//                fmt::print("[ERROR]: function call parameter array dimension size not match\n");
+//                return false;
+//            }
+//            for(size_t j = 0; j < lval->position.size(); j++){
+//                if(lval->position[j] != symbol->arglist[i]->dimension[j] && j != 0){
+//                    fmt::print("[ERROR]: function call parameter array {}th dimension not match\n", j+1);
+//                    return false;
+//                }
+//            }
+            bool isArrayCall = false;
+            if(auto *exp = params[i]->as<Expr*>()){
+                if(auto *lgexp = exp->LgExp->as<LgExp*>()){
+                    if(lgexp->rhs== nullptr && lgexp->lhs != nullptr){
+                        if(auto *lglgexp = lgexp->lhs->as<LgExp*>()) {
+                            if(lglgexp->rhs == nullptr && lglgexp->lhs != nullptr) {
+                                if(auto *compexp = lglgexp->lhs->as<CompExp*>()){
+                                    if(compexp->rhs == nullptr && compexp->lhs != nullptr) {
+                                        if(auto *compcompexp = compexp->lhs->as<CompExp*>()){
+                                            if(compcompexp->rhs== nullptr && compcompexp->lhs != nullptr){
+                                                if(auto *addexp = compcompexp->lhs->as<AddExp*>()){
+                                                    if(addexp->addExp == nullptr && addexp->mulExp != nullptr){
+                                                        if(auto *mulexp = addexp->mulExp->as<MulExp*>()){
+                                                            if(mulexp->mulExp == nullptr && mulexp->unaryExp != nullptr){
+                                                                if(auto *unaryexp = mulexp->unaryExp->as<UnaryExpr*>()){
+                                                                    if(unaryexp->unaryExp == nullptr && unaryexp->primaryExp != nullptr && unaryexp->name == ""){
+                                                                        if(auto* primaryexp = unaryexp->primaryExp->as<PrimaryExpr*>()){
+                                                                            if(primaryexp->LVal != nullptr){
+                                                                                isArrayCall = true;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            if(isArrayCall){
+                fmt::print("array call\n");
+                auto *temp = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>();
+                fmt::print("get actual parameter name: {}\n",temp->name);
+                varSymbolTypePtr tmp = findVarByName(currentTable, temp->name);
+                if(tmp->isArray){
+                    if(tmp->dimension.size() - temp->position.size() != symbol->arglist[i]->dimension.size()){
+                        fmt::print("tmp->dimension.size(): {}\n",tmp->dimension.size());
+                        fmt::print("temp->position.size(): {}\n",temp->position.size());
+                        fmt::print("symbol->arglist[i]->dimension.size(): {}\n",symbol->arglist[i]->dimension.size());
+                        fmt::print("function call parameter array dimension size not match\n");
+                        return false;
+                    }
+                    for(size_t j = 0; j < temp->position.size(); j++){
+                        if(temp->position[j] != symbol->arglist[i]->dimension[j] && j!=0){
+                            fmt::print("[ERROR]: function call parameter array {}th dimension not match\n", j+1);
+                            return false;
+                        }
+                    }
+                }else{
+                    fmt::print("[ERROR]: function call parameter is not array\n");
+                    exit(1);
+                    return false;
+                }
+            }else{
+                fmt::print("[ERROR]: function call parameter is not array\n");
+                exit(1);
+                return false;
+            }
         }else{
-            fmt::print("function call parameter type not match\n");
-            return false;
+//            fmt::print("[ERROR]: function call parameter type not match\n");
+//            return false;
         }
     }
     fmt::print("[checkFuncCall]: func Call valid\n");
