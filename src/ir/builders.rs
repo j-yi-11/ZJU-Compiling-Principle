@@ -1,7 +1,5 @@
 
 use std::collections::HashMap;
-use std::rc::Rc;
-use std::cell::RefCell;
 
 use slotmap::SlotMap;
 
@@ -11,7 +9,7 @@ use super::{structures::*, values};
 
 
 struct FunctionEmitState {
-    /* local variabels */
+    /* local variables */
     local_string_value_map: HashMap<String, ValueRef>,
     local_string_bb_map: HashMap<String, BlockRef>,
 
@@ -57,7 +55,16 @@ impl IRBuilder {
             unwrap().
             namer;
         match base.as_ref() {
-            Some(given_name) => namer.next_name(&given_name),
+            // do not rename local value for interpreter.
+            Some(given_name) => {
+                // check duplicated name.
+                // assert!(
+                //     !namer.contains_name(given_name),
+                //     "duplicated local value name `{}` in function `{}`",
+                //     given_name, self.get_current_function_data_mut().name
+                // );
+                namer.next_name(given_name)
+            }
             None => namer.next_anonymous_name()
         }
     }
@@ -68,6 +75,7 @@ impl IRBuilder {
             .unwrap()
             .local_string_value_map
             .get(name)
+            .or_else(|| self.global_string_value_map.get(name))
             .cloned()
     }
 
@@ -89,7 +97,7 @@ impl IRBuilder {
     }
 
     fn get_current_block_data_mut(&mut self) -> &mut BasicBlock {
-        let state = self.func
+        let state: &mut FunctionEmitState = self.func
             .as_mut()
             .expect("IR builder has no working function");
         let working_bb = state
@@ -119,6 +127,7 @@ impl IRBuilder {
         match possible_bb {
             Some(bb_ref) => bb_ref,
             None => {
+                // println!("insert forwarding reference bb: %{}\n", name);
                 let mut placeholder_bb = BasicBlock::new();
                 placeholder_bb.set_name(Some(name.into()));
                 // only insert symbol not push into the function structure.
@@ -143,9 +152,8 @@ impl IRBuilder {
         self.module.insert_value(value)
     }
 
-    fn append_basic_block(&mut self, bb: BasicBlock) -> BlockRef {
-        let current_function = self.get_current_function_data_mut();
-        current_function.append_basic_block(bb)
+    fn insert_global_value(&mut self, value: Value) -> ValueRef {
+        self.module.insert_global_value(value)
     }
 
     /// get the handler of value and update local symbol value map
@@ -154,6 +162,7 @@ impl IRBuilder {
         let handler = self.insert_value(value);
         match value_name {
             Some(name) => {
+            // println!("inesrt local symbol: %{}\n", name);
                 self.func
                     .as_mut()
                     .expect("builder has no working function")
@@ -165,27 +174,17 @@ impl IRBuilder {
         }
     }
 
-    /// get the handler of basic block and update local symbol value map
-    fn append_basic_block_symbol(&mut self, bb: BasicBlock) -> BlockRef {
-        let bb_name = bb.name.clone();
-        let handler = self.append_basic_block(bb.clone());
-        match bb_name {
-            Some(name) => {
-                self.func
-                    .as_mut()
-                    .expect("builder has no working function")
-                    .local_string_bb_map
-                    .insert(name, handler);
-                handler
-            },
-            None => handler
-        }
-    }
-
     fn insert_instruction_symbol(&mut self, instr: Value) -> ValueRef {
         let handler = self.insert_local_value_symbol(instr);
         let working_bb = self.get_current_block_data_mut();
         working_bb.insert_instr_before_terminator(handler);
+        handler
+    }
+
+    pub fn insert_global_symbol(&mut self, global_variable: Value) -> ValueRef {
+        let global_name = global_variable.name.as_ref().unwrap().clone();
+        let handler = self.insert_global_value(global_variable);
+        self.global_string_value_map.insert(global_name, handler);
         handler
     }
 
@@ -264,8 +263,12 @@ impl IRBuilder {
     pub fn emit_basic_block(&mut self, name: Option<String>) -> BlockRef {
 
         match name {
-            Some(bb_name) => {
-                if let Some(dangling_bb_ref) = self.get_block_ref(&bb_name) {
+            Some(_) => {
+                // is a forwarding reference dangling basic block.
+                // println!("emit basic block `%{}`\n", bb_name);
+                let name = self.get_unique_name(&name);
+                let handler = 
+                if let Some(dangling_bb_ref) = self.get_block_ref(&name) {
                     // println!("find dangling basic block `%{}`\n", bb_name);
                     let current_function = self.get_current_function_data_mut();
                     current_function.append_back_dangling_basic_block(dangling_bb_ref);
@@ -273,14 +276,23 @@ impl IRBuilder {
                 } else {
                     let current_function = self.get_current_function_data_mut();
                     let mut new_bb = BasicBlock::new();
-                    new_bb.set_name(Some(bb_name));
+                    new_bb.set_name(Some(name.clone()));
                     current_function.append_basic_block(new_bb)
-                }
+                };
+                // always update basic block symbols
+                self.func
+                    .as_mut()
+                    .expect("builder has no working function")
+                    .local_string_bb_map
+                    .insert(name.clone(), handler);
+                handler
+
             },
             None => {
+                let name = self.get_unique_name(&name);
                 let current_function = self.get_current_function_data_mut();
                 let mut new_bb = BasicBlock::new();
-                new_bb.set_name(name);
+                new_bb.set_name(Some(name));
                 current_function.append_basic_block(new_bb)
             }
         }
@@ -299,24 +311,25 @@ impl IRBuilder {
         let inner_name = self.get_unique_name(&name);
         assert!(
             lhs_ty.is_integer_type() && lhs_ty.eq(&rhs_ty),
-            "`lhs` and `rhs` should be the same integer type for {}",
-            inner_name
+            "`lhs` and `rhs` should be the same integer type for '%{}', where lhs type `{}` and rhs type `{}`",
+            inner_name, lhs_ty, rhs_ty
         );
         let expected_ty = match op {
             values::BinaryOp::Add | values::BinaryOp::Sub |
             values::BinaryOp::Mul | values::BinaryOp::Div | values::BinaryOp::Rem |
             values::BinaryOp::And | values::BinaryOp::Or | values::BinaryOp::Xor =>
                 lhs_ty,
+            // current standard use i32 only.
             values::BinaryOp::Lt | values::BinaryOp::Gt |
             values::BinaryOp::Le | values::BinaryOp::Ge |
             values::BinaryOp::Eq | values::BinaryOp::Ne =>
-                Type::get_i1()
+                lhs_ty
         };
         let result_ty = match annotated_type {
             Some(check_ty) => {
                 assert!(
                     expected_ty.eq(&check_ty),
-                    "expect type `{}` for `{}`, but found wrong annotation `{}`", 
+                    "expect type `{}` for '%{}', but found wrong annotation `{}`", 
                     expected_ty, inner_name, check_ty
                 );
                 check_ty
@@ -343,14 +356,14 @@ impl IRBuilder {
         if let Some(check_ty) = annotated_type {
             assert!(
                 check_ty.eq(&addr_ty),
-                "expect type `{}` for `{}`, but found wrong annotation `{}`", 
+                "expect type `{}` for '%{}', but found wrong annotation `{}`", 
                 addr_ty, inner_name, check_ty
             );
         }
 
         assert!(
             addr_ty.deref_matches(&base_type),
-            "element type `{}` is not compatible with input pointer in offset `{}`",
+            "element type `{}` is not compatible with input pointer in offset '%{}'",
             base_type, inner_name
         );
 
@@ -361,7 +374,7 @@ impl IRBuilder {
         assert!(
             index.iter().cloned()
                 .all(| index_ref | self.get_value(index_ref).ty.is_integer_type()),
-            "expected integer type index in offset `{}`",
+            "expected integer type index in offset '%{}'",
             inner_name
         );
 
@@ -382,7 +395,7 @@ impl IRBuilder {
             let expected_type = Type::get_pointer(base_type.clone());
             assert!(
                 check_ty.eq(&expected_type),
-                "expect type `{}` for `{}`, but found wrong annotation `{}`", 
+                "expect type `{}` for '%{}', but found wrong annotation `{}`", 
                 expected_type, inner_name, check_ty
             );
         }
@@ -403,7 +416,7 @@ impl IRBuilder {
         let result_ty = if let Some(check_ty) = annotated_type {
             assert!(
                 addr_ty.deref_matches(&check_ty),
-                "expect type `{}` for `{}`, but found wrong annotation `{}`", 
+                "expect type `{}` for '%{}', but found wrong annotation `{}`", 
                 addr_ty, inner_name, check_ty
             );
             check_ty
@@ -431,13 +444,13 @@ impl IRBuilder {
         if let Some(check_ty) = annotated_type {
             assert!(
                 check_ty.is_unit_type(),
-                "expect type `{}` for `{}`, but found wrong annotation `{}`", 
+                "expect type `{}` for `%{}`, but found wrong annotation `{}`", 
                 Type::get_unit(), inner_name, check_ty
             );
         }
         assert!(
             addr_ty.deref_matches(&stored_ty),
-            "in load instruction `{}`,value type `{}` and address type `{}` are incompatible", 
+            "in store instruction '%{}', value type `{}` and address type `{}` are incompatible", 
             inner_name, stored_ty, addr_ty
         );
 
@@ -483,8 +496,8 @@ impl IRBuilder {
                 assert!(
                     params_ty.iter().zip(args_value.iter())
                     .all( | (param_ty, arg_value) | param_ty.eq(&arg_value.ty)),
-                    "function call `{}` has different argument type with function prototyp `{}`",
-                    inner_name, callee
+                    "function call `{}` has different argument type with function prototyp `{}`, where argument types are {:?} and function prototype types are {:?}",
+                    inner_name, callee, args_value.iter().map(| arg | arg.ty.clone()).collect::<Vec<_>>(), params_ty
                 );
                 ret_ty
             }
@@ -534,9 +547,9 @@ impl IRBuilder {
             .value_ctx
             .get(cond)
             .unwrap();
-
-        assert!(cond_value.ty.is_i1_type(),
-                "expect condition value type `i1` in branch terminator, but found type `{}`",
+        // current branch condition requires i32 type.
+        assert!(cond_value.ty.is_i32_type(),
+                "expect condition value type `i32` in branch terminator, but found type `{}`",
                 cond_value.ty.clone());
         let current_function = self.module
             .func_ctx

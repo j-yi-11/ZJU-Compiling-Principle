@@ -3,18 +3,16 @@ use nom::{
     branch::alt,
     bytes::complete::{is_not, tag, take_until},
     character::complete::{
-        alpha0, alpha1, 
-        alphanumeric0, alphanumeric1, 
-        char, digit0, digit1, 
-        multispace0, multispace1
+        alpha1, 
+        alphanumeric1, 
+        digit1, 
+        multispace1
     },
-    combinator::{all_consuming, map_res, opt, recognize, value, cut},
-    multi::{fold_many1, many0, many0_count, many1, separated_list0}, 
-    sequence::{delimited, pair, preceded, separated_pair, terminated, tuple}, 
-    Err
+    combinator::{all_consuming, map_res, opt, recognize, value},
+    multi::{many0_count, many1}, 
+    sequence::{pair, preceded, terminated, tuple}, 
 };
 
-use crate::ir::builders::IRBuilder;
 
 use super::token::Token;
 
@@ -80,7 +78,8 @@ fn lex_keyword(input: &str) -> IResult<&str, Token> {
         alt((
             value(Token::KwFn, tag("fn")),
             value(Token::KwLet, tag("let")),
-            value(Token::KwLabel, tag("label"))
+            value(Token::KwLabel, tag("label")),
+            value(Token::KwRegion, tag("region"))
     )))(input)
 }
 
@@ -145,7 +144,8 @@ fn lex_terminator_operator(input: &str) -> IResult<&str, Token> {
         alt((
             value(Token::TkJmp,    tag("jmp")),
             value(Token::TKBranch, tag("br")),
-            value(Token::TKRet,    tag("ret"))
+            value(Token::TKRet,    tag("ret")),
+            value(Token::KwRegion, tag("region"))
         ))
     )(input)
 }

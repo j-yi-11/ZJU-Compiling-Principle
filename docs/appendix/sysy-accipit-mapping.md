@@ -9,7 +9,7 @@
 在 Accipit 中，你能看到两种形式的局部变量：
 
 - 临时变量/虚拟寄存器.
-- 在栈上分配的临时.
+- 在栈上分配的临时变量.
 
 
 前一种局部变量是顶层变量 (top level variable).
@@ -164,16 +164,18 @@ let %3 = store 1, %0
 let %4 = store 2, %1
 let %5 = store 0, %2
 // result = lhs + rhs
-let %6 = load %lhs.addr
-let %7 = load %rhs.addr
+let %6 = load %0
+let %7 = load %1
 let %8 = add %3, %4
-let %9 = store %8, %result.addr
+let %9 = store %8, %2
 // result = result + 1
-let %10 = load %result.addr
+let %10 = load %2
 let %11 = add %10, 1
-let %12 = store %11, %result.addr
+let %12 = store %11, %2
 ```
 
+总之，我们看到，**源代码**中的 `lhs` 等变量在翻译得到的 IR 中并没有一个显式的虚拟寄存器（也就是顶层变量）与之对应，而只有 alloca 指令将其作为一个取地址变量来处理；但是 alloca 指令得到的指针 `%lhs.addr` 是一个顶层变量，我们借助顶层变量 `%lhs.addr` 来操作 `lhs` 这个取地址变量.
+这种两种局部变量的“区分”在中端无关代码的指针分析（别名分析）中有着重要意义.
 
 ### 常数
 

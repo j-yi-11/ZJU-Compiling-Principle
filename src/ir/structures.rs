@@ -5,7 +5,7 @@ use slotmap::{new_key_type, SlotMap};
 use itertools::Itertools;
 
 use super::values;
-use super::types::{Type, TypeKind};
+use super::types::Type;
 use crate::utils::display_helper::*;
 
 new_key_type! {
@@ -27,6 +27,7 @@ pub enum ValueKind {
     Alloca(values::Alloca),
     Load(values::Load),
     Store(values::Store),
+    GlobalVar(values::GlobalVar)
 }
 
 #[derive(Debug, Clone)]
@@ -78,7 +79,9 @@ impl fmt::Display for Value {
             ValueKind::Alloca(..) | ValueKind::Load(..) | ValueKind::Store(..) =>
                 write!(f, "%{}: {}", self.name.clone().unwrap_or(String::from("<anonymous>")), self.ty),
             ValueKind::Argument(..) =>
-                write!(f, "#{}: {}", self.name.clone().unwrap_or(String::from("<anonymous>")), self.ty)
+                write!(f, "#{}: {}", self.name.clone().unwrap_or(String::from("<anonymous>")), self.ty),
+            ValueKind::GlobalVar(..) =>
+                write!(f, "@{}: {}", self.name.clone().unwrap_or(String::from("<anonymous>")), self.ty)
         }
     }
 }
@@ -185,6 +188,12 @@ impl Module {
             .insert(value)
     }
 
+    pub fn insert_global_value(&mut self, value: Value) -> ValueRef {
+        let handler = self.insert_value(value);
+        self.globals.push(handler);
+        handler
+    }
+
     pub fn append_function(&mut self, function: Function) -> FunctionRef {
         let function_name = function.name.clone();
         let handler = self.func_ctx.insert(function);
@@ -212,7 +221,7 @@ impl Module {
     pub fn get_function_ref(&self, name: &str) -> FunctionRef {
         self.string_func_map
             .get(name)
-            .unwrap()
+            .unwrap_or_else(| | panic!("function '{}' not found", name))
             .clone()
     }
 
@@ -255,8 +264,13 @@ impl<'a> fmt::Display for DisplayWithContext<'a, Value, Module> {
             ValueKind::FnCall(inner) => {
                 let callee = inner.callee.clone();
                 let args = inner.args.iter().cloned().map(| argref| module.get_value(argref));
-                write!(f, "  let {} = call {}, {}\n",
-                        value, callee, args.format(", "))
+                if inner.args.len() == 0 {
+                    write!(f, "  let {} = call @{}\n",
+                            value, callee)
+                } else {
+                    write!(f, "  let {} = call @{}, {}\n",
+                            value, callee, args.format(", "))
+                }
             },
             ValueKind::Offset(inner) => {
                 let elem_type = inner.elem_type.clone();
@@ -273,7 +287,11 @@ impl<'a> fmt::Display for DisplayWithContext<'a, Value, Module> {
                             }
                         })
                     )
-            }
+            },
+            ValueKind::GlobalVar(inner) => {
+                write!(f, "  {} : region {}, {}\n",
+                        value, inner.elem_ty, inner.size)
+            },
             _ => panic!("invalid instruction {}", value)
         }
     }
@@ -282,6 +300,16 @@ impl<'a> fmt::Display for DisplayWithContext<'a, Value, Module> {
 
 impl fmt::Display for Module {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for gvref in self.globals.iter() {
+            let global_var = self.get_value(gvref.clone());
+            let name = global_var.name.clone().unwrap();
+            let ty = Type::get_pointer_base_type(&global_var.ty).unwrap();
+            let size = match &global_var.kind {
+                ValueKind::GlobalVar(inner) => inner.size,
+                _ => panic!("invalid global variable")
+            };
+            write!(f, "@{}: region {}, {} \n\n", name, ty, size)?;
+        }
         for funcref in self.funcs.iter() {
             let function = self
                 .func_ctx
@@ -291,7 +319,7 @@ impl fmt::Display for Module {
                 .iter()
                 .map(| arg_ref | self.get_value(arg_ref.clone()) )
                 .collect::<Vec<_>>();
-            write!(f, "fn %{}({}) -> {} ",
+            write!(f, "fn @{}({}) -> {}",
                     function.name,
                     param_val.iter().format(", "),
                     function.ty.get_function_ret_type().unwrap()
@@ -299,7 +327,7 @@ impl fmt::Display for Module {
             if function.is_external {
                 write!(f, ";\n\n")?;
             } else {
-                write!(f, "{{\n")?;
+                write!(f, " {{\n")?;
                 for bb_ref in function.blocks.iter() {
                     let basic_block = function
                         .blocks_ctx
