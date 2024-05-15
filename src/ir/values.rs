@@ -8,13 +8,6 @@ use super::structures::{
 };
 
 
-
-#[derive(Debug, Clone)]
-pub struct Function;
-
-#[derive(Debug, Clone)]
-pub struct BasicBlock;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOp {
     /* Numeric Operations */
@@ -43,8 +36,8 @@ impl fmt::Display for BinaryOp {
             BinaryOp::Mul => write!(f, "mul"),
             BinaryOp::Div => write!(f, "div"),
             BinaryOp::Rem => write!(f, "rem"),
-            BinaryOp::And => write!(f, "or"),
-            BinaryOp::Or => write!(f, "and"),
+            BinaryOp::And => write!(f, "and"),
+            BinaryOp::Or => write!(f, "or"),
             BinaryOp::Xor => write!(f, "xor"),
             BinaryOp::Lt => write!(f, "lt"),
             BinaryOp::Gt => write!(f, "gt"),
@@ -99,6 +92,17 @@ impl ConstantBool {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct GlobalVar {
+    pub elem_ty: Type,
+    pub size: usize
+}
+
+impl GlobalVar {
+    pub fn new_value(elem_ty: Type, size: usize) -> Value {
+        Value::new(Type::get_pointer(elem_ty.clone()), None, ValueKind::GlobalVar(Self { elem_ty, size }))
+    }
+}
 
 /* Treat the parameters of function as `Value`.
  */

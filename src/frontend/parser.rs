@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::take,
     combinator::{all_consuming, map, opt, peek, value},
-    error::{context, Error, ErrorKind, ParseError, VerboseError},
+    error::{ErrorKind, ParseError, VerboseError},
     multi::{fold_many1, many0, many0_count, many1, many1_count, separated_list0},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     Compare, CompareResult, Err, InputIter, InputLength, InputTake
@@ -14,7 +14,6 @@ use crate::ir::{
     builders::IRBuilder, structures::*, types::Type, values
 };
 
-use super::{lexer::Lexer, token};
 use super::token::{Token, Tokens};
 
 pub type IResult<I, O, E=nom::error::VerboseError<I>> = Result<(I, O), nom::Err<E>>;
@@ -170,7 +169,7 @@ impl<'a, 'b: 'a> Parser {
                 builder
                     .borrow()
                     .get_value_ref(name)
-                    .expect("undefined symbol")
+                    .unwrap_or_else(|| panic!("undefined symbol '{}'", name))
             }),
             map(parse_literal,  | value: Value| {
                 builder
@@ -502,13 +501,33 @@ impl<'a, 'b: 'a> Parser {
         ))(input)
     }
 
+    fn parse_global_variable(
+        input: Tokens<'a>,
+        builder: Rc<RefCell<IRBuilder>>
+    ) -> IResult<Tokens<'a>, ()> {
+        // global variable: @<identifier> : region, <size>
+        let (input, (name, (elem_ty, region_size))) = pair(
+            identifier,
+            preceded(token(Token::Colon), 
+                preceded(token(Token::KwRegion), 
+                            separated_pair(parse_type, token(Token::Comma), map(i32_literal, | lit | usize::try_from(lit).expect("expect non-negative global variable region size"))))))(input)?;
+        let mut new_gv = values::GlobalVar::new_value(
+            elem_ty,
+            region_size
+        );
+        new_gv.set_name(String::from(name));
+        builder.borrow_mut().insert_global_symbol(new_gv);
+        Ok((input, ()))
+    }
+
     pub fn parse_from_complete_input(
         input: Tokens<'a>,
         builder: Rc<RefCell<IRBuilder>>
     ) -> IResult<Tokens<'a>, Module> {
-        let (input, _) = all_consuming(many1(
+        let (input, _) = all_consuming(many1(alt((
+            | input: Tokens<'a> | Parser::parse_global_variable(input, builder.clone()),
             | input: Tokens<'a> | Parser::parse_function(input, builder.clone())
-        ))(input)?;
+        ))))(input)?;
 
         Ok((input, builder.borrow().module.clone()))
     }
@@ -518,8 +537,6 @@ impl<'a, 'b: 'a> Parser {
 
 #[cfg(test)]
 mod test {
-    use crate::frontend::parser;
-    use crate::ir::builders;
 
     use super::*;
     use super::super::lexer::Lexer;

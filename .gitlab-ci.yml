@@ -1,3 +1,7 @@
+stages:
+  - build
+  - deploy
+
 pages:
   tags:
     - pages-builder

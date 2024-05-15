@@ -1,0 +1,6 @@
+/*
+binary_operator [\*/%]
+unary_operator [!+-]
+{unary_operator}  { yylval.ival = (int)yytext[0]; return UNARYOP; }
+{binary_operator} { yylval.ival = (int)yytext[0]; return BINARYOP; }
+*/
