@@ -1,0 +1,21 @@
+[package]
+name = "accsys-rs"
+version = "0.1.0"
+edition = "2021"
+
+
+
+[dependencies]
+ariadne = "0.4.0"
+chumsky = { version = "1.0.0-alpha.6", features = ["regex", "label", "pratt"] }
+num_enum = "0.7.2"
+rpds = "1.1.0"
+slotmap = "1.0.7"
+strum = { version = "0.26", features = ["derive"] }
+strum_macros = "0.26"
+paste = "1.0.14"
+accipit = { git = "https://github.com/floatshadow/accipit.git" }
+
+[[bin]]
+name = "compiler"
+path = "src/main.rs"

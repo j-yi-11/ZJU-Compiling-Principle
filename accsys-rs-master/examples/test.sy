@@ -1,0 +1,14 @@
+int main(){
+    int a = 0;
+    int b = 7;
+    if(a){
+        a = a + 1;
+    }
+    b = b + 6;
+    while(1){
+        if(b){
+            b = b / 3;
+        }
+    }
+    return 0;
+}

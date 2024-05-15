@@ -1,7 +1,0 @@
-void f(){return;}
-int g(int a){return 1;}
-int main() {
-  f();
-  int a = g(2);
-  return 0;
-}
