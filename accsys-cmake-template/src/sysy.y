@@ -7,10 +7,6 @@
 void yyerror(const char *s);
 extern int yylex(void);
 extern NodePtr root;
-
-
-
-
 %}
 
 /// types
@@ -23,27 +19,42 @@ extern NodePtr root;
     OpType opVal;
 }
 
-%token <ival> CONSTINT UNARYOP BINARYOP
+%token <ival> CONSTINT 
+// %token <ival> UNARYOP BINARYOP
 %token <sval> IDENTIFIER
-%token <opVal> AND OR NOT
-%token <opVal> NEQ EQ GEQ LEQ GREAT LESS
-%type <nodeVal> FuncDef Block Stmt  Exp UnaryExp PrimaryExp Number AddExp MulExp
-%type <nodeVal> LOrExp LAndExp EqExp RelExp
+// jy comment 5.14
+// %token <opVal> AND OR NOT
+// %token <opVal> NEQ EQ GEQ LEQ GREAT LESS
+%type <nodeVal> FuncDef Block Stmt  Exp 
+// %type <nodeVal> UnaryExp PrimaryExp Number AddExp MulExp
+// %type <nodeVal> LOrExp LAndExp EqExp RelExp
 %type <nodeVal> Decl BlockItem LVal
-%type <nodeVal> VarDecl InitVal VarDef
+%type <nodeVal> VarDecl VarDef
+// %type <nodeVal> InitVal
 %type <nodeVal> FuncFParam
 %type <nodeVal> Matched Unmatched
 %type <vecVal> BlockItems VarDefs
 %type <vecVal> FuncFParams DFuncFParams FuncRParams DExps CompUnits
 %type <iVecVal> Dimensions Dimensions_funcdef Dimensions_lval
 
-
+// jy add 5.14 ADD SUB MUL DIV MOD NOT
 %token  ASSIGN
+				ADD SUB MUL DIV MOD NOT
         IF ELSE WHILE CONTINUE BREAK
         RETURN INT VOID
         COMMA SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
 %start CompUnit
+
+// jy add 5.14
+%right ASSIGN
+%left OR
+%left AND
+%left EQ NEQ
+%left GEQ LEQ GREAT LESS
+%left ADD SUB
+%left MUL DIV MOD
+%right NOT
 
 // JY write
 %%
@@ -52,7 +63,6 @@ CompUnit : CompUnits {
                 for(auto a : *$1) 
                         comp_unit->all.emplace_back(a);
                 root = comp_unit;
-                //printf("root is initialized\n");
         };
 CompUnits: //{}|
         CompUnits Decl {
@@ -114,7 +124,7 @@ VarDefs : { $$ = nullptr; }
 // a
 // a[3]
 // a[3][4][5]
-VarDef : IDENTIFIER ASSIGN InitVal {
+VarDef : IDENTIFIER ASSIGN Exp { // IDENTIFIER ASSIGN InitVal
                 auto vardef_unit = new VarDef();
                 vardef_unit->name = *$1;
                 vardef_unit->initialValue = $3;
@@ -144,17 +154,16 @@ Dimensions : LBRACKET CONSTINT RBRACKET {
                 $$ = $4;
         };
 
-InitVal : Exp {
-                auto val = new InitVal();
-                val->Exp = $1;
-                $$ = val;
-        };
+// InitVal : Exp {
+//                 auto val = new InitVal();
+//                 val->Exp = $1;
+//                 $$ = val;
+//         };
 
 // func def   
 // int f(int a, int b[]){...}
 // FuncType
 FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
-		// ("int FuncDef\n");
     auto funcdef_unit = new FuncDef();
     funcdef_unit->ReturnType = FuncDef::Type::INT;
     funcdef_unit->name = *($2);
@@ -167,7 +176,6 @@ FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
     $$ = funcdef_unit;
   }
   | VOID IDENTIFIER LPAREN FuncFParams RPAREN Block {
-  // printf("void FuncDef\n");
 		auto funcdef_unit = new FuncDef();
 		funcdef_unit->ReturnType = FuncDef::Type::VOID;
 		funcdef_unit->name = *($2);
@@ -180,24 +188,12 @@ FuncDef : INT IDENTIFIER LPAREN FuncFParams RPAREN Block {
 		$$ = funcdef_unit;
 	}
   ;
-// return type
-// FuncType :
-//	VOID{
-//		auto node = new FuncType(FuncType::Type::VOID);
-//		$$ = node;
-//  }
-//	| INT {
-//		auto node = new FuncType(FuncType::Type::INT);
-//		$$ = node;
-//	}
-//	;
 FuncFParams
   : DFuncFParams {
     $$ = $1;
   }
   | {
     $$ = nullptr;
-    // printf("FuncFParams is void\n");
   }
   ;
 DFuncFParams
@@ -243,12 +239,10 @@ Block: LBRACE BlockItems RBRACE
     auto block = new Block();
     if($2 == nullptr){
 		    $$ = block;
-		    // printf("Block is empty\n");
     }else{
         for(auto i: *$2){
             block->BlockItems.emplace_back(i);
         }
-        // printf("BlockItem.size = %d\n", block->BlockItems.size());
         $$ = block;
     }
   }
@@ -281,11 +275,9 @@ BlockItem: Decl {
 
 Stmt:
 	Matched {
-				//dynamic_cast<NodePtr>($1)->matched = true;
 				$$ = $1;
 		}
   | Unmatched {
-				//dynamic_cast<NodePtr>($1)->matched = false;
 				$$ = $1;
  };
 Matched:
@@ -359,8 +351,6 @@ Unmatched:
 		    $$ = stmt;
 		}
 		| IF LPAREN Exp RPAREN Matched ELSE Unmatched {
-		    //dynamic_cast<IfStmt*>($5)->matched = true;
-		    //dynamic_cast<IfStmt*>($7)->matched = false;
 		    auto stmt = new IfStmt();
 		    stmt->condition = ($3);
 		    stmt->matched = false;
@@ -369,13 +359,6 @@ Unmatched:
 		    $$ = stmt;
 		}
 		;
-
-Exp : LOrExp { 
-            auto exp = new Expr();
-            exp->LgExp = ($1);
-            $$ = exp;
-        };
-
 LVal :
 	IDENTIFIER {
 			auto l_val = new LVal();
@@ -392,63 +375,12 @@ LVal :
 		;
 Dimensions_lval : LBRACKET CONSTINT RBRACKET {
 	$$ = new std::vector<int>;
-	$$->emplace_back($2); 
+	$$->emplace_back($2);
 }
 | LBRACKET CONSTINT RBRACKET Dimensions_lval {
     $4->emplace_back($2);
     $$ = $4;
 };
-PrimaryExp: LPAREN Exp RPAREN { 
-      auto primary = new PrimaryExpr();
-			primary->Exp = ($2);
-			$$ = primary;
-		}
-		| LVal { 
-			auto primary = new PrimaryExpr();
-			primary->LVal = ($1);
-			$$ = primary; 
-		}
-		| Number { 
-			auto primary = new PrimaryExpr();
-			primary->Number = ($1);
-			$$ = primary;	
-		};
-
-Number: CONSTINT {
-		auto number = new IntegerLiteral($1);
-		$$ = number;
-  };
-
-UnaryExp: PrimaryExp { 
-		auto unary = new UnaryExpr();
-    unary->primaryExp = ($1);
-    $$ = unary;
-	}
-	| IDENTIFIER LPAREN FuncRParams RPAREN { 
-		auto unary = new UnaryExpr();
-		unary->name = *$1;
-		unary->isFunCall = true;
-		if($3 == nullptr)
-			$$ = unary;
-		else{
-			for(auto i: *$3)
-            unary->params.emplace_back(i);
-        $$ = unary;
-		}
-	}
-	| UNARYOP UnaryExp {
-		auto unary = new UnaryExpr();
-    unary->unaryExp = $2;
-    if($1 == '+'){
-        unary->opType = OpType::OP_Add;
-    }else if($1 == '-'){
-        unary->opType = OpType::OP_Neg;
-    }else if($1 == '!'){
-		     unary->opType = OpType::OP_Lnot;
-		}
-    $$ = unary;
-	};
-
 FuncRParams: Exp { 
 		auto param = new std::vector<NodePtr>;
     param->emplace_back($1);
@@ -471,123 +403,305 @@ DExps
     $$ = param;
   };
 
-MulExp: UnaryExp { 
-		auto mul_exp = new MulExp();
-    mul_exp->unaryExp = ($1);
-    $$ = mul_exp;
- }
-	| MulExp BINARYOP UnaryExp {
-		auto mul_exp = new MulExp();
-    mul_exp->mulExp = ($1);
-    if($2 == '*'){
-		    mul_exp->optype = OpType::OP_Mul;
-    }else if($2 == '/'){
-        mul_exp->optype = OpType::OP_Div;
-    }else if($2 == '%'){
-        mul_exp->optype = OpType::OP_Mod;
-    }
-    mul_exp->unaryExp = $3;
-    $$ = mul_exp;
-	};
+// jy want to change
 
-AddExp: MulExp { 
-		auto add_exp = new AddExp();
-    add_exp->mulExp = ($1);
-    $$ = add_exp;
- }
-	| AddExp UNARYOP MulExp {
-		auto add_exp = new AddExp();
-    add_exp->addExp = $1;
-    if($2 == '+'){
-        add_exp->optype = OpType::OP_Add;
-    }else if($2 == '-'){
-        add_exp->optype = OpType::OP_Sub;
-    }
-    add_exp->mulExp = $3;
-    $$ = add_exp;
-	};
-
-RelExp: AddExp { 
-		auto rel_exp = new CompExp();
-    rel_exp->lhs = $1;
-    $$ = rel_exp;
- }
-	| RelExp LESS AddExp { 
-		auto rel_exp = new CompExp();
-    rel_exp->lhs = ($1);
-		rel_exp->optype = OpType::OP_Lt;
-		rel_exp->rhs = $3;
-    $$ = rel_exp;	
+Exp:
+	Exp ADD Exp {
+		auto exp = new addExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
 	}
-	| RelExp GREAT AddExp { 
-		auto rel_exp = new CompExp();
-    rel_exp->lhs = $1;
-		rel_exp->optype = OpType::OP_Gt;
-		rel_exp->rhs = $3;
-    $$ = rel_exp;	
+	| Exp SUB Exp {
+		auto exp = new subExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
 	}
-	| RelExp LEQ AddExp { 
-		auto rel_exp = new CompExp();
-    rel_exp->lhs = $1;
-		rel_exp->optype = OpType::OP_Le;
-		rel_exp->rhs = $3;
-    $$ = rel_exp;	
+	| Exp MUL Exp {
+		auto exp = new mulExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
 	}
-	| RelExp GEQ AddExp { 
-		auto rel_exp = new CompExp();
-    rel_exp->lhs = $1;
-		rel_exp->optype = OpType::OP_Ge;
-		rel_exp->rhs = $3;
-    $$ = rel_exp;	
-	};
-
-EqExp: RelExp { 
-		auto comp_exp = new CompExp();
-    comp_exp->lhs = $1;
-    $$ = comp_exp;	
- }
-	| EqExp EQ RelExp { 
-		auto comp_exp = new CompExp();
-    comp_exp->lhs = $1;
-		comp_exp->optype = OpType::OP_Eq;
-		comp_exp->rhs = $3;
-    $$ = comp_exp;	
+	| Exp DIV Exp {
+		auto exp = new divExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
 	}
-	| EqExp NEQ RelExp { 
-		auto comp_exp = new CompExp();
-    comp_exp->lhs = $1;
-		comp_exp->optype = OpType::OP_Ne;
-		comp_exp->rhs = $3;
-    $$ = comp_exp;	
-	};
+	| Exp MOD Exp {
+		auto exp = new modExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp AND Exp {
+		auto exp = new andExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp OR Exp {
+		auto exp = new orExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp EQ Exp {
+		auto exp = new eqExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp NEQ Exp {
+		auto exp = new neqExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp GEQ Exp {
+		auto exp = new geqExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp LEQ Exp {
+		auto exp = new leqExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp GREAT Exp {
+		auto exp = new greatExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| Exp LESS Exp {
+		auto exp = new lessExp();
+		exp->lhs = $1;
+		exp->rhs = $3;
+		$$ = exp;
+	}
+	| NOT Exp {
+		auto exp = new notExp();
+		exp->lhs = $2;
+		$$ = exp;
+	}
+	| ADD Exp %prec NOT {
+		auto exp = new posExp();
+		exp->lhs = $2;
+		$$ = exp;
+	}
+	| SUB Exp %prec NOT {
+		auto exp = new negExp();
+		exp->lhs = $2;
+		$$ = exp;
+	}
+	| LPAREN Exp RPAREN {
+		$$ = $2;
+	}
+	| CONSTINT {
+		auto exp = new intExp();
+		exp->value = $1;
+		$$ = exp;
+	}
+	| IDENTIFIER LPAREN FuncRParams RPAREN {
+		auto exp = new funcallExp();
+		exp->name = *($1);
+		if($3 == nullptr)
+			$$ = exp;
+		else{
+			for(auto i: *$3)
+				exp->params.emplace_back(i);
+			$$ = exp;
+		}
+	}
+	| LVal {
+		$$ = $1;
+	}
+//	| LVal ASSIGN Exp {
+//		auto exp = new assignExp();
+//		exp->lhs = $1;
+//		exp->rhs = $3;
+//		$$ = exp;
+//	}
+	;
 
-LAndExp: EqExp { 
-		auto lg_exp = new LgExp();
-    lg_exp->lhs = ($1);
-    $$ = lg_exp;
- }
-	| LAndExp AND EqExp { 
-		auto lg_exp = new LgExp();
-    lg_exp->lhs = $1;
-    lg_exp->optype = OpType::OP_Land;
-    lg_exp->rhs = $3;
-    $$ = lg_exp;
-	 };
-
-LOrExp: LAndExp { 
-		auto lg_exp = new LgExp();
-    lg_exp->lhs = ($1);
-    $$ = lg_exp;
-}
-  | LOrExp OR LAndExp { 
-		auto lg_exp = new LgExp();
-    lg_exp->lhs = $1;
-    lg_exp->optype = OpType::OP_Lor;
-    lg_exp->rhs = $3;
-    $$ = lg_exp;
-	};
+// previous
 
 
+
+// PrimaryExp: LPAREN Exp RPAREN {  // ok
+//       auto primary = new PrimaryExpr();
+// 			primary->Exp = ($2);
+// 			$$ = primary;
+// 		}
+// 		| LVal { //ok
+// 			auto primary = new PrimaryExpr();
+// 			primary->LVal = ($1);
+// 			$$ = primary;
+// 		}
+// 		| CONSTINT { // ok
+// 			auto primary = new PrimaryExpr();
+// 			primary->Number = new IntegerLiteral($1);
+// 			$$ = primary;
+// 		};
+
+// UnaryExp: PrimaryExp { // ok
+// 		auto unary = new UnaryExpr();
+//     unary->primaryExp = ($1);
+//     $$ = unary;
+// 	}
+// 	| IDENTIFIER LPAREN FuncRParams RPAREN { //ok
+// 		auto unary = new UnaryExpr();
+// 		unary->name = *$1;
+// 		unary->isFunCall = true;
+// 		if($3 == nullptr)
+// 			$$ = unary;
+// 		else{
+// 			for(auto i: *$3)
+//             unary->params.emplace_back(i);
+//         $$ = unary;
+// 		}
+// 	}
+// 	| UNARYOP UnaryExp { //ok
+// 		auto unary = new UnaryExpr();
+//     unary->unaryExp = $2;
+//     if($1 == '+'){
+//         unary->opType = OpType::OP_Add;
+//     }else if($1 == '-'){
+//         unary->opType = OpType::OP_Neg;
+//     }else if($1 == '!'){
+// 		     unary->opType = OpType::OP_Lnot;
+// 		}
+//     $$ = unary;
+// 	};
+
+
+// MulExp: UnaryExp { //ok
+// 		auto mul_exp = new MulExp();
+//     mul_exp->unaryExp = ($1);
+//     $$ = mul_exp;
+//  }
+// 	| MulExp BINARYOP UnaryExp { //ok
+// 		auto mul_exp = new MulExp();
+//     mul_exp->mulExp = ($1);
+//     if($2 == '*'){
+// 		    mul_exp->optype = OpType::OP_Mul;
+//     }else if($2 == '/'){
+//         mul_exp->optype = OpType::OP_Div;
+//     }else if($2 == '%'){
+//         mul_exp->optype = OpType::OP_Mod;
+//     }
+//     mul_exp->unaryExp = $3;
+//     $$ = mul_exp;
+// 	};
+
+// AddExp: MulExp { //ok
+// 		auto add_exp = new AddExp();
+//     add_exp->mulExp = ($1);
+//     $$ = add_exp;
+//  }
+// 	| AddExp UNARYOP MulExp { //ok
+// 		auto add_exp = new AddExp();
+//     add_exp->addExp = $1;
+//     if($2 == '+'){
+//         add_exp->optype = OpType::OP_Add;
+//     }else if($2 == '-'){
+//         add_exp->optype = OpType::OP_Sub;
+//     }
+//     add_exp->mulExp = $3;
+//     $$ = add_exp;
+// 	};
+
+// RelExp: AddExp { //ok
+// 		auto rel_exp = new CompExp();
+//     rel_exp->lhs = $1;
+//     $$ = rel_exp;
+//  }
+// 	| RelExp LESS AddExp { //ok
+// 		auto rel_exp = new CompExp();
+//     rel_exp->lhs = ($1);
+// 		rel_exp->optype = OpType::OP_Lt;
+// 		rel_exp->rhs = $3;
+//     $$ = rel_exp;	
+// 	}
+// 	| RelExp GREAT AddExp { //ok
+// 		auto rel_exp = new CompExp();
+//     rel_exp->lhs = $1;
+// 		rel_exp->optype = OpType::OP_Gt;
+// 		rel_exp->rhs = $3;
+//     $$ = rel_exp;	
+// 	}
+// 	| RelExp LEQ AddExp { //ok
+// 		auto rel_exp = new CompExp();
+//     rel_exp->lhs = $1;
+// 		rel_exp->optype = OpType::OP_Le;
+// 		rel_exp->rhs = $3;
+//     $$ = rel_exp;	
+// 	}
+// 	| RelExp GEQ AddExp { //ok
+// 		auto rel_exp = new CompExp();
+//     rel_exp->lhs = $1;
+// 		rel_exp->optype = OpType::OP_Ge;
+// 		rel_exp->rhs = $3;
+//     $$ = rel_exp;	
+// 	};
+
+
+// EqExp: RelExp { //ok
+// 		auto comp_exp = new CompExp();
+//     comp_exp->lhs = $1;
+//     $$ = comp_exp;	
+//  }
+// 	| EqExp EQ RelExp { //ok
+// 		auto comp_exp = new CompExp();
+//     comp_exp->lhs = $1;
+// 		comp_exp->optype = OpType::OP_Eq;
+// 		comp_exp->rhs = $3;
+//     $$ = comp_exp;	
+// 	}
+// 	| EqExp NEQ RelExp { //ok
+// 		auto comp_exp = new CompExp();
+//     comp_exp->lhs = $1;
+// 		comp_exp->optype = OpType::OP_Ne;
+// 		comp_exp->rhs = $3;
+//     $$ = comp_exp;	
+// 	};
+
+// LAndExp: EqExp { //ok
+// 		auto lg_exp = new LgExp();
+//     lg_exp->lhs = ($1);
+//     $$ = lg_exp;
+//  }
+// 	| LAndExp AND EqExp { //ok
+// 		auto lg_exp = new LgExp();
+//     lg_exp->lhs = $1;
+//     lg_exp->optype = OpType::OP_Land;
+//     lg_exp->rhs = $3;
+//     $$ = lg_exp;
+// 	 };
+
+// LOrExp: LAndExp { // ok
+// 		auto lg_exp = new LgExp();
+//     lg_exp->lhs = ($1);
+//     $$ = lg_exp;
+// }
+//   | LOrExp OR LAndExp { // ok
+// 		auto lg_exp = new LgExp();
+//     lg_exp->lhs = $1;
+//     lg_exp->optype = OpType::OP_Lor;
+//     lg_exp->rhs = $3;
+//     $$ = lg_exp;
+// 	};
+
+// Exp : LOrExp { // ok
+//            auto exp = new Expr();
+//            exp->LgExp = ($1);
+//            $$ = exp;
+//        };
 
 
 %%

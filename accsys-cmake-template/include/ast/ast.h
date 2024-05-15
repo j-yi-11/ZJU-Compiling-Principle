@@ -52,70 +52,182 @@ struct FuncType : public Node {
     FuncType(Type type) : Node(this_type), type(type) {}
 };
 
-/// Expr
-struct Expr : public Node {
-    constexpr static NodeType this_type = ND_Expr;
-    NodePtr LgExp = nullptr;
-    Expr() : Node(this_type) {}
-};
-
-struct LgExp : public Node {
-    constexpr static NodeType this_type = ND_LgExpr;
+/// jy 5.14
+struct addExp : public Node {
+    constexpr static NodeType this_type = ND_AddExp;
     NodePtr lhs = nullptr;
     NodePtr rhs = nullptr;
-    OpType optype;
-    LgExp() : Node(this_type) {}
+    addExp() : Node(this_type) {}
 };
-
-struct CompExp : public Node {
-    constexpr static NodeType this_type = ND_CompExpr;
+struct subExp : public Node {
+    constexpr static NodeType this_type = ND_SubExp;
     NodePtr lhs = nullptr;
     NodePtr rhs = nullptr;
-    OpType optype;
-    CompExp() : Node(this_type) {}
+    subExp() : Node(this_type) {}
 };
-
-struct AddExp : public Node {
-    constexpr static NodeType this_type = ND_AddExpr;
-    NodePtr mulExp = nullptr;
-    NodePtr addExp = nullptr;
-    OpType optype;
-    AddExp() : Node(this_type) {}
+struct mulExp : public Node {
+    constexpr static NodeType this_type = ND_MulExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    mulExp() : Node(this_type) {}
 };
-
-struct MulExp : public Node {
-    constexpr static NodeType this_type = ND_MulExpr;
-    NodePtr mulExp = nullptr;
-    NodePtr unaryExp = nullptr;
-    OpType optype;
-    MulExp() : Node(this_type) {}
+struct divExp : public Node {
+    constexpr static NodeType this_type = ND_DivExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    divExp() : Node(this_type) {}
 };
-
-struct PrimaryExpr : public Node {
-    constexpr static NodeType this_type = ND_PrimaryExpr;
-    NodePtr Exp = nullptr;
-    NodePtr LVal = nullptr;
-    NodePtr Number = nullptr;
-    PrimaryExpr() : Node(this_type) {}
+struct modExp : public Node {
+    constexpr static NodeType this_type = ND_ModExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    modExp() : Node(this_type) {}
 };
-
-struct UnaryExpr : public Node {
-    constexpr static NodeType this_type = ND_UnaryExpr;
-    OpType opType;
-    NodePtr primaryExp = nullptr;
-    NodePtr unaryExp = nullptr;
-    bool isFunCall = false;
-    std::vector<NodePtr> params;
-    std::string name = "";
-    UnaryExpr() : Node(this_type) { }
+struct andExp : public Node {
+    constexpr static NodeType this_type = ND_AndExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    andExp() : Node(this_type) {}
 };
-
-struct IntegerLiteral : public Node {
-    constexpr static NodeType this_type = ND_IntegerLiteral;
+struct orExp : public Node {
+    constexpr static NodeType this_type = ND_OrExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    orExp() : Node(this_type) {}
+};
+struct lessExp : public Node {
+    constexpr static NodeType this_type = ND_LtExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    lessExp() : Node(this_type) {}
+};
+struct greatExp : public Node {
+    constexpr static NodeType this_type = ND_GtExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    greatExp() : Node(this_type) {}
+};
+struct leqExp : public Node {
+    constexpr static NodeType this_type = ND_LeExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    leqExp() : Node(this_type) {}
+};
+struct geqExp : public Node {
+    constexpr static NodeType this_type = ND_GeExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    geqExp() : Node(this_type) {}
+};
+struct eqExp : public Node {
+    constexpr static NodeType this_type = ND_EqExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    eqExp() : Node(this_type) {}
+};
+struct neqExp : public Node {
+    constexpr static NodeType this_type = ND_NeExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    neqExp() : Node(this_type) {}
+};
+struct notExp : public Node {
+    constexpr static NodeType this_type = ND_NotExp;
+    NodePtr lhs = nullptr;
+    notExp() : Node(this_type) {}
+};
+struct negExp : public Node {
+    constexpr static NodeType this_type = ND_NegExp;
+    NodePtr lhs = nullptr;
+    negExp() : Node(this_type) {}
+};
+struct posExp : public Node {
+    constexpr static NodeType this_type = ND_PosExp;
+    NodePtr lhs = nullptr;
+    posExp() : Node(this_type) {}
+};
+struct intExp : public Node {
+    constexpr static NodeType this_type = ND_IntegerConstExp;
     int64_t value = 0;
-    IntegerLiteral() : Node(this_type) {}
-    IntegerLiteral(int64_t value) : Node(this_type), value(value) {}
+    intExp() : Node(this_type) {}
+    intExp(int64_t value) : Node(this_type), value(value) {}
 };
+struct funcallExp : public Node {
+    constexpr static NodeType this_type = ND_FuncCallExp;
+    std::string name = "";
+    std::vector<NodePtr> params;
+    funcallExp() : Node(this_type) {}
+};
+struct assignExp : public Node {
+    constexpr static NodeType this_type = ND_AssignExp;
+    NodePtr lhs = nullptr;
+    NodePtr rhs = nullptr;
+    assignExp() : Node(this_type){}
+};
+/// Expr
+//struct Expr : public Node {
+//    constexpr static NodeType this_type = ND_Expr;
+//    NodePtr LgExp = nullptr;
+//    Expr() : Node(this_type) {}
+//};
+
+//struct LgExp : public Node {
+//    constexpr static NodeType this_type = ND_LgExpr;
+//    NodePtr lhs = nullptr;
+//    NodePtr rhs = nullptr;
+//    OpType optype;
+//    LgExp() : Node(this_type) {}
+//};
+//
+//struct CompExp : public Node {
+//    constexpr static NodeType this_type = ND_CompExpr;
+//    NodePtr lhs = nullptr;
+//    NodePtr rhs = nullptr;
+//    OpType optype;
+//    CompExp() : Node(this_type) {}
+//};
+
+//struct AddExp : public Node {
+//    constexpr static NodeType this_type = ND_AddExpr;
+//    NodePtr mulExp = nullptr;
+//    NodePtr addExp = nullptr;
+//    OpType optype;
+//    AddExp() : Node(this_type) {}
+//};
+//
+//struct MulExp : public Node {
+//    constexpr static NodeType this_type = ND_MulExpr;
+//    NodePtr mulExp = nullptr;
+//    NodePtr unaryExp = nullptr;
+//    OpType optype;
+//    MulExp() : Node(this_type) {}
+//};
+
+//struct PrimaryExpr : public Node {
+//    constexpr static NodeType this_type = ND_PrimaryExpr;
+//    NodePtr Exp = nullptr;
+//    NodePtr LVal = nullptr;
+//    NodePtr Number = nullptr;
+//    PrimaryExpr() : Node(this_type) {}
+//};
+
+//struct UnaryExpr : public Node {
+//    constexpr static NodeType this_type = ND_UnaryExpr;
+//    OpType opType;
+//    NodePtr primaryExp = nullptr;
+//    NodePtr unaryExp = nullptr;
+//    bool isFunCall = false;
+//    std::vector<NodePtr> params;
+//    std::string name = "";
+//    UnaryExpr() : Node(this_type) { }
+//};
+
+//struct IntegerLiteral : public Node {
+//    constexpr static NodeType this_type = ND_IntegerLiteral;
+//    int64_t value = 0;
+//    IntegerLiteral() : Node(this_type) {}
+//    IntegerLiteral(int64_t value) : Node(this_type), value(value) {}
+//};
 
 
 /// lval
@@ -192,8 +304,7 @@ struct VarDef : public Node {
     NodePtr initialValue = nullptr;//var single
     bool isArray = false;
     std::vector<int> dimensions;// array
-    VarDef() : Node(this_type){ }//std::string &name, int initialValue
-        //, name(name), initialValue(initialValue)
+    VarDef() : Node(this_type){ }
 };
 
 struct FuncDef : public Node {
@@ -228,11 +339,11 @@ struct VarDecl : public Node {
 };
 
 /// initial value
-struct InitVal : public Node {
-    constexpr static NodeType this_type = ND_InitVal;
-    NodePtr Exp = nullptr;
-    InitVal() : Node(this_type) {}
-};
+//struct InitVal : public Node {
+//    constexpr static NodeType this_type = ND_InitVal;
+//    NodePtr Exp = nullptr;
+//    InitVal() : Node(this_type) {}
+//};
 
 /// block
 struct Block : public Node {

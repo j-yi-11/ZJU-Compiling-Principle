@@ -12,13 +12,17 @@ digit [1-9][0-9]*|0
 blank [ \t\n]
 identifier [a-zA-Z_][a-zA-Z0-9_]*
 
-binary_operator [\*/%]
-unary_operator [!+-]
 %%
 
 {digit}           { yylval.ival = atoi(yytext); return CONSTINT; }
-{unary_operator}  { yylval.ival = (int)yytext[0]; return UNARYOP; }
-{binary_operator} { yylval.ival = (int)yytext[0]; return BINARYOP; }
+
+"+"             { return ADD; }
+"-"             { return SUB; }
+"*"             { return MUL; }
+"/"             { return DIV; }
+"%"             { return MOD; }
+"!"             { return NOT; }
+
 
 "="             { return ASSIGN; }
 "=="            { return EQ; }
@@ -58,3 +62,4 @@ unary_operator [!+-]
 .               { /*printf("ERROR(%s)\n", yytext);*/ }
 
 %%
+
