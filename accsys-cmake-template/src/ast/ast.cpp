@@ -28,91 +28,6 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         }
         return;
     }
-//    if (auto *expr = exp->as<Expr *>()) {
-////        fmt::print(prefix);
-//        printAST(expr->LgExp, prefix, ident);
-////        fmt::print(ident);
-//        return;
-//    }
-    // lg_exp
-//    if (auto *lg_exp = exp->as<LgExp *>()) {
-//        fmt::print(prefix);
-//        fmt::print("LgExp \"{}\"\n", op_str(lg_exp->optype));
-//        if(lg_exp->rhs == nullptr){
-//            printAST(lg_exp->lhs, prefix, ident);
-//        }else{
-//            printAST(lg_exp->lhs, prefix+" ", ident);
-//            printAST(lg_exp->rhs, prefix+" ", ident);
-//        }
-//        return;
-//    }
-    // comp_exp
-//    if (auto *comp_exp = exp->as<CompExp *>()) {
-//        fmt::print(prefix);
-//        fmt::print("CompExp \"{}\"\n", op_str(comp_exp->optype));
-//        if(comp_exp->rhs == nullptr){
-//            printAST(comp_exp->lhs, prefix, ident);
-//        }else{
-//            printAST(comp_exp->lhs, prefix+" ", ident);
-//            printAST(comp_exp->rhs, prefix+" ", ident);
-//        }
-//        return;
-//    }
-    // add_exp
-//    if (auto *add_exp = exp->as<AddExp *>()) {
-//        fmt::print(prefix);
-//        fmt::print("AddExp \"{}\"\n", op_str(add_exp->optype));
-//        printAST(add_exp->addExp, prefix+" ", ident);
-//        printAST(add_exp->mulExp, prefix+" ", ident);
-////        fmt::print(ident);
-//        return;
-//    }
-    // mul_exp
-//    if (auto *mul_exp = exp->as<MulExp *>()) {
-//        fmt::print(prefix);
-//        fmt::print("MulExp \"{}\"\n", op_str(mul_exp->optype));
-//        printAST(mul_exp->mulExp, prefix+" ", ident);
-//        printAST(mul_exp->unaryExp, prefix+" ", ident);
-////        fmt::print(ident);
-//        return;
-//    }
-    // primary_exp
-//    if (auto *primary_exp = exp->as<PrimaryExpr *>()) {
-//        fmt::print(prefix);
-//        fmt::print("PrimaryExpr\n");
-//        if (primary_exp->Exp != nullptr) {
-//            printAST(primary_exp->Exp, prefix+" ", ident);
-//        } else if (primary_exp->LVal != nullptr) {
-//            printAST(primary_exp->LVal, prefix+" ", ident);
-//        } else if (primary_exp->Number != nullptr) {
-//            printAST(primary_exp->Number, prefix+" ", ident);
-//        }
-////        fmt::print(ident);
-//        return;
-//    }
-//    if (auto *unary_exp = exp->as<UnaryExpr *>()) {
-//        fmt::print(prefix);
-//        fmt::print("UnaryExpr \"{}\"\n", op_str(unary_exp->opType));
-//        if (unary_exp->primaryExp != nullptr) {
-//            printAST(unary_exp->primaryExp, prefix+" ", ident);
-//        } else if (unary_exp->unaryExp != nullptr) {
-//            printAST(unary_exp->unaryExp, prefix+" ", ident);
-//        } else {
-//            fmt::print(prefix+" "+"{}\n", unary_exp->name);
-//            for (auto &param : unary_exp->params) {
-//                printAST(param, prefix+" ", ident);
-//            }
-//        }
-////        fmt::print(ident);
-//        return;
-//    }
-    // integer literal
-//    if (auto *lit = exp->as<IntegerLiteral *>()) {
-//        fmt::print(prefix);
-//        fmt::print("Int {}\n", lit->value);
-////        fmt::print(ident);
-//        return;
-//    }
     if (auto *add_exp = exp->as<addExp*>()){
         fmt::print(prefix);
         fmt::print("exp +\n");
@@ -247,16 +162,6 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         printAST(whilestmt->then, prefix+" ", ident);
         return;
     }
-//    if (auto *breakstmt = exp->as<BreakStmt *>()) {
-//        fmt::print(prefix);
-//        fmt::print("BreakStmt\n");
-//        return;
-//    }
-//    if (auto *continuestmt = exp->as<ContinueStmt *>()) {
-//        fmt::print(prefix);
-//        fmt::print("ContinueStmt\n");
-//        return;
-//    }
     if (auto *returnstmt = exp->as<ReturnStmt *>()) {
         fmt::print(prefix);
         fmt::print("ReturnStmt\n");
@@ -270,8 +175,6 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
     }
     // exp statement
     if (auto *stmt = exp->as<ExpStmt *>()) {
-//        fmt::print(prefix);
-//        fmt::print("ExpStmt\n");
         printAST(stmt->Exp, prefix, ident);
         return;
     }
@@ -283,14 +186,7 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         printAST(assignstmt->Exp, prefix+" ", ident);
         return;
     }
-//    if (auto *initialvalue = exp->as<InitVal *>()) {
-//        fmt::print(prefix);
-//        fmt::print("InitialValue:\n");
-//        printAST(initialvalue->Exp, prefix+" ", ident);
-//        return;
-//    }
     if (auto *decl = exp->as<Decl *>()) {
-//        fmt::print(prefix);
         printAST(decl->VarDecl, prefix, ident);
         return;
     }

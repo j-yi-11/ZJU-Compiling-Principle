@@ -6,6 +6,8 @@
 #include <ast/ast.h>
 #include <string>
 #include "sysy.tab.hh"
+
+int lineCount = 0;
 %}
 
 digit [1-9][0-9]*|0
@@ -52,14 +54,15 @@ identifier [a-zA-Z_][a-zA-Z0-9_]*
 "{"				{ return LBRACE; }
 "}"				{ return RBRACE; }
 
-"/*"[^*]*[*]+([^*/][^*]*[*]+)*"/"           { ; }
-"//".*	        { ; }
+"/*"[^*]*[*]+([^*/][^*]*[*]+)*"/"           { printf(" /**/ "); }
+"//".*	        { printf(" // "); }
 {identifier}        { 
                          yylval.sval = new std::string(yytext, yyleng);
+                         printf(" %s(ID) ", yytext);
                          return IDENTIFIER; 
 										}
 {blank}         { }
-.               { /*printf("ERROR(%s)\n", yytext);*/ }
+.               { printf("%s\n", yytext); printf("line count = %d",++lineCount); }
 
 %%
 

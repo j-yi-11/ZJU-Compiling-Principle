@@ -1,21 +1,69 @@
 
-// Semantic Error at Line 12: Array dimensions not matched, cannot convert 'int (*)[2]' to 'int (*)[3]'
-int f(int a[][3])
-{
-    a[2][2] = 1;
-    return 0;
+int func(int x, int y) {
+    return x;
 }
-
 
 int main()
 {
-    int a[20][3][2];
-    f(a[1]);
-    putint(a[3][2][1]);
+    // decl
+    int a;
+    int b,e,f;
+    a = 3 + 4;
+    int c[10];
+    int d[10][1];
+    if (a > 1) {
+        int a;
+        a = 9;
+        int m;
+        int k;
+        //if (b > 0) {
+        //    a = 3;
+        //}
+    } 
+    int u;
+    int i;
+    int j;
+    if (a == b * b) {
+
+    }
+
+
     return 0;
 }
 
-// Semantic Error at Line 8: No matching function for call to 'f'
 
-//int f (int i, int a[]) { return i; }
-//int main () { int a = f(1,2); return 0;}
+/*
+
+    if (1 > 5) {
+
+    } else if (2 > 5) {
+        if (a > 1) {
+            
+        }
+    }
+
+
+
+
+
+
+
+
+a > 1
+
+
+1 <= b | 1
+
+
+    if (b = 1) {
+
+    }
+    if (a == b * b) {
+
+    }
+    if (1 <= b - 1) {
+
+    }
+
+*/
+

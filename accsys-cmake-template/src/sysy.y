@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ast/ast.h>
 #include <string>
+#include <iostream>
 #include <vector>
 void yyerror(const char *s);
 extern int yylex(void);
@@ -59,6 +60,7 @@ extern NodePtr root;
 // JY write
 %%
 CompUnit : CompUnits {
+                std::cout<<"CompUnit";
                 auto comp_unit = new CompUnit();       
                 for(auto a : *$1) 
                         comp_unit->all.emplace_back(a);
@@ -373,20 +375,29 @@ LVal :
 			$$ = l_val;
 		}
 		;
-Dimensions_lval : LBRACKET CONSTINT RBRACKET {
-	$$ = new std::vector<int>;
-	$$->emplace_back($2);
-}
-| LBRACKET CONSTINT RBRACKET Dimensions_lval {
-    $4->emplace_back($2);
-    $$ = $4;
-};
+Dimensions_lval :
+		LBRACKET RBRACKET {
+			std::cout<<"Dimensions_lval";
+			$$ = new std::vector<int>;
+			$$->emplace_back(-1);
+		}
+		|
+		LBRACKET CONSTINT RBRACKET {
+			$$ = new std::vector<int>;
+			$$->emplace_back($2);
+		}
+		| LBRACKET CONSTINT RBRACKET Dimensions_lval {
+		    $4->emplace_back($2);
+		    $$ = $4;
+		};
+
 FuncRParams: Exp { 
 		auto param = new std::vector<NodePtr>;
     param->emplace_back($1);
     $$ = param;
   }
-	| DExps COMMA Exp { // keeping the parameter order
+	| DExps COMMA Exp {
+	  std::cout<<"FuncRParams";
     $1->emplace_back($3);
     $$ = $1;
   }

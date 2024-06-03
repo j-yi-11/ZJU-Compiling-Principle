@@ -44,6 +44,7 @@ endif()
 add_subdirectory(third_party/fmt EXCLUDE_FROM_ALL)
 
 # project include directories
+
 include_directories(include)
 include_directories(third_party/fmt/include)
 
