@@ -1,0 +1,63 @@
+// p = p - 1
+[checkExp]: subexp
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+[checkExp]: intexp->value: 1
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+
+// return p
+[ReturnStmt]: return int
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+
+// a = 10
+[checkExp]: intexp->value: 10
+[checkExp]: lval->name: a
+[findVarByName]: var a found
+
+// b = func(a)
+[checkExp]: funcallexp
+[checkFuncCall]: begin
+[checkFuncCall]: func name: func
+[checkFuncCall]: i: 0
+[checkFuncCall]: formal parameter is int
+[checkExp]: lval->name: a
+[findVarByName]: var a found
+[checkExp]: lval->name: b
+[findVarByName]: var b found
+
+// return b
+[ReturnStmt]: return int
+[checkExp]: lval->name: b
+[findVarByName]: var b found
+
+
+
+[checkExp]: subexp
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+[checkExp]: intexp->value: 1
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+
+
+[ReturnStmt]: return int
+[checkExp]: lval->name: p
+[findVarByName]: var p found
+
+
+[checkExp]: intexp->value: 10
+[checkExp]: lval->name: a
+[findVarByName]: var a found
+
+
+[checkExp]: funcallexp
+[checkFuncCall]: begin
+[checkFuncCall]: func name: func
+[checkFuncCall]: i: 0
+[checkFuncCall]: formal parameter is int
+[checkExp]: lval->name: a
+[findVarByName]: var a found
+
+assign statement has invalid expression

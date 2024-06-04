@@ -1,0 +1,27 @@
+CompUnit
+ VarDecl:
+  a
+ FuncDef: int func
+  FuncFParam:  p 'int'
+  Block
+   AssignStmt
+    LVal: p
+    exp -
+    LVal: p
+    exp int const with value 1
+   ReturnStmt
+    LVal: p
+ FuncDef: int main
+  FuncFParam: void
+  Block
+   VarDecl:
+    b
+   AssignStmt
+    LVal: a
+    exp int const with value 10
+   AssignStmt
+    LVal: b
+    exp function call with name func
+     LVal: a
+   ReturnStmt
+    LVal: b
