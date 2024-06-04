@@ -2796,7 +2796,7 @@ class GTEST_API_ Message {
   // This function is an overload of the previous one.  When you
   // stream a pointer to a Message, this definition will be used as it
   // is more specialized.  (The C++ Standard, section
-  // [temp.func.order].)  If you stream a non-pointer, then the
+  // [assembly.func.order].)  If you stream a non-pointer, then the
   // previous definition will be used.
   //
   // The reason for this overload is that streaming a NULL pointer to

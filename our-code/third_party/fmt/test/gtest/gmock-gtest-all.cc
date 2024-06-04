@@ -8186,11 +8186,11 @@ std::string TempDir() {
 #if defined(GTEST_CUSTOM_TEMPDIR_FUNCTION_)
   return GTEST_CUSTOM_TEMPDIR_FUNCTION_();
 #elif GTEST_OS_WINDOWS_MOBILE
-  return "\\temp\\";
+  return "\\assembly\\";
 #elif GTEST_OS_WINDOWS
   const char* temp_dir = internal::posix::GetEnv("TEMP");
   if (temp_dir == nullptr || temp_dir[0] == '\0') {
-    return "\\temp\\";
+    return "\\assembly\\";
   } else if (temp_dir[strlen(temp_dir) - 1] == '\\') {
     return temp_dir;
   } else {

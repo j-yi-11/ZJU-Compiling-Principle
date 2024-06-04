@@ -100,8 +100,8 @@
 // 'argK', and refer to its type by 'argK_type'.  For example:
 //
 //   ACTION(IncrementArg1) {
-//     arg1_type temp = arg1;
-//     return ++(*temp);
+//     arg1_type assembly = arg1;
+//     return ++(*assembly);
 //   }
 //
 // allows you to write
@@ -5448,7 +5448,7 @@ class PointwiseMatcher {
           StringMatchResultListener inner_listener;
           // Create InnerMatcherArg as a temporarily object to avoid it outlives
           // *left and *right. Dereference or the conversion to `const T&` may
-          // return temp objects, e.g for vector<bool>.
+          // return assembly objects, e.g for vector<bool>.
           if (!mono_tuple_matcher_.MatchAndExplain(
                   InnerMatcherArg(ImplicitCast_<const LhsValue&>(*left),
                                   ImplicitCast_<const RhsValue&>(*right)),

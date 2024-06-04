@@ -886,9 +886,9 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
 //        // params[i] is actual parameter
 //        // todo check param[i] is int exp
 //        // todo check params[i] is variable call
-////        if(auto* temp = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>()){
-////            fmt::print("get actual parameter name: {}\n",temp->name);
-////            varSymbolTypePtr tmp = findVarByName(currentTable, temp->name);
+////        if(auto* assembly = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>()){
+////            fmt::print("get actual parameter name: {}\n",assembly->name);
+////            varSymbolTypePtr tmp = findVarByName(currentTable, assembly->name);
 ////            // print info of tmp
 ////            if(tmp->isArray){
 ////                fmt::print("{} is array with ",tmp->name);
@@ -959,19 +959,19 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
 //
 //            if(isArrayCall){
 //                fmt::print("array call\n");
-//                auto *temp = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>();
-//                fmt::print("get actual parameter name: {}\n",temp->name);
-//                varSymbolTypePtr tmp = findVarByName(currentTable, temp->name);
+//                auto *assembly = params[i]->as<Expr*>()->LgExp->as<LgExp*>()->lhs->as<LgExp*>()->lhs->as<CompExp*>()->lhs->as<CompExp*>()->lhs->as<AddExp*>()->mulExp->as<MulExp*>()->unaryExp->as<UnaryExpr*>()->primaryExp->as<PrimaryExpr*>()->LVal->as<LVal*>();
+//                fmt::print("get actual parameter name: {}\n",assembly->name);
+//                varSymbolTypePtr tmp = findVarByName(currentTable, assembly->name);
 //                if(tmp->isArray){
-//                    if(tmp->dimension.size() - temp->position.size() != symbol->arglist[i]->dimension.size()){
+//                    if(tmp->dimension.size() - assembly->position.size() != symbol->arglist[i]->dimension.size()){
 //                        fmt::print("tmp->dimension.size(): {}\n",tmp->dimension.size());
-//                        fmt::print("temp->position.size(): {}\n",temp->position.size());
+//                        fmt::print("assembly->position.size(): {}\n",assembly->position.size());
 //                        fmt::print("symbol->arglist[i]->dimension.size(): {}\n",symbol->arglist[i]->dimension.size());
 //                        fmt::print("function call parameter array dimension size not match\n");
 //                        return false;
 //                    }
-//                    for(size_t j = 0; j < temp->position.size(); j++){
-//                        if(temp->position[j] != symbol->arglist[i]->dimension[j] && j!=0){
+//                    for(size_t j = 0; j < assembly->position.size(); j++){
+//                        if(assembly->position[j] != symbol->arglist[i]->dimension[j] && j!=0){
 //                            fmt::print("[ERROR]: function call parameter array {}th dimension not match\n", j+1);
 //                            return false;
 //                        }

@@ -41,8 +41,8 @@
 // 'argK', and refer to its type by 'argK_type'.  For example:
 //
 //   ACTION(IncrementArg1) {
-//     arg1_type temp = arg1;
-//     return ++(*temp);
+//     arg1_type assembly = arg1;
+//     return ++(*assembly);
 //   }
 //
 // allows you to write

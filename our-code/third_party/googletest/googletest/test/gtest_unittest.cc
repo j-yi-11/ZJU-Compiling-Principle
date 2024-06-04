@@ -1733,7 +1733,7 @@ using testing::internal::Int32FromGTestEnv;
 // environment variable is not set.
 TEST(Int32FromGTestEnvTest, ReturnsDefaultWhenVariableIsNotSet) {
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "");
-  EXPECT_EQ(10, Int32FromGTestEnv("temp", 10));
+  EXPECT_EQ(10, Int32FromGTestEnv("assembly", 10));
 }
 
 #if !defined(GTEST_GET_INT32_FROM_ENV_)
@@ -1744,10 +1744,10 @@ TEST(Int32FromGTestEnvTest, ReturnsDefaultWhenValueOverflows) {
   printf("(expecting 2 warnings)\n");
 
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "12345678987654321");
-  EXPECT_EQ(20, Int32FromGTestEnv("temp", 20));
+  EXPECT_EQ(20, Int32FromGTestEnv("assembly", 20));
 
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "-12345678987654321");
-  EXPECT_EQ(30, Int32FromGTestEnv("temp", 30));
+  EXPECT_EQ(30, Int32FromGTestEnv("assembly", 30));
 }
 
 // Tests that Int32FromGTestEnv() returns the default value when the
@@ -1756,10 +1756,10 @@ TEST(Int32FromGTestEnvTest, ReturnsDefaultWhenValueIsInvalid) {
   printf("(expecting 2 warnings)\n");
 
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "A1");
-  EXPECT_EQ(40, Int32FromGTestEnv("temp", 40));
+  EXPECT_EQ(40, Int32FromGTestEnv("assembly", 40));
 
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "12X");
-  EXPECT_EQ(50, Int32FromGTestEnv("temp", 50));
+  EXPECT_EQ(50, Int32FromGTestEnv("assembly", 50));
 }
 
 #endif  // !defined(GTEST_GET_INT32_FROM_ENV_)
@@ -1769,10 +1769,10 @@ TEST(Int32FromGTestEnvTest, ReturnsDefaultWhenValueIsInvalid) {
 // the range of an Int32.
 TEST(Int32FromGTestEnvTest, ParsesAndReturnsValidValue) {
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "123");
-  EXPECT_EQ(123, Int32FromGTestEnv("temp", 0));
+  EXPECT_EQ(123, Int32FromGTestEnv("assembly", 0));
 
   SetEnv(GTEST_FLAG_PREFIX_UPPER_ "TEMP", "-321");
-  EXPECT_EQ(-321, Int32FromGTestEnv("temp", 0));
+  EXPECT_EQ(-321, Int32FromGTestEnv("assembly", 0));
 }
 #endif  // !GTEST_OS_WINDOWS_MOBILE
 
