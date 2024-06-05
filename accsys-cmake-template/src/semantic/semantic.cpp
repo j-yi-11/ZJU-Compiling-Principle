@@ -663,15 +663,15 @@ bool checkLval(NodePtr exp, symbolTablePtr currentTable, funcSymbolTablePtr func
                     exit(1);
                     return false;
                 }
-                for (size_t i = 0; i < lval->position.size(); i++) {
-                    if (lval->position[i] >= symbol->dimension[i] && i != 0) {
-                        fmt::print("lvalue array index out of range\n");
-                        fmt::print("position[{}]: {}\n", i, lval->position[i]);
-                        fmt::print("dimension[{}]: {}\n", i, symbol->dimension[i]);
-                        exit(1);
-                        return false;
-                    }
-                }
+                // for (size_t i = 0; i < lval->position.size(); i++) {
+                //     if (lval->position[i] >= symbol->dimension[i] && i != 0) {
+                //         fmt::print("lvalue array index out of range\n");
+                //         fmt::print("position[{}]: {}\n", i, lval->position[i]);
+                //         fmt::print("dimension[{}]: {}\n", i, symbol->dimension[i]);
+                //         exit(1);
+                //         return false;
+                //     }
+                // }
             } else {
                 if (lval->position.size() != 0) {
                     fmt::print("lvalue variable has no dimension\n");
@@ -802,17 +802,17 @@ bool checkFuncCall(NodePtr exp, symbolTablePtr currentTable,
                                 return false;
                                 exit(1);
                             }
-                            for(size_t j = 0; j < symbol->arglist[i]->dimension.size(); j++){
-                                // funcallexp->params[i]->as<LVal*>()->position
-                                // int a[2][3][4];
-                                // void f(int a[])
-                                // f(a[1][2]) ok
-                                if(j != 0 && lval->position[i] >= symbol->arglist[i]->dimension[i]){
-                                    fmt::print("[ERROR]: function call parameter type not match array dimension\n");
-                                    return false;
-                                    exit(1);
-                                }
-                            }
+                            // for(size_t j = 0; j < symbol->arglist[i]->dimension.size(); j++){
+                            //     // funcallexp->params[i]->as<LVal*>()->position
+                            //     // int a[2][3][4];
+                            //     // void f(int a[])
+                            //     // f(a[1][2]) ok
+                            //     if(j != 0 && lval->position[i] >= symbol->arglist[i]->dimension[i]){
+                            //         fmt::print("[ERROR]: function call parameter type not match array dimension\n");
+                            //         return false;
+                            //         exit(1);
+                            //     }
+                            // }
                         }
                     }else{
                         fmt::print("[ERROR]: function call parameter type not match array: lval is nullptr\n");

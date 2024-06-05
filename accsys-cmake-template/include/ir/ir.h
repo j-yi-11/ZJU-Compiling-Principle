@@ -718,6 +718,7 @@ protected:
 private:
     Function *Parent;
     unsigned ArgNo;
+    
 
     friend class Function;
 public:
@@ -729,6 +730,9 @@ public:
     static bool classof(const Value *V) {
         return V->getValueID() == Value::ArgumentVal;
     }
+    // ydp added
+    std::vector<int> dimensions;
+    // std::string name;
 };
 
 
@@ -822,14 +826,15 @@ public:
     // ydp added
     friend class TempBlock;
     friend class Value;
-    void genEntryBlock(FuncDef *funcdef);
-    void genReturnBlock(FuncDef *funcdef);
-    void genExitBlock(FuncDef *funcdef);
-    void genSubBlock(Block *rootBlock, TempBlock *rootTempBlock);
-    void genExitStmt();
+    TempBlock *generateEntryBlock();
+    void generateReturnBlock();
+    void generateExitBlock();
+    void generateTempBlock(Block *rootBlock, TempBlock *parent);
+    void createLocalVariable(VarDef *varDef, TempBlock *root);
 
     int if_index = 0;
     int else_index = 0;
+    int while_index = 0;
     int cur_depth = 0;
     std::vector<TempBlock*> block_exec_ordered;
     std::vector<AllocaInst*> variable_stack;
@@ -838,9 +843,12 @@ public:
     void TempBlockConnect();
     void CreateBlocks();
     void BasicBlockConnect();
-    // void CreateJumpInst(BasicBlock *block)
-    void CalculateExpVal(NodePtr root);
-    Value* PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock); 
+
+
+    Value *PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock); 
+
+    Value *findEntryVariable(TempBlock *root, NodePtr variable);
+    Value *findVariable(NodePtr variable, TempBlock *root);
 
 };
 
@@ -853,6 +861,7 @@ protected:
 private:
     Type *EleTy;
     std::size_t NumElements;
+    std::vector<std::optional<std::size_t>> Bounds; // added
     bool ExternalLinkage;
     Module *Parent;
 public:
@@ -866,6 +875,10 @@ public:
     /// Return the function is defined in the current module or has external linkage.
     bool hasExternalLinkage() const { return ExternalLinkage; }
     Module *getParent() const { return Parent; }
+    std::vector<std::optional<std::size_t>> getBounds() const { return Bounds; }   // added
+    void setBounds(size_t bound) {
+        Bounds.push_back(bound);
+    }
 
     static bool classof(const Value *V) {
         return V->getValueID() == Value::GlobalVariableVal;
@@ -943,6 +956,7 @@ public:
 
     void genGlobalList(NodePtr root);
     void genFuncList(NodePtr root);
+    void declExLinkFunction();
 };
 
 
@@ -951,14 +965,21 @@ public:
 class TempBlock {
 public:
     enum TempBlockType {
+        ENTRY,
+        AFTER_RETURN,
+        EXIT,
         IF_THEN,
         IF_ELSE,
-        IF_END
+        IF_END, 
+        WHILE_COND,
+        WHILE_BODY,
+        WHILE_END
     };
     
     TempBlockType type;
     int if_index;
     int else_index;
+    int while_index;
     int depth;
 
     enum BranchType {
@@ -972,16 +993,22 @@ public:
 
     std::vector<Instruction*> instructions;
     BasicBlock *basic_block;
-    TempBlock *next_block;
-    TempBlock *parent;
+    std::optional<TempBlock *> next_block = nullptr;
 
-    TempBlock(){}
-    void addInstruction(unsigned Opcode);
-    // void blockConnect();
+
+    TempBlock *parent;
+    Value *condition;
+
+    TempBlock(TempBlockType type, TempBlock *parent, int depth, int if_index = 0, int else_index = 0, int while_index = 0)
+        : type(type), parent(parent), depth(depth), if_index(if_index), else_index(else_index), while_index(while_index) {}
+
     void print() {
         
         std::string name;
         switch(type) {
+            case ENTRY:
+                name = "entry";
+                break;
             case IF_THEN:
                 name = "if_then"+std::to_string(if_index);
                 break;
@@ -991,8 +1018,17 @@ public:
             case IF_END:
                 name = "if_end"+std::to_string(if_index);
                 break;
+            case WHILE_COND:
+                name = "while_cond"+std::to_string(while_index);
+                break;
+            case WHILE_BODY:
+                name = "while_body"+std::to_string(while_index);
+                break;
+            case WHILE_END:
+                name = "while_end"+std::to_string(while_index);
+                break;
         }
-        std::string next_name;
+        std::string next_name = {};
         switch(next_block_type) {
             case IF_THEN:
                 next_name = "if_then"+std::to_string(next_block_index);
@@ -1003,11 +1039,25 @@ public:
             case IF_END:
                 next_name = "if_end"+std::to_string(next_block_index);
                 break;
+            case WHILE_COND:
+                next_name = "while_cond"+std::to_string(next_block_index);
+                break;
+            case WHILE_BODY:
+                next_name = "while_body"+std::to_string(next_block_index);
+                break;
+            case WHILE_END:
+                next_name = "while_end"+std::to_string(next_block_index);
+                break;
+            case EXIT:
+                next_name = "exit";
+                break;
         }
 
         if (is_last == true) {
-            fmt::print("{}\n", name + " -> " + "JMP " + "exit");
-        } else
-            fmt::print("{}\n", name + " -> " + (branch == JMP ? "JMP" : "BR") + " " + next_name);
+            fmt::print("{}\n", name + " depth-" + std::to_string(depth) + " -> " + "JMP " + "exit");
+        } else {
+            fmt::print("{}\n", name + " depth-" + std::to_string(depth) + " -> " + (branch == JMP ? "JMP" : "BR") + " " + next_name);
+        }
+            
     }
 };

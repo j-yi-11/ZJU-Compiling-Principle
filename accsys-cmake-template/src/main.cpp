@@ -32,7 +32,7 @@ int main(int argc, char **argv)
         return 1;
     }
     fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "lexer and parser success\n");
-    bool printAST_flag = false;
+    bool printAST_flag = true;
     if (root == nullptr)
     {
         fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "AST root is nullptr\n");
@@ -47,11 +47,11 @@ int main(int argc, char **argv)
         }
     }
     // semantic anaylsis
-    funcSymbolTablePtr funTablePtr = GenerateFuncSymTable(root);
+    // funcSymbolTablePtr funTablePtr = GenerateFuncSymTable(root);
 
-    symbolTablePtr rootTablePtr = new SymbolTable();
-    GenerateVarSymTable(root, rootTablePtr, funTablePtr, "");
-    fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "semantic analysis success\n");
+    // symbolTablePtr rootTablePtr = new SymbolTable();
+    // GenerateVarSymTable(root, rootTablePtr, funTablePtr, "");
+    // fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "semantic analysis success\n");
 
     // ir generation
     Module *M = new Module;

@@ -36,8 +36,8 @@ extern NodePtr root;
 %type <nodeVal> Matched Unmatched
 %type <vecVal> BlockItems VarDefs
 %type <vecVal> FuncFParams DFuncFParams FuncRParams DExps CompUnits
-%type <iVecVal> Dimensions Dimensions_funcdef Dimensions_lval
-
+%type <iVecVal> Dimensions Dimensions_funcdef 
+%type <vecVal> Dimensions_lval
 // jy add 5.14 ADD SUB MUL DIV MOD NOT
 %token  ASSIGN
 				ADD SUB MUL DIV MOD NOT
@@ -155,12 +155,6 @@ Dimensions : LBRACKET CONSTINT RBRACKET {
                 $4->insert($4->begin(), $2);
                 $$ = $4;
         };
-
-// InitVal : Exp {
-//                 auto val = new InitVal();
-//                 val->Exp = $1;
-//                 $$ = val;
-//         };
 
 // func def   
 // int f(int a, int b[]){...}
@@ -378,17 +372,19 @@ LVal :
 Dimensions_lval :
 		LBRACKET RBRACKET {
 			std::cout<<"Dimensions_lval";
-			$$ = new std::vector<int>;
-			$$->emplace_back(-1);
+			// $$ = new std::vector<int>;
+			$$ = new std::vector<NodePtr>;
+			$$->emplace_back(nullptr);
 		}
 		|
-		LBRACKET CONSTINT RBRACKET {
-			$$ = new std::vector<int>;
+		LBRACKET Exp RBRACKET { //  CONSTINT
+			// $$ = new std::vector<int>;
+			$$ = new std::vector<NodePtr>;
 			$$->emplace_back($2);
 		}
-		| LBRACKET CONSTINT RBRACKET Dimensions_lval {
-		    $4->emplace_back($2);
-		    $$ = $4;
+		| Dimensions_lval LBRACKET Exp RBRACKET  { // CONSTINT
+		    $1->emplace_back($3);
+		    $$ = $1;
 		};
 
 FuncRParams: Exp { 

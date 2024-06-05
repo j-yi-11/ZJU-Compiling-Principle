@@ -235,7 +235,8 @@ struct LVal : public Node {
     constexpr static NodeType this_type = ND_LVal;
     std::string name = "";
     bool isArray = false;
-    std::vector<int> position; // array
+    std::vector<NodePtr> position;
+    // std::vector<int> position; // array
     LVal() : Node(this_type) {}
 };
 /// statement

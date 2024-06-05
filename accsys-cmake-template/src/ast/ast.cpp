@@ -139,8 +139,8 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         if (lval->isArray) {
             // print array out
             fmt::print(" with dimension ");
-            for(auto &i : lval->position){
-                fmt::print("[{}]", i);
+            for(auto *i : lval->position){
+                printAST(i,prefix,ident);
             }
         }
         fmt::print("\n");
