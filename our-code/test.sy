@@ -1,0 +1,63 @@
+// int a;
+// int b[2];
+// int c[4][3];
+// int i = 2024;
+
+// int func_t(int m, int n, int p) {
+//     return 1;
+// }
+
+// void func(int a[][100000], int x) {
+//     return;
+// }
+
+int main() {
+    int a;
+    int b;
+    a = 1;
+    b = a;
+    if (b * 3 - 1 + a == 1 && a > 3) {
+        a = 1;
+    } 
+    else if (b == 2) {
+        a = 2;
+    } else {
+        a = 3;
+    }
+
+    int end;
+    end = 777;
+
+    if (b == 3) {
+        if (b == 4) {
+            a = 4;
+            if (b == 100) {
+                a = 100;
+            }
+            if (b == 99) {
+                a = 99;
+            } else {
+                a = 98;
+            }
+        } else {
+            a = 5;
+        }
+
+        if(b == 50) {
+            a = 50;
+        }
+        
+    } 
+    else if (b == 5) {
+        a = 5;
+    } else {
+        a = 6;
+    }
+
+    if (b == 6) {
+        a = 6;
+    }
+    
+    
+    return 1;
+}

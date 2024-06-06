@@ -4,6 +4,11 @@
 #include "utils/list.h"
 #include "utils/casting.h"
 
+// ydp added
+#include "ast/ast.h"
+#include <fmt/core.h>
+#include <fmt/color.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -19,6 +24,7 @@ class Constant;
 class BasicBlock;
 class Function;
 class Module;
+class TempBlock;
 
 
 
@@ -331,7 +337,7 @@ public:
     };    
 };
 
-
+// used
 class BinaryInst: public Instruction {
 protected:
     BinaryInst(BinaryOps Op, Value *LHS, Value *RHS, Type* Ty,
@@ -363,7 +369,7 @@ public:
         return isa<Instruction>(V) && dyn_cast<Instruction>(V)->isBinaryOp();
     }
 };
-
+// used
 class AllocaInst: public Instruction {
 protected:
     AllocaInst(Type *PointeeTy, std::size_t NumElements, Instruction *InsertBefore);
@@ -371,6 +377,8 @@ protected:
 private:
     Type *AllocatedType;
     std::size_t NumElements;
+    // added for offset bounds by ydp
+    std::vector<std::optional<std::size_t>> Bounds;
 public:
     static AllocaInst *Create(Type *PointeeTy, std::size_t NumElements,
                               Instruction *InsertBefore = nullptr);
@@ -380,7 +388,10 @@ public:
     Type *getAllocatedType() const { return AllocatedType; }
     /// Return the number of elements allocated.
     std::size_t getNumElements() const { return NumElements; }
-
+    std::vector<std::optional<std::size_t>> getBounds() const { return Bounds; }   // added
+    void setBounds(size_t bound) {
+        Bounds.push_back(bound);
+    }
 
     static bool classof(const Instruction *I) {
         return I->getOpcode() == Instruction::Alloca;
@@ -390,7 +401,7 @@ public:
         return isa<Instruction>(V) && classof(cast<Instruction>(V));
     }
 };
-
+// used
 class StoreInst: public Instruction {
 protected:
     StoreInst(Value *Val, Value *Ptr, Instruction *InsertBefore);
@@ -416,8 +427,7 @@ public:
         return isa<Instruction>(V) && classof(cast<Instruction>(V));
     }
 };
-
-
+// used
 class LoadInst: public Instruction {
 protected:
     LoadInst(Value *Ptr, Instruction *InsertBefore);
@@ -437,8 +447,7 @@ public:
         return isa<Instruction>(V) && classof(cast<Instruction>(V));
     }
 };
-
-
+// used
 class OffsetInst: public Instruction {
 protected:
     OffsetInst(Type *PointeeTy,
@@ -466,7 +475,7 @@ public:
                               Instruction *InsertBefore = nullptr);
     static OffsetInst *Create(Type *PointeeTy, Value *Ptr,
                               std::vector <Value *> &Indices,
-                              std::vector <std::optional<std::size_t>> &Boundss,
+                              std::vector <std::optional<std::size_t>> &Bounds,
                               BasicBlock *InsertAtEnd);
 
     using bound_iter = std::vector<std::optional<std::size_t>>::iterator;
@@ -504,8 +513,7 @@ public:
         return isa<Instruction>(V) && classof(cast<Instruction>(V));
     }
 };
-
-
+// used
 class CallInst: public Instruction {
 protected:
     CallInst(Function *Callee, const std::vector<Value *> &Args, Instruction *InsertBefore);
@@ -651,12 +659,14 @@ private:
     const InstListType &getInstList() const { return InstList; }
 
     BasicBlock(Function *Parent, BasicBlock *InsertBefore);
+    void setParent(Function *F);
+
+    friend class Function;
 public:
     static BasicBlock *Create(Function *Parent = nullptr, BasicBlock *InsertBefore = nullptr);
     /// Insert an unlinked basic block into a function immediately before the specified basic block.
     void insertInto(Function *Parent, BasicBlock *InsertBefore = nullptr);
 
-    void setParent(Function *F);
     Function *getParent() const { return Parent; }
     bool hasName() const;
     void setName(std::string_view Name);
@@ -689,6 +699,13 @@ public:
     [[nodiscard]] Instruction &front() { return InstList.front(); }
     [[nodiscard]] const Instruction &back() const { return InstList.back(); }
     [[nodiscard]] Instruction &back() { return InstList.back(); }
+
+
+    // ydp added
+    // int if_idx = 0;
+    // int else_idx = 0;
+    // int depth = 0;
+
 };
 
 
@@ -800,6 +817,31 @@ public:
     // Arguments container method.
     [[nodiscard]] std::size_t arg_size() const { return NumArgs; }
     [[nodiscard]] bool arg_empty() const { return arg_size() == 0; }
+
+
+    // ydp added
+    friend class TempBlock;
+    friend class Value;
+    void genEntryBlock(FuncDef *funcdef);
+    void genReturnBlock(FuncDef *funcdef);
+    void genExitBlock(FuncDef *funcdef);
+    void genSubBlock(Block *rootBlock, TempBlock *rootTempBlock);
+    void genExitStmt();
+
+    int if_index = 0;
+    int else_index = 0;
+    int cur_depth = 0;
+    std::vector<TempBlock*> block_exec_ordered;
+    std::vector<AllocaInst*> variable_stack;
+
+    void AnalysisBlockOrder();
+    void TempBlockConnect();
+    void CreateBlocks();
+    void BasicBlockConnect();
+    // void CreateJumpInst(BasicBlock *block)
+    void CalculateExpVal(NodePtr root);
+    Value* PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock); 
+
 };
 
 
@@ -812,7 +854,6 @@ private:
     Type *EleTy;
     std::size_t NumElements;
     bool ExternalLinkage;
-    std::string Name;
     Module *Parent;
 public:
     static GlobalVariable *Create(Type *EleTy, std::size_t NumElements = 1, bool ExternalLinkage = false,
@@ -825,9 +866,6 @@ public:
     /// Return the function is defined in the current module or has external linkage.
     bool hasExternalLinkage() const { return ExternalLinkage; }
     Module *getParent() const { return Parent; }
-    std::string_view getName() const { return Name; }
-    bool hasName() const;
-
 
     static bool classof(const Value *V) {
         return V->getValueID() == Value::GlobalVariableVal;
@@ -849,10 +887,10 @@ public:
     using const_global_iterator = GlobalListType::const_iterator;
 
 private:
-    FunctionListType FunctionList;
-    GlobalListType GlobalVariableList;
     std::unordered_map<std::string_view, Function *> SymbolFunctionMap;
     std::unordered_map<std::string_view, GlobalVariable *> SymbolGlobalMap;
+    FunctionListType FunctionList;
+    GlobalListType GlobalVariableList;
 
     friend class Function;
     friend class GlobalVariable;
@@ -875,6 +913,10 @@ public:
     // Private functions and global variables accessors.
     FunctionListType &getFunctionList() { return FunctionList; }
     const FunctionListType &getFunctionList() const { return FunctionList; }
+    std::unordered_map<std::string_view, Function *> &
+    getFunctionMap() { return SymbolFunctionMap; }
+    const std::unordered_map<std::string_view, Function *> &
+    getFunctionMap() const { return SymbolFunctionMap; }
 
     [[nodiscard]] std::size_t size() const { return FunctionList.size(); }
     [[nodiscard]] bool empty() const { return FunctionList.empty(); }
@@ -882,6 +924,10 @@ public:
     /// Global variable accessor.
     /// Look up the specified global variable in the module symbol table.
     GlobalVariable *getGlobalVariable(std::string_view Name) const;
+    std::unordered_map<std::string_view, GlobalVariable *> &
+    getGlobalVariableMap() { return SymbolGlobalMap; }
+    const std::unordered_map<std::string_view, GlobalVariable *> &
+    getGlobalVariableMap() const { return SymbolGlobalMap; }
     // Global iteration.
     global_iterator global_begin() { return GlobalVariableList.begin(); }
     const_global_iterator global_begin() const { return GlobalVariableList.cbegin(); }
@@ -892,4 +938,76 @@ public:
 
     [[nodiscard]] std::size_t global_size() const { return GlobalVariableList.size(); }
     [[nodiscard]] bool global_empty() const { return GlobalVariableList.empty(); }
+
+    // ydp added
+
+    void genGlobalList(NodePtr root);
+    void genFuncList(NodePtr root);
+};
+
+
+
+// ydp added
+class TempBlock {
+public:
+    enum TempBlockType {
+        IF_THEN,
+        IF_ELSE,
+        IF_END
+    };
+    
+    TempBlockType type;
+    int if_index;
+    int else_index;
+    int depth;
+
+    enum BranchType {
+        JMP,
+        BR
+    };
+    BranchType branch;
+    TempBlockType next_block_type;
+    int next_block_index;
+    bool is_last = false;
+
+    std::vector<Instruction*> instructions;
+    BasicBlock *basic_block;
+    TempBlock *next_block;
+    TempBlock *parent;
+
+    TempBlock(){}
+    void addInstruction(unsigned Opcode);
+    // void blockConnect();
+    void print() {
+        
+        std::string name;
+        switch(type) {
+            case IF_THEN:
+                name = "if_then"+std::to_string(if_index);
+                break;
+            case IF_ELSE:
+                name = "if_else"+std::to_string(if_index);
+                break;
+            case IF_END:
+                name = "if_end"+std::to_string(if_index);
+                break;
+        }
+        std::string next_name;
+        switch(next_block_type) {
+            case IF_THEN:
+                next_name = "if_then"+std::to_string(next_block_index);
+                break;
+            case IF_ELSE:
+                next_name = "if_else"+std::to_string(next_block_index);
+                break;
+            case IF_END:
+                next_name = "if_end"+std::to_string(next_block_index);
+                break;
+        }
+
+        if (is_last == true) {
+            fmt::print("{}\n", name + " -> " + "JMP " + "exit");
+        } else
+            fmt::print("{}\n", name + " -> " + (branch == JMP ? "JMP" : "BR") + " " + next_name);
+    }
 };

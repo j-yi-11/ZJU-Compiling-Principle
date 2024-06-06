@@ -1,0 +1,18 @@
+int a;
+int b[2];
+int c[4][3];
+int i = 2024;
+
+int func_t() {
+    return 1;
+}
+
+void func(int a[][100000]) {
+    int i = 1;
+    return;
+}
+
+int main() {
+
+    return 0;
+}

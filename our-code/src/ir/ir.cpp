@@ -1,312 +1,627 @@
-//
-// Created by jiangyi on 2024/5/30.
-//
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <iostream>
-#include <fmt/core.h>
 #include "ir/ir.h"
-#include "ast/ast.h"
-int registerNumber = 1;
-int if_scope = 0;
-int while_scope = -1;
-int short_circuit_scope = 0;
-std::vector<std::string> global_var_init;
-std::unordered_map<std::string, std::vector<int> > all_arrays;
-void re_format(std::string &s){
-    if(s[0]=='%'){
-        s += ": i32";
-        if(s[1]>='a'&&s[1]<='z'||s[1]>='A'&&s[1]<='Z'){
-            s += "*";
-        }
+#include "ir/type.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <string_view>
+#include <vector>
+
+Use::Use(Value *Parent) : Parent(Parent) { }
+
+
+void Use::removeFromList() {
+    *Prev = Next;
+    if (Next) {
+        Next->Prev = Prev;
     }
 }
 
-std::string translate_params(std::vector<NodePtr> &arglist){
-    std::string result, singleParam;
-    bool debug = false;
-    if(debug) fmt::print("translate_params\n");
-    for(size_t i = 0; i < arglist.size(); i++){
-        if(auto* param = arglist[i]->as<FuncFParam*>()){
-            singleParam = "#" + param->name + ": i32";
-            if(param->isArray){
-                singleParam += "*";
-            }
-            result += singleParam;
-            if(i != arglist.size() - 1){
-                result += ", ";
-            }
-        }
+void Use::addToList(Use **UseList) {
+    Next = *UseList;
+    if (Next) {
+        Next->Prev = &Next;
     }
-    return result;
+    Prev = UseList;
+    *Prev = this;
 }
 
-std::string translate_exp(NodePtr node){
-    bool debug = false;
-    std::string result = "";
-    if(debug) fmt::print("translate_exp\n");
-    if (auto *int_exp = node->as<intExp*>()){
-        result = std::to_string(int_exp->value);
-    }
-    if(auto* pos_exp = node->as<posExp*>()){
-        // a = +b
-        // let %4: i32 = load %b: i32*
-        // let %5: () = store %4: i32, @a: i32*
-        result = translate_exp(pos_exp->lhs);
-    }
-    if(auto* neg_exp = node->as<negExp*>()){
-        // a = -b
-        // let %4: i32 = load %b: i32*
-        // let %5: i32 = sub 0, %4: i32
-        // let %6: () = store %5: i32, @a: i32*
-        result = translate_exp(neg_exp->lhs);
-        re_format(result);
-        result = "let %" + std::to_string(registerNumber++) + ": i32 = sub 0, " + result;
-    }
-    if(auto *not_exp = node->as<notExp*>()){
-        // a = !b
-        // let %4: i32 = load %b: i32*
-        // let %5: i32 = eq 0, %4: i32
-        // let %6: () = store %5: i32, @a: i32*
-        result = translate_exp(not_exp->lhs);
-        re_format(result);
-        result = "let %" + std::to_string(registerNumber++) + ": i32 = eq 0, " + result;
-    }
-    return result;
+void Use::set(Value *V) {
+    if (Val)
+        removeFromList();
+    Val = V;
+    if (V)
+        V->addUse(*this);
 }
 
-std::string translate_LVal(NodePtr node){
-    bool debug = false;
-    std::string result = "";
-    if(auto* lval = node->as<LVal*>()){
-        if(debug) fmt::print("translate_LVal\n");
-        if(lval->isArray == false){
-            // not array
-            result = lval->name;
-        }else{
-            // array
-            // find name in all_arrays
-            if(all_arrays.find(lval->name) != all_arrays.end()){
-                // get array size per dimension
-                std::vector<int> dimensions = all_arrays[lval->name];
-                result = "let %" + std::to_string(registerNumber++);
-                // get array index for lval->position
-                // todo
-            }else{
-                fmt::print("Error: array {} not found in all_arrays\n",lval->name);
-            }
-        }
-    }
-    return result;
 
+Value::Value(Type *Ty, unsigned scid)
+    : SubclassID(scid), Ty(Ty) {} 
+
+Value::~Value() {
+    // remove all uses.
+    replaceAllUsesWith(nullptr);
 }
 
-void translate_Stmt(NodePtr node){
-    bool debug = false;
-    if(auto* return_stmt = node->as<ReturnStmt*>()){
-        if(return_stmt->result == nullptr){
-            // return ;
-            if(debug) fmt::print("[translate_Stmt]:return ;\n");
-            ircode.emplace_back("jmp label %exit");
-        }else{
-            // return exp;
-            if(debug) fmt::print("[translate_Stmt]:return exp\n");
-            std::string return_result = translate_exp(return_stmt->result);
-            re_format(return_result);
-            //  let %22: () = store 0, %ret_val.addr: i32*
-            //  jmp label %exit
-            ircode.emplace_back("let %" + std::to_string(registerNumber++) + ": () = store " + return_result + ", %ret_val.addr: i32*");
-            ircode.emplace_back("jmp label %exit");
-        }
-    } else if(auto* assign_stmt = node->as<AssignStmt*>()){
-        std::string lval_name = translate_LVal(assign_stmt->LVal);
-        std::string exp_result = translate_exp(assign_stmt->Exp);
-        re_format(exp_result);
-        fmt::print("[translate_Stmt]:assign {}\n",lval_name);
-        // let %4: i32* = offset i32, %a: i32*, [2 < 10]
-        // let %5: () = store 4, %4: i32*
-
-    }
+unsigned Value::getNumUses() const {
+    auto view = getUserView();
+    unsigned size = 0;
+    for (auto I = view.begin(), IE = view.end(); I != IE; ++I)
+        ++size;
+    return size;
 }
 
-void translate_BlockItem(NodePtr node){
-    bool debug = false;
-    if(auto* block_item = node->as<BlockItem*>()){
-        if(block_item->Decl != nullptr){
-            auto* temp = block_item->Decl->as<Decl*>();
-            auto* var_decl = temp->VarDecl->as<VarDecl*>();
-            if(debug) fmt::print("[translate_BlockItem]:varDecl\n");
-            translate_VarDecl(var_decl,false);
-        }else if(block_item->Stmt != nullptr){
-            if(debug) fmt::print("[translate_BlockItem]:Stmt\n");
-            translate_Stmt(block_item->Stmt);
+void Value::replaceAllUsesWith(Value *V) {
+    std::vector<Use *> Uses;
+    auto view = getUserView();
+    for (auto &I : view)
+        Uses.push_back(&I);
+    
+    for (auto I: Uses)
+        I->set(V);
+}
+
+void Value::setName(std::string_view NewName) {
+    // 'Constant' has no name
+    if (isa<Constant>(this))
+        return;
+    // set no name.
+    if (!hasName() && NewName.empty())
+        return;
+    // Name isn't change?
+    if (getName() == NewName)
+        return;
+    // symbol table to update?
+    if (auto *GV = dyn_cast<GlobalVariable>(this)) {
+        auto &ST = GV->getParent()->getGlobalVariableMap();
+        if (!NewName.empty()) {
+            if (GV->hasName())
+                ST.erase(GV->getName());
+            ST[NewName] = GV;
+        } else {
+            ST.erase(GV->getName());
         }
+    }
+    // set name.
+    Name = NewName;
+}
+
+bool Value::hasName() const {
+    return !Name.empty();
+}
+
+
+Constant::Constant(Type *Ty, unsigned VT)
+    : Value(Ty, VT) {}
+
+ConstantInt::ConstantInt(std::uint32_t Val)
+    : Constant(Type::getIntegerTy(), Value::ConstantIntVal),
+      value(Val) {}
+
+ConstantInt *ConstantInt::Create(std::uint32_t Val) {
+    return new ConstantInt(Val);
+}
+
+ConstantUnit::ConstantUnit()
+    : Constant(Type::getUnitTy(), Value::ConstantUnitVal) {}
+
+ConstantUnit *ConstantUnit::Create() {
+    return new ConstantUnit;
+}
+
+
+Instruction::Instruction(Type *Ty, unsigned Opcode, 
+                         const std::vector<Value *> &Ops,
+                         Instruction *InsertBefore) 
+    : Value(Ty, Value::InstructionVal + Opcode),
+      NumUserOperands(Ops.size()) {
+    if (NumUserOperands > 0) {
+        Uses = std::allocator<Use>().allocate(NumUserOperands);
+        for (unsigned i = 0, e = NumUserOperands; i != e; ++i) {
+            new (Uses + i) Use(this);
+            Uses[i].set(Ops[i]);
+        }
+    }
+    if (InsertBefore) {
+        BasicBlock *BB = InsertBefore->getParent();
+        assert(BB && "Instruction to insert before is not in a basic block!");
+        insertInto(BB, BasicBlock::iterator(InsertBefore));
     }
 }
 
-void translate_Block(NodePtr node){
-    bool debug = false;
-    if(auto* block = node->as<Block*>()){
-        if(debug) fmt::print("[translate_Block]:block->BlockItem.size() = {}\n",block->BlockItems.size());
-        for(auto* blockitem : block->BlockItems){
-            translate_BlockItem(blockitem);
+Instruction::Instruction(Type *Ty, unsigned Opcode,
+                         const std::vector<Value *> &Ops, 
+                         BasicBlock *InsertAtEnd)
+    : Value(Ty, Value::InstructionVal + Opcode), 
+      NumUserOperands(Ops.size()) {
+    if (NumUserOperands > 0) {
+        Uses = std::allocator<Use>().allocate(NumUserOperands);
+        for (unsigned i = 0, e = NumUserOperands; i != e; ++i) {
+            new (Uses + i) Use(this);
+            Uses[i].set(Ops[i]);
         }
+    }
+    if (InsertAtEnd) {
+        insertInto(InsertAtEnd, InsertAtEnd->end());
     }
 }
 
-void translate_VarDef(NodePtr node, bool isGlobalVar){
-    bool debug = false;
-    if(auto* var_def = node->as<VarDef*>()){
-        if(isGlobalVar){
-            if(debug) fmt::print("[translate_VarDef]: global var {}\n",var_def->name);
-            if(var_def->dimensions.size() == 0) {
-                // not array
-                ircode.emplace_back("@" + var_def->name + " region i32, 1\n");
-                if(var_def->initialValue != nullptr) {
-                    std::string value = translate_exp(var_def->initialValue);
-                    re_format(value);
-                    std::string init = "let %" + std::to_string(registerNumber++) + ":() = store " + value + ",@" +
-                                       var_def->name + ": i32*";
-                    global_var_init.emplace_back(init);
-                }
-            } else{
-                // array
-                // TODO function parameter array
-                int arraySize = 1;
-                for(auto dim : var_def->dimensions){
-                    arraySize *= dim;
-                }
-                all_arrays[var_def->name] = var_def->dimensions;
-                ircode.emplace_back("@" + var_def->name + " region i32, " + std::to_string(arraySize) + "\n");
-            }
-        }else{
-            if(debug) fmt::print("[translate_VarDef]: local var {}\n",var_def->name);
-            if(var_def->dimensions.size() == 0){
-                // not array
-                ircode.emplace_back("let %" + var_def->name + ": i32* = alloca i32, 1\n");
-                if(var_def->initialValue != nullptr){
-                    std::string value = translate_exp(var_def->initialValue);
-                    re_format(value);
-                    std::string init = "let %" + std::to_string(registerNumber++) + ":() = store " + value + ",%" + var_def->name + ": i32*";
-                    ircode.emplace_back(init);
-                }
-            }else{
-                // array
-                int arraySize = 1;
-                for(auto dim : var_def->dimensions){
-                    arraySize *= dim;
-                }
-                all_arrays[var_def->name] = var_def->dimensions;
-                ircode.emplace_back("let %" + var_def->name + ": i32* = alloca i32, " + std::to_string(arraySize) + "\n");
-            }
+Instruction::~Instruction() {
+    if (NumUserOperands > 0) {
+        for (unsigned i = 0, e = NumUserOperands; i != e; ++i) {
+            Uses[i].~Use();
         }
+        std::allocator<Use>().deallocate(Uses, NumUserOperands);
+        Uses = nullptr;
     }
 }
 
-void translate_VarDecl(NodePtr node, bool isGlobalVar){
-    bool debug = true;
-    if(debug) {
-        fmt::print("translate_VarDecl ");
-        if(isGlobalVar) fmt::print("global\n");
-        else fmt::print("local\n");
+void Instruction::setParent(BasicBlock *BB) {
+    Parent = BB;
+}
+
+void Instruction::insertBefore(Instruction *InsertBefore) {
+    insertBefore(BasicBlock::iterator(InsertBefore));
+}
+
+
+void Instruction::insertBefore(BasicBlock::iterator InsertBefore) {
+    insertBefore(*InsertBefore->getParent(), InsertBefore);
+}
+
+void Instruction::insertBefore(BasicBlock &BB, InstListType::iterator IT) {
+    BB.getInstList().insert(IT, this);
+    setParent(&BB);
+}
+
+void Instruction::insertAfter(Instruction *InsertPos) {
+    BasicBlock *DestParent = InsertPos->getParent();
+
+    DestParent->getInstList().insertAfter(BasicBlock::iterator(InsertPos), this);
+    setParent(DestParent);
+}
+
+BasicBlock::iterator Instruction::insertInto(BasicBlock *BB, BasicBlock::iterator IT) {
+    assert(getParent() == nullptr && "Expected detached instruction!");
+    assert((IT == BB->end() || IT->getParent() == BB) && "IT not in ParentBB");
+    insertBefore(*BB, IT);
+    setParent(BB);
+    return BasicBlock::iterator(this);
+}
+
+void Instruction::removeFromParent() {
+    getParent()->getInstList().remove(BasicBlock::iterator(this));
+}
+
+BasicBlock::iterator Instruction::eraseFromParent() {
+    return getParent()->getInstList().erase(BasicBlock::iterator(this));
+}
+
+
+
+BinaryInst::BinaryInst(BinaryOps Op, Value *LHS, Value *RHS, Type *Ty,
+                       Instruction *InsertBefore) 
+    : Instruction(Ty, Op, std::vector<Value *> {LHS, RHS}, InsertBefore) {
+
+}
+
+BinaryInst::BinaryInst(BinaryOps Op, Value *LHS, Value *RHS, Type *Ty,
+                       BasicBlock *InsertAtEnd)
+    : Instruction(Ty, Op, std::vector<Value *> {LHS, RHS}, InsertAtEnd) {
+
+}
+
+BinaryInst *BinaryInst::Create(BinaryOps Op, Value *LHS, Value *RHS, Type *Ty,
+                              Instruction *InsertBefore) {
+    assert(LHS->getType() == RHS->getType() &&
+        "Cannot create binary operator with two operands of differing type!");
+    return new BinaryInst(Op, LHS, RHS, Ty, InsertBefore);
+}
+    
+BinaryInst *BinaryInst::Create(BinaryOps Op, Value *LHS, Value *RHS, Type *Ty,
+                              BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Op, LHS, RHS, Ty);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+AllocaInst::AllocaInst(Type *PointeeType, std::size_t NumElements, Instruction *InsertBefore)
+    : Instruction(PointerType::get(PointeeType), Instruction::Alloca, 
+    { }, InsertBefore),
+      AllocatedType(PointeeType), NumElements(NumElements) {
+    assert(!PointeeType->isUnitTy() && "Cannot allocate () type!");
+}
+
+AllocaInst::AllocaInst(Type *PointeeType, std::size_t NumElements, BasicBlock *InsertAtEnd)
+    : Instruction(PointerType::get(PointeeType), Instruction::Alloca, 
+    { }, InsertAtEnd),
+      AllocatedType(PointeeType), NumElements(NumElements) {
+    assert(!PointeeType->isUnitTy() && "Cannot allocate () type!");
+}
+
+
+AllocaInst *AllocaInst::Create(Type *PointeeTy, std::size_t NumElements,
+                              Instruction *InsertBefore) {
+    return new AllocaInst(PointeeTy, NumElements, InsertBefore);
+}
+
+AllocaInst *AllocaInst::Create(Type *PointeeTy, std::size_t NumElements,
+                              BasicBlock *InsertAtEnd) {
+    auto *Res = Create(PointeeTy, NumElements);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+StoreInst::StoreInst(Value *Val, Value *Ptr, Instruction *InsertBefore)
+    : Instruction(Type::getUnitTy(), Instruction::Store, { Val, Ptr }, InsertBefore) {
+
+}
+
+StoreInst::StoreInst(Value *Val, Value *Ptr, BasicBlock *InsertAtEnd)
+    : Instruction(Type::getUnitTy(), Instruction::Store, { Val, Ptr }, InsertAtEnd) {
+        
+}
+
+StoreInst *StoreInst::Create(Value *Val, Value *Ptr,
+                             Instruction *InsertBefore) {
+    return new StoreInst(Val, Ptr, InsertBefore);
+}
+
+StoreInst *StoreInst::Create(Value *Val, Value *Ptr,
+                             BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Val, Ptr);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+LoadInst::LoadInst(Value *Ptr, Instruction *InsertBefore)
+    : Instruction(dyn_cast<PointerType>(Ptr->getType())->getElementType(),
+    Instruction::Load, { Ptr }, InsertBefore) {
+    assert(Ptr->getType()->isPointerTy() && "Cannot load from non-pointer type!");
+}
+
+LoadInst::LoadInst(Value *Ptr, BasicBlock *InsertAtEnd)
+    : Instruction(dyn_cast<PointerType>(Ptr->getType())->getElementType(),
+    Instruction::Load, { Ptr }, InsertAtEnd) {
+    assert(Ptr->getType()->isPointerTy() && "Cannot load from non-pointer type!");
+}
+
+LoadInst *LoadInst::Create(Value *Ptr, Instruction *InsertBefore) {
+    return new LoadInst(Ptr, InsertBefore);
+}
+
+LoadInst *LoadInst::Create(Value *Ptr, BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Ptr);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+void OffsetInst::AssertOK() const {
+    assert(getOperand(0)->getType()->isPointerTy() && "Offset pointer is not of the pointer type!");
+    assert(dyn_cast<PointerType>(getOperand(0)->getType())->getElementType() == ElementTy &&
+           "Element type of offset does not match the type of pointer!");
+    assert(getNumOperands() == (unsigned)(bounds().size() + 1) && "Num of indices and bounds does not match!");
+}
+
+OffsetInst::OffsetInst(Type *PointeeTy,
+               std::vector <Value *> &Ops,
+               std::vector <std::optional<std::size_t>> &Bounds,
+               Instruction *InsertBefore) 
+    : Instruction(PointerType::get(PointeeTy), Instruction::Offset, Ops, InsertBefore),
+      ElementTy(PointeeTy),
+      Bounds(Bounds) {
+    AssertOK();
+}
+
+OffsetInst::OffsetInst(Type *PointeeTy,
+               std::vector <Value *> &Ops,
+               std::vector <std::optional<std::size_t>> &Bounds,
+               BasicBlock *InsertAtEnd) 
+    : Instruction(PointerType::get(PointeeTy), Instruction::Offset, Ops, InsertAtEnd),
+      ElementTy(PointeeTy),
+      Bounds(Bounds) {
+    AssertOK();
+}
+
+OffsetInst *OffsetInst::Create(Type *PointeeTy, Value *Ptr,
+                              std::vector <Value *> &Indices,
+                              std::vector <std::optional<std::size_t>> &Bounds,
+                              Instruction *InsertBefore) {
+    std::vector<Value *> Ops { Ptr };
+    Ops.insert(Ops.end(), Indices.begin(), Indices.end());
+    return new OffsetInst(PointeeTy, Ops, Bounds, InsertBefore);
+}
+
+OffsetInst *OffsetInst::Create(Type *PointeeTy, Value *Ptr,
+                              std::vector <Value *> &Indices,
+                              std::vector <std::optional<std::size_t>> &Bounds,
+                              BasicBlock *InsertAtEnd) {
+
+    std::vector<Value *> Ops { Ptr };
+    Ops.insert(Ops.end(), Indices.begin(), Indices.end());
+    auto *Res = new OffsetInst(PointeeTy, Ops, Bounds);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+
+bool OffsetInst::accumulateConstantOffset(std::size_t &Offset) const {
+    std::vector<std::size_t> indices;
+    std::vector<std::size_t> no_option_bounds;
+    for (auto BI = Bounds.begin() + 1; BI != Bounds.end(); ++BI) {
+        no_option_bounds.emplace_back(BI->value());
     }
-    if(auto *var_decl = node->as<VarDecl*>()){
-        if(debug) fmt::print("[translate_VarDecl]:VarDecl->VarDefs.size = {}\n",var_decl->VarDefs.size());
-        for(auto* vardef : var_decl->VarDefs){
-            translate_VarDef(vardef,isGlobalVar);
+    no_option_bounds.emplace_back(1);
+
+    for (const_op_iterator Op = op_begin() + 1, E = op_end(); Op != E; ++Op) {
+        if (auto *Index = dyn_cast<ConstantInt>(Op->get())) {
+            indices.emplace_back(Index->getValue());
+        } else {
+            return false;
         }
-    }else{
-        fmt::print("node is not a VarDecl\n");
+    }
+
+    size_t TotalOffset = 0;
+    for (size_t dim = 0; dim < indices.size(); ++dim) {
+        TotalOffset = (TotalOffset + indices[dim]) * no_option_bounds[dim];
+    }
+    Offset += TotalOffset;
+
+    return true;
+}
+
+CallInst::CallInst(Function *Callee, 
+                   const std::vector<Value *> &Args,
+                   Instruction *InsertBefore)
+    : Instruction(Callee->getReturnType(), Instruction::Call, Args, InsertBefore),
+      Callee(Callee) {
+    assert(Callee->getNumParams() == Args.size() && "Number of arguments does not match number of parameters!");
+}
+
+CallInst::CallInst(Function *Callee, 
+                   const std::vector<Value *> &Args,
+                   BasicBlock *InsertAtEnd)
+    : Instruction(Callee->getReturnType(), Instruction::Call, Args, InsertAtEnd),
+      Callee(Callee) {
+    assert(Callee->getNumParams() == Args.size() && "Number of arguments does not match number of parameters!");
+}
+
+CallInst *CallInst::Create(Function *Callee, 
+                           const std::vector<Value *> &Args,
+                           Instruction *InsertBefore) {
+    return new CallInst(Callee, Args, InsertBefore);
+}
+
+CallInst *CallInst::Create(Function *Callee, 
+                           const std::vector<Value *> &Args,
+                           BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Callee, Args);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+JumpInst::JumpInst(BasicBlock *Dest, Instruction *InsertBefore)
+    : Instruction(Type::getUnitTy(), Instruction::Jump, { }, InsertBefore),
+      Dest(Dest) {
+}
+
+JumpInst::JumpInst(BasicBlock *Dest, BasicBlock *InsertAtEnd)
+    : Instruction(Type::getUnitTy(), Instruction::Jump, { }, InsertAtEnd),
+      Dest(Dest) {
+}
+
+JumpInst *JumpInst::Create(BasicBlock *Dest, Instruction *InsertBefore) {
+    return new JumpInst(Dest, InsertBefore);
+}
+
+JumpInst *JumpInst::Create(BasicBlock *Dest, BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Dest);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+RetInst::RetInst(Value *Val, Instruction *InsertBefore)
+    : Instruction(Type::getUnitTy(), Instruction::Ret, { Val }, InsertBefore) {
+
+}
+
+RetInst::RetInst(Value *Val, BasicBlock *InsertAtEnd)
+    : Instruction(Type::getUnitTy(), Instruction::Ret, { Val }, InsertAtEnd) {
+
+}
+
+RetInst *RetInst::Create(Value *Val, Instruction *InsertBefore) {
+    return new RetInst(Val, InsertBefore);
+}
+
+RetInst *RetInst::Create(Value *Val, BasicBlock *InsertAtEnd) {
+    auto *Res = Create(Val);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+void BranchInst::AssertOK() const {
+    assert(getCondition()->getType()->isIntegerTy() &&
+           "May only branch on integer predicate!");
+}
+
+BranchInst::BranchInst(BasicBlock *IfTrue, BasicBlock *IfFalse, Value *Cond, Instruction *InsertBefore)
+    : Instruction(Type::getUnitTy(), Instruction::Br, 
+    { Cond }, InsertBefore),
+      IfTrue(IfTrue), IfFalse(IfFalse) {
+    AssertOK();
+} 
+
+BranchInst::BranchInst(BasicBlock *IfTrue, BasicBlock *IfFalse, Value *Cond, BasicBlock *InsertAtEnd)
+    : Instruction(Type::getUnitTy(), Instruction::Br,
+    { Cond }, InsertAtEnd),
+      IfTrue(IfTrue), IfFalse(IfFalse) {
+    AssertOK();
+}
+
+
+BranchInst *BranchInst::Create(BasicBlock *IfTrue, BasicBlock *IfFalse, 
+                              Value *Cond, 
+                              Instruction *InsertBefore) {
+    return new BranchInst(IfTrue, IfFalse, Cond, InsertBefore);
+}
+
+BranchInst *BranchInst::Create(BasicBlock *IfTrue, BasicBlock *IfFalse, 
+                              Value *Cond, 
+                              BasicBlock *InsertAtEnd) {
+    auto *Res = Create(IfTrue, IfFalse, Cond);
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+
+PanicInst::PanicInst(Instruction *InsertBefore)
+    : Instruction(Type::getUnitTy(), Instruction::Panic, { }, InsertBefore) {
+
+}
+
+PanicInst::PanicInst(BasicBlock *InsertAtEnd)
+    : Instruction(Type::getUnitTy(), Instruction::Panic, { }, InsertAtEnd) {
+
+}
+
+PanicInst *PanicInst::Create(Instruction *InsertBefore) {
+    return new PanicInst(InsertBefore);
+}
+
+PanicInst *PanicInst::Create(BasicBlock *InsertAtEnd) {
+    auto *Res = Create();
+    Res->insertInto(InsertAtEnd, InsertAtEnd->end());
+    return Res;
+}
+
+BasicBlock::BasicBlock(Function *Parent, BasicBlock *InsertBefore)
+    : Parent(nullptr) {
+    if (Parent) {
+        insertInto(Parent, InsertBefore);
+    } else {
+        assert(!InsertBefore && "Cannot insert before another basic block with no function!");
     }
 }
 
-void translate_FuncDef(NodePtr node){
-    bool debug = false;
-    std::string func_def_code;
-    if(auto *func_def = node->as<FuncDef*>()){
-        if(debug) fmt::print("translate_FuncDef\n");
-        // head
-        func_def_code = "fn @" + func_def->name + "(";
-        std::string func_params_code = translate_params(func_def->argList);
-        func_def_code += func_params_code + ") -> ";
-        if(func_def->ReturnType == FuncDef::Type::INT){
-            func_def_code += "i32";
-        }else{
-            func_def_code += "()";
+void BasicBlock::insertInto(Function *NewParent, BasicBlock *InsertBefore) {
+    assert(NewParent && "Expected a parent function!");
+    assert(!Parent && "BasicBlock already has a parent!");
+
+    if (InsertBefore) {
+        NewParent->getBasicBlockList().insert(Function::iterator(InsertBefore), this);
+    } else {
+        NewParent->getBasicBlockList().insert(NewParent->end(), this);  // at last 
+    }
+    setParent(NewParent);
+}
+
+BasicBlock *BasicBlock::Create(Function *Parent, BasicBlock *InsertBefore) {
+    return new BasicBlock(Parent, InsertBefore);
+}
+
+
+void BasicBlock::setParent(Function *Parent) {
+    this->Parent = Parent;
+}
+
+bool BasicBlock::hasName() const {
+    return !Name.empty();
+}
+
+
+void BasicBlock::setName(std::string_view Name) {
+    this->Name = Name;
+}
+
+
+Argument::Argument(Type *Ty, Function *Parent, unsigned ArgNo)
+    : Value(Ty, Value::ArgumentVal), Parent(Parent), ArgNo(ArgNo) {
+}
+
+Function::Function(FunctionType *FTy, bool ExternalLinkage,
+                   std::string_view Name, Module *M)
+    : FTy(FTy), NumArgs(FTy->getNumParams()),
+      ExternalLinkage(ExternalLinkage), Name(Name), Parent(M) {
+    // check return type.
+    assert(FunctionType::isValidReturnType(getReturnType()) &&
+            "invalid return type");
+    // build parameters and check parameter types.
+    if (NumArgs > 0) {
+        Arguments = std::allocator<Argument>().allocate(NumArgs);
+        for (unsigned i = 0, e = NumArgs; i != e; ++i) {
+            Type *ArgTy = FTy->getParamType(i);
+            assert(FunctionType::isValidArgumentType(ArgTy) && "Badly typed arguments!");
+            new (Arguments + i) Argument(ArgTy, this, i);
         }
-        if(debug) fmt::print("[translate_FuncDef]: head finish\n");
-        // body
-        func_def_code += "{";
-        ircode.emplace_back(func_def_code);
-        ircode.emplace_back("%entry:");
-        // func param init
-        for(auto* param : func_def->argList){
-            //  let %a.addr: i32* = alloca i32, 1
-            //  let %3: () = store #a: i32, %a.addr: i32*
-            if(auto* fparam = param->as<FuncFParam*>()){
-                ircode.emplace_back("let %" + fparam->name + ".addr: i32* = alloca i32, 1");
-                ircode.emplace_back("let %" + std::to_string(registerNumber++) + ": () = store #" + fparam->name + ": i32, %" + fparam->name + ".addr: i32*");
-            }
-        }
-        if(debug) fmt::print("[translate_FuncDef]: func param init finish\n");
-        // return value init
-        if(func_def->ReturnType == FuncDef::Type::INT){
-            ircode.emplace_back("let %ret_val.addr: i32* = alloca i32, 1");
-            if(debug) fmt::print("[translate_FuncDef]: return value init finish\n");
-        }
-        // add global init to main()
-        if(func_def->name == "main"){
-            for(auto init : global_var_init){
-                ircode.emplace_back(init);
-            }
-            if(debug) fmt::print("[translate_FuncDef]: global var init finish\n");
-        }
-        // block
-        translate_Block(func_def->block);
-        if(debug) fmt::print("[translate_FuncDef]: block finish\n");
-        // %exit:
-        // let %25: i32 = load %ret_val.addr: i32*
-        // ret %25: i32
-        ircode.emplace_back("%exit:");
-        if(func_def->ReturnType == FuncDef::Type::INT){
-            ircode.emplace_back("let %" + std::to_string(registerNumber++) + ": i32 = load %ret_val.addr: i32*");
-            ircode.emplace_back("ret %" + std::to_string(registerNumber - 1) + ": i32");
-        }else{
-            ircode.emplace_back("ret ()");
-        }
-        ircode.emplace_back("}");
+    }
+
+    if (M) {
+        M->getFunctionList().push_back(this);
+        if (hasName())
+            M->SymbolFunctionMap[getName()] = this;
     }
 }
 
-void translate_CompUnit(NodePtr node){
-    bool debug = false;
-    if(debug) fmt::print("translate_CompUnit\n");
-    if(auto* decl = node->as<Decl*>()){
-        if(debug) fmt::print("CompUnit->Decl\n");
-        if(auto* var_decl = decl->VarDecl->as<VarDecl*>()){
-            translate_VarDecl(var_decl,true);
+Function::~Function() {
+    if (NumArgs > 0) {
+        for (unsigned i = 0, e = NumArgs; i != e; ++i) {
+            Arguments[i].~Argument();
         }
-    }else if(auto* func_def = node->as<FuncDef*>()) {
-        if(debug) fmt::print("CompUnit->FuncDef\n");
-        translate_FuncDef(func_def);
+        std::allocator<Argument>().deallocate(Arguments, NumArgs);
+        Arguments = nullptr;
+    }
+    // remove symbol table entry.
+    if (Parent) {
+        Parent->SymbolFunctionMap.erase(getName());
     }
 }
 
-void generate_ircode(NodePtr root){
-    ircode.emplace_back("fn @putint(#x: i32) -> ();\n");
-    ircode.emplace_back("fn @putch(#x: i32) -> ();\n");
-    ircode.emplace_back("fn @putarray(#n: i32, #arr: i32*) -> ();\n");
-    ircode.emplace_back("fn @getint() -> i32;\n");
-    ircode.emplace_back("fn @getch() -> i32;\n");
-    ircode.emplace_back("fn @getarray(#n: i32, #arr: i32*) -> ();\n");
-    bool debug = false;
-    if(debug) fmt::print("generate_ircode\n");
-    if(auto* comp_unit = root->as<CompUnit*>()){
-        for(size_t i = 0; i < comp_unit->all.size(); i++){
-            translate_CompUnit(comp_unit->all[i]);
-        }
-    }else{
-        fmt::print("Error: root is not a CompUnit\n");
+Function *Function::Create(FunctionType *FTy, bool ExternalLinkage, 
+                           std::string_view Name, Module *M) {
+    return new Function(FTy, ExternalLinkage, Name, M);
+}
+
+Function::iterator Function::insert(Function::iterator Position, BasicBlock *BB) {
+    Function::iterator FIT = getBasicBlockList().insert(Position, BB);
+    BB->setParent(this);
+    return FIT;
+}
+
+bool Function::hasName() const {
+    return !Name.empty();
+}
+
+GlobalVariable::GlobalVariable(Type *EleTy, std::size_t NumElements, bool ExternalLinkage,
+                               std::string_view Name, Module *M)
+    : Value(PointerType::get(EleTy), Value::GlobalVariableVal),
+      EleTy(EleTy), NumElements(NumElements),
+      ExternalLinkage(ExternalLinkage), Parent(M) {
+    assert(!EleTy->isUnitTy() && "Cannot create global variable of () type!");
+    if (M) {
+        M->getGlobalList().push_back(this);
+        if (hasName())
+            M->SymbolGlobalMap[getName()] = this;
     }
+    setName(Name);
+}
+
+GlobalVariable *GlobalVariable::Create(Type *EleTy, std::size_t NumElements, bool ExternalLinkage,
+                                        std::string_view Name, Module *M) {
+    return new GlobalVariable(EleTy, NumElements, ExternalLinkage, Name, M);
+}
+
+
+Function *Module::getFunction(const std::string_view Name) const {
+    auto IT = SymbolFunctionMap.find(Name);
+    if (IT != SymbolFunctionMap.end())
+        return IT->second;
+    return nullptr;
+}
+
+GlobalVariable *Module::getGlobalVariable(const std::string_view Name) const {
+    auto IT = SymbolGlobalMap.find(Name);
+    if (IT != SymbolGlobalMap.end())
+        return IT->second;
+    return nullptr;
 }
