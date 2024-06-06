@@ -732,7 +732,7 @@ public:
     }
     // ydp added
     std::vector<int> dimensions;
-    // std::string name;
+    AllocaInst *pointer; // the instruction of loading it
 };
 
 
@@ -830,7 +830,7 @@ public:
     void generateReturnBlock();
     void generateExitBlock();
     void generateTempBlock(Block *rootBlock, TempBlock *parent);
-    void createLocalVariable(VarDef *varDef, TempBlock *root);
+    Value *createLocalVariable(VarDef *varDef, TempBlock *root);
 
     int if_index = 0;
     int else_index = 0;
