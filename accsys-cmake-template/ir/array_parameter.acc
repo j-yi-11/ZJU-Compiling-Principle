@@ -1,0 +1,86 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @print_array(#a: i32*, #len: i32) -> () {
+%entry:
+  let %len.addr = alloca i32, 1
+  let %0 = store #len, %len.addr
+  let %i = alloca i32, 1
+  let %1 = store 0, %i
+  jmp label %while_cond
+%while_cond:
+  let %3 = load %i
+  let %4 = load %len.addr
+  let %5 = lt %3, %4
+  br %5, label %while_body, label %while_end
+%while_body:
+  let %7 = load %i
+  let %8 = offset i32, #a, [%7< none]
+  let %9 = load %8
+  let %10 = call @putint, %9
+  let %11 = call @putch, 32
+  let %12 = load %i
+  let %13 = add %12, 1
+  let %14 = load %i
+  let %15 = store %13, %14
+  jmp label %while_cond
+%while_end:
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  ret ()
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %a = alloca i32, 8
+  let %0 = offset i32, %a, [0< 4], [0< 2]
+  let %1 = load %0
+  let %2 = store 1, %1
+  let %3 = offset i32, %a, [0< 4], [1< 2]
+  let %4 = load %3
+  let %5 = store 2, %4
+  let %6 = offset i32, %a, [1< 4], [0< 2]
+  let %7 = load %6
+  let %8 = store 3, %7
+  let %9 = offset i32, %a, [1< 4], [1< 2]
+  let %10 = load %9
+  let %11 = store 4, %10
+  let %12 = offset i32, %a, [2< 4], [0< 2]
+  let %13 = load %12
+  let %14 = store 5, %13
+  let %15 = offset i32, %a, [2< 4], [1< 2]
+  let %16 = load %15
+  let %17 = store 6, %16
+  let %18 = offset i32, %a, [3< 4], [0< 2]
+  let %19 = load %18
+  let %20 = store 7, %19
+  let %21 = offset i32, %a, [3< 4], [1< 2]
+  let %22 = load %21
+  let %23 = store 8, %22
+  let %24 = offset i32, %a, [2< 4], [0< 2]
+  let %25 = load %24
+  let %26 = call @print_array, %25, 2
+  let %27 = offset i32, %a, [1< 4], [0< 2]
+  let %28 = load %27
+  let %29 = call @print_array, %28, 2
+  let %30 = offset i32, %a, [0< 4], [0< 2]
+  let %31 = load %30
+  let %32 = call @print_array, %31, 2
+  let %33 = offset i32, %a, [3< 4], [0< 2]
+  let %34 = load %33
+  let %35 = call @print_array, %34, 2
+  let %36 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %40 = load %ret_val.addr
+  ret %40
+}

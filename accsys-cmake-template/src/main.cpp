@@ -5,6 +5,7 @@
 // #include "../accsys/include/ir/ir.h"
 // #include "../accsys/include/ir/type.h"
 // #include "intermediate/ir_gen.h"
+#include <cassert>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -26,22 +27,17 @@ int main(int argc, char **argv)
     }
     fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "parsing file: {} read success\n", argv[1]);
     int res = yyparse();
-    if (res != 0)
-    {
+    if (res != 0) {
         fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "parse failed with res = {}\n", res);
         return 1;
     }
     fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "lexer and parser success\n");
     bool printAST_flag = true;
-    if (root == nullptr)
-    {
+    if (root == nullptr) {
         fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "AST root is nullptr\n");
-    }
-    else
-    {
+    } else {
         // fmt::print("root is not nullptr\n");
-        if (printAST_flag)
-        {
+        if (printAST_flag) {
             printAST(root, "", "");
             fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "AST print success\n");
         }
@@ -55,16 +51,22 @@ int main(int argc, char **argv)
 
     // ir generation
     Module *M = new Module;
+    if(M == nullptr){
+        fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "Module M is nullptr\n");
+        return 1;
+    }
     M->genGlobalList(root);
     M->genFuncList(root);
-    std::cout << "ir generation" << std::endl;
+    fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "ir generation success\n");
     // argv[2] is output file name
-//    std::ostream os(std::string(argv[2]));
-//    M->print(os,false);
-    std::ostream OS(std::cout.rdbuf());
-    M->print(OS, false);
-
-    // std::cout << OS.str();
+//    std::string filename = argv[2];
+    std::ofstream file;
+    file.open(std::string(argv[2]), std::ios::trunc);
+    M->print(file, false);
+    file.close();
+    fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "ir write success\n");
+//        std::ostream OS(std::cout.rdbuf());
+//        M->print(OS, false);
 
     return 0;
 }

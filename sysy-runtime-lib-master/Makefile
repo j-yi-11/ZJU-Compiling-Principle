@@ -1,6 +1,6 @@
 # parameters
 NO_LIBC ?= 0
-ADD_CFLAGS ?=
+ADD_CFLAGS ?= #riscv64-unknown-linux-elf -march=rv64im -mabi=lp64
 LIB_OPT ?= -O3
 TEST_OPT ?= -O1
 
@@ -12,8 +12,10 @@ ifneq ($(shell uname), Darwin)
 CFLAGS += -nostdlib -nostdinc -static
 endif
 endif
-CC := clang $(CFLAGS) $(ADD_CFLAGS)
+## added jy
+#CC += -target riscv64-unknown-linux-elf -march=rv64im -mabi=lp64
 
+CC := clang $(CFLAGS) $(ADD_CFLAGS)
 # archiver
 ARFLAGS := ru
 AR := llvm-ar $(ARFLAGS)

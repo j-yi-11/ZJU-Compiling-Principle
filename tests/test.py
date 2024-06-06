@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 TIMEOUT = 5
 PYTHON_PATH = sys.executable  # always use the current python
-IR_PATH = "./ir"
+IR_PATH = "../accsys-cmake-template/ir"
 EXECUTOR_PATH = "../accipit-binary"
 
 ### Color Utils ###

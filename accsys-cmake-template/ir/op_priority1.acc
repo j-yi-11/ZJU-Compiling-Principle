@@ -1,0 +1,41 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %a = alloca i32, 1
+  let %b = alloca i32, 1
+  let %c = alloca i32, 1
+  let %d = alloca i32, 1
+  let %0 = load %a
+  let %1 = store 10, %0
+  let %2 = load %b
+  let %3 = store 4, %2
+  let %4 = load %c
+  let %5 = store 2, %4
+  let %6 = load %d
+  let %7 = store 2, %6
+  let %result = alloca i32, 1
+  let %8 = load %c
+  let %9 = load %a
+  let %10 = load %b
+  let %11 = mul %9, %10
+  let %12 = add %8, %11
+  let %13 = load %d
+  let %14 = sub %12, %13
+  let %15 = store %14, %result
+  let %16 = load %result
+  let %17 = call @putint, %16
+  let %18 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %22 = load %ret_val.addr
+  ret %22
+}

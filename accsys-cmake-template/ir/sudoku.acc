@@ -1,0 +1,535 @@
+@a : region i32, 81
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @check_sudoku(#a: i32*) -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %i = alloca i32, 1
+  let %j = alloca i32, 1
+  let %k = alloca i32, 1
+  let %b = alloca i32, 9
+  let %0 = load %i
+  let %1 = store 0, %0
+  jmp label %while_cond
+%while_cond:
+  let %3 = load %i
+  let %4 = lt %3, 9
+  br %4, label %while_body, label %while_end
+%while_body:
+  let %6 = load %j
+  let %7 = store 0, %6
+  jmp label %while_cond.1
+%while_end:
+  let %9 = load %i
+  let %10 = store 0, %9
+  jmp label %while_cond.3
+%while_cond.1:
+  let %12 = load %j
+  let %13 = lt %12, 9
+  br %13, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %15 = load %j
+  let %16 = offset i32, %b, [%15< 9]
+  let %17 = load %16
+  let %18 = store 0, %17
+  let %19 = load %j
+  let %20 = add %19, 1
+  let %21 = load %j
+  let %22 = store %20, %21
+  jmp label %while_cond.1
+%while_end.1:
+  let %24 = load %j
+  let %25 = store 0, %24
+  jmp label %while_cond.2
+%while_cond.2:
+  let %27 = load %j
+  let %28 = lt %27, 9
+  br %28, label %while_body.2, label %while_end.2
+%while_body.2:
+  let %30 = load %i
+  let %31 = load %j
+  let %32 = offset i32, #a, [%30< none], [%31< 9]
+  let %33 = load %32
+  br %33, label %if_then, label %if_end
+%while_end.2:
+  let %35 = load %i
+  let %36 = add %35, 1
+  let %37 = load %i
+  let %38 = store %36, %37
+  jmp label %while_cond
+%if_then:
+  let %40 = load %i
+  let %41 = load %j
+  let %42 = offset i32, #a, [%40< none], [%41< 9]
+  let %43 = load %42
+  let %44 = sub %43, 1
+  let %45 = offset i32, %b, [%44< 9]
+  let %46 = load %45
+  let %47 = eq 0, %46
+  br %47, label %if_then.1, label %if_else
+%if_end:
+  let %49 = load %j
+  let %50 = add %49, 1
+  let %51 = load %j
+  let %52 = store %50, %51
+  jmp label %while_cond.2
+%if_then.1:
+  let %54 = load %i
+  let %55 = load %j
+  let %56 = offset i32, #a, [%54< none], [%55< 9]
+  let %57 = load %56
+  let %58 = sub %57, 1
+  let %59 = offset i32, %b, [%58< 9]
+  let %60 = load %59
+  let %61 = store 1, %60
+  jmp label %if_end.1
+%if_end.1:
+  jmp label %if_end
+%if_else:
+  let %64 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%while_cond.3:
+  let %67 = load %i
+  let %68 = lt %67, 9
+  br %68, label %while_body.3, label %while_end.3
+%while_body.3:
+  let %70 = load %j
+  let %71 = store 0, %70
+  jmp label %while_cond.4
+%while_end.3:
+  let %73 = load %i
+  let %74 = store 0, %73
+  jmp label %while_cond.6
+%while_cond.4:
+  let %76 = load %j
+  let %77 = lt %76, 9
+  br %77, label %while_body.4, label %while_end.4
+%while_body.4:
+  let %79 = load %j
+  let %80 = offset i32, %b, [%79< 9]
+  let %81 = load %80
+  let %82 = store 0, %81
+  let %83 = load %j
+  let %84 = add %83, 1
+  let %85 = load %j
+  let %86 = store %84, %85
+  jmp label %while_cond.4
+%while_end.4:
+  let %88 = load %j
+  let %89 = store 0, %88
+  jmp label %while_cond.5
+%while_cond.5:
+  let %91 = load %j
+  let %92 = lt %91, 9
+  br %92, label %while_body.5, label %while_end.5
+%while_body.5:
+  let %94 = load %j
+  let %95 = load %i
+  let %96 = offset i32, #a, [%94< none], [%95< 9]
+  let %97 = load %96
+  br %97, label %if_then.2, label %if_end.2
+%while_end.5:
+  let %99 = load %i
+  let %100 = add %99, 1
+  let %101 = load %i
+  let %102 = store %100, %101
+  jmp label %while_cond.3
+%if_then.2:
+  let %104 = load %j
+  let %105 = load %i
+  let %106 = offset i32, #a, [%104< none], [%105< 9]
+  let %107 = load %106
+  let %108 = sub %107, 1
+  let %109 = offset i32, %b, [%108< 9]
+  let %110 = load %109
+  let %111 = eq 0, %110
+  br %111, label %if_then.3, label %if_else.1
+%if_end.2:
+  let %113 = load %j
+  let %114 = add %113, 1
+  let %115 = load %j
+  let %116 = store %114, %115
+  jmp label %while_cond.5
+%if_then.3:
+  let %118 = load %j
+  let %119 = load %i
+  let %120 = offset i32, #a, [%118< none], [%119< 9]
+  let %121 = load %120
+  let %122 = sub %121, 1
+  let %123 = offset i32, %b, [%122< 9]
+  let %124 = load %123
+  let %125 = store 1, %124
+  jmp label %if_end.3
+%if_end.3:
+  jmp label %if_end.2
+%if_else.1:
+  let %128 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%while_cond.6:
+  let %131 = load %i
+  let %132 = lt %131, 3
+  br %132, label %while_body.6, label %while_end.6
+%while_body.6:
+  let %134 = load %j
+  let %135 = store 0, %134
+  jmp label %while_cond.7
+%while_end.6:
+  let %137 = store 1, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%while_cond.7:
+  let %140 = load %j
+  let %141 = lt %140, 3
+  br %141, label %while_body.7, label %while_end.7
+%while_body.7:
+  let %143 = load %k
+  let %144 = store 0, %143
+  jmp label %while_cond.8
+%while_end.7:
+  let %146 = load %i
+  let %147 = add %146, 1
+  let %148 = load %i
+  let %149 = store %147, %148
+  jmp label %while_cond.6
+%while_cond.8:
+  let %151 = load %k
+  let %152 = lt %151, 9
+  br %152, label %while_body.8, label %while_end.8
+%while_body.8:
+  let %154 = load %k
+  let %155 = offset i32, %b, [%154< 9]
+  let %156 = load %155
+  let %157 = store 0, %156
+  let %158 = load %k
+  let %159 = add %158, 1
+  let %160 = load %k
+  let %161 = store %159, %160
+  jmp label %while_cond.8
+%while_end.8:
+  let %163 = load %k
+  let %164 = store 0, %163
+  jmp label %while_cond.9
+%while_cond.9:
+  let %166 = load %k
+  let %167 = lt %166, 3
+  br %167, label %while_body.9, label %while_end.9
+%while_body.9:
+  let %l = alloca i32, 1
+  let %169 = load %l
+  let %170 = store 0, %169
+  jmp label %while_cond.10
+%while_end.9:
+  let %172 = load %j
+  let %173 = add %172, 1
+  let %174 = load %j
+  let %175 = store %173, %174
+  jmp label %while_cond.6
+%while_cond.10:
+  let %177 = load %l
+  let %178 = lt %177, 3
+  br %178, label %while_body.10, label %while_end.10
+%while_body.10:
+  let %m = alloca i32, 1
+  let %180 = load %i
+  let %181 = mul %180, 3
+  let %182 = load %k
+  let %183 = add %181, %182
+  let %184 = load %j
+  let %185 = mul %184, 3
+  let %186 = load %l
+  let %187 = add %185, %186
+  let %188 = offset i32, #a, [%183< none], [%187< 9]
+  let %189 = load %188
+  let %190 = load %m
+  let %191 = store %189, %190
+  let %192 = load %m
+  br %192, label %if_then.4, label %if_end.4
+%while_end.10:
+  let %194 = load %k
+  let %195 = add %194, 1
+  let %196 = load %k
+  let %197 = store %195, %196
+  jmp label %while_cond.6
+%if_then.4:
+  let %199 = load %m
+  let %200 = sub %199, 1
+  let %201 = offset i32, %b, [%200< 9]
+  let %202 = load %201
+  let %203 = eq 0, %202
+  br %203, label %if_then.5, label %if_else.2
+%if_end.4:
+  let %205 = load %l
+  let %206 = add %205, 1
+  let %207 = load %l
+  let %208 = store %206, %207
+  jmp label %while_cond.10
+%if_then.5:
+  let %210 = load %m
+  let %211 = sub %210, 1
+  let %212 = offset i32, %b, [%211< 9]
+  let %213 = load %212
+  let %214 = store 1, %213
+  jmp label %if_end.5
+%if_end.5:
+  jmp label %if_end.4
+%if_else.2:
+  let %217 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %221 = load %ret_val.addr
+  ret %221
+}
+fn @solve_sudoku() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %i = alloca i32, 1
+  let %j = alloca i32, 1
+  let %solve_i = alloca i32, 1
+  let %solve_j = alloca i32, 1
+  let %done = alloca i32, 1
+  let %0 = store 1, %done
+  let %1 = load %i
+  let %2 = store 0, %1
+  jmp label %while_cond
+%while_cond:
+  let %4 = load %i
+  let %5 = lt %4, 9
+  let %6 = load %done
+  let %7 = and %5, %6
+  br %7, label %while_body, label %while_end
+%while_body:
+  let %9 = load %j
+  let %10 = store 0, %9
+  jmp label %while_cond.1
+%while_end:
+  let %12 = load %done
+  br %12, label %if_then.1, label %if_end.1
+%while_cond.1:
+  let %14 = load %j
+  let %15 = lt %14, 9
+  let %16 = load %done
+  let %17 = and %15, %16
+  br %17, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %19 = load %i
+  let %20 = load %j
+  let %21 = offset i32, @a, [%19< 9], [%20< 9]
+  let %22 = load %21
+  let %23 = eq %22, 0
+  br %23, label %if_then, label %if_end
+%while_end.1:
+  let %25 = load %i
+  let %26 = add %25, 1
+  let %27 = load %i
+  let %28 = store %26, %27
+  jmp label %while_cond
+%if_then:
+  let %30 = load %done
+  let %31 = store 0, %30
+  let %32 = load %i
+  let %33 = load %solve_i
+  let %34 = store %32, %33
+  let %35 = load %j
+  let %36 = load %solve_j
+  let %37 = store %35, %36
+  jmp label %if_end
+%if_end:
+  let %39 = load %j
+  let %40 = add %39, 1
+  let %41 = load %j
+  let %42 = store %40, %41
+  jmp label %while_cond.1
+%if_then.1:
+  let %44 = load @a
+  let %45 = call @check_sudoku, %44
+  let %46 = store %45, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_end.1:
+  let %49 = load %i
+  let %50 = store 1, %49
+  jmp label %while_cond.2
+%while_cond.2:
+  let %52 = load %i
+  let %53 = le %52, 9
+  br %53, label %while_body.2, label %while_end.2
+%while_body.2:
+  let %55 = load %i
+  let %56 = load %solve_i
+  let %57 = load %solve_j
+  let %58 = offset i32, @a, [%56< 9], [%57< 9]
+  let %59 = load %58
+  let %60 = store %55, %59
+  let %61 = load @a
+  let %62 = call @check_sudoku, %61
+  br %62, label %if_then.2, label %if_end.2
+%while_end.2:
+  let %64 = load %solve_i
+  let %65 = load %solve_j
+  let %66 = offset i32, @a, [%64< 9], [%65< 9]
+  let %67 = load %66
+  let %68 = store 0, %67
+  let %69 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_then.2:
+  let %72 = call @solve_sudoku
+  br %72, label %if_then.3, label %if_end.3
+%if_end.2:
+  let %74 = load %i
+  let %75 = add %74, 1
+  let %76 = load %i
+  let %77 = store %75, %76
+  jmp label %while_cond.2
+%if_then.3:
+  let %79 = store 1, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_end.3:
+  jmp label %if_end.2
+%after return:
+  jmp label %exit
+%exit:
+  let %84 = load %ret_val.addr
+  ret %84
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %i = alloca i32, 1
+  let %0 = store 0, %i
+  let %j = alloca i32, 1
+  let %1 = store 0, %j
+  let %solve = alloca i32, 1
+  let %2 = store 0, %solve
+  jmp label %while_cond
+%while_cond:
+  let %4 = load %i
+  let %5 = lt %4, 9
+  br %5, label %while_body, label %while_end
+%while_body:
+  let %7 = load %j
+  let %8 = store 0, %7
+  jmp label %while_cond.1
+%while_end:
+  let %10 = load %solve
+  br %10, label %if_then.1, label %if_else
+%while_cond.1:
+  let %12 = load %j
+  let %13 = lt %12, 9
+  br %13, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %15 = call @getint
+  let %16 = load %i
+  let %17 = load %j
+  let %18 = offset i32, @a, [%16< 9], [%17< 9]
+  let %19 = load %18
+  let %20 = store %15, %19
+  let %21 = load %i
+  let %22 = load %j
+  let %23 = offset i32, @a, [%21< 9], [%22< 9]
+  let %24 = load %23
+  let %25 = lt %24, 0
+  let %26 = load %i
+  let %27 = load %j
+  let %28 = offset i32, @a, [%26< 9], [%27< 9]
+  let %29 = load %28
+  let %30 = gt %29, 9
+  let %31 = or %25, %30
+  br %31, label %if_then, label %if_end
+%while_end.1:
+  let %33 = load %i
+  let %34 = add %33, 1
+  let %35 = load %i
+  let %36 = store %34, %35
+  jmp label %while_cond
+%if_then:
+  let %38 = call @putint, 0
+  let %39 = call @putch, 32
+  let %40 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_end:
+  let %43 = load %j
+  let %44 = add %43, 1
+  let %45 = load %j
+  let %46 = store %44, %45
+  jmp label %while_cond.1
+%if_then.1:
+  let %48 = call @solve_sudoku
+  br %48, label %if_then.2, label %if_else.1
+%if_end.1:
+  let %50 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_else:
+  let %53 = load @a
+  let %54 = call @check_sudoku, %53
+  br %54, label %if_then.3, label %if_else.2
+%if_then.2:
+  let %56 = load %i
+  let %57 = store 0, %56
+  jmp label %while_cond.2
+%if_end.2:
+  jmp label %if_end.1
+%if_else.1:
+  let %60 = call @putint, 0
+  let %61 = call @putch, 32
+  jmp label %if_end.2
+%while_cond.2:
+  let %63 = load %i
+  let %64 = lt %63, 9
+  br %64, label %while_body.2, label %while_end.2
+%while_body.2:
+  let %66 = load %j
+  let %67 = store 0, %66
+  jmp label %while_cond.3
+%while_end.2:
+  jmp label %if_end.1
+%while_cond.3:
+  let %70 = load %j
+  let %71 = lt %70, 9
+  br %71, label %while_body.3, label %while_end.3
+%while_body.3:
+  let %73 = load %i
+  let %74 = load %j
+  let %75 = offset i32, @a, [%73< 9], [%74< 9]
+  let %76 = load %75
+  let %77 = call @putint, %76
+  let %78 = call @putch, 32
+  let %79 = load %j
+  let %80 = add %79, 1
+  let %81 = load %j
+  let %82 = store %80, %81
+  jmp label %while_cond.3
+%while_end.3:
+  let %84 = load %i
+  let %85 = add %84, 1
+  let %86 = load %i
+  let %87 = store %85, %86
+  jmp label %if_end.1
+%if_then.3:
+  let %89 = call @putint, 1
+  let %90 = call @putch, 32
+  jmp label %if_end.3
+%if_end.3:
+  jmp label %if_end.1
+%if_else.2:
+  let %93 = call @putint, 0
+  let %94 = call @putch, 32
+  jmp label %if_end.3
+%after return:
+  jmp label %exit
+%exit:
+  let %97 = load %ret_val.addr
+  ret %97
+}

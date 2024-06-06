@@ -1,0 +1,108 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @get_one(#a: i32) -> i32 {
+%entry:
+  let %a.addr = alloca i32, 1
+  let %0 = store #a, %a.addr
+  let %ret_val.addr = alloca i32, 1
+  let %1 = store 1, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %5 = load %ret_val.addr
+  ret %5
+}
+fn @deepWhileBr(#a: i32, #b: i32) -> i32 {
+%entry:
+  let %a.addr = alloca i32, 1
+  let %0 = store #a, %a.addr
+  let %b.addr = alloca i32, 1
+  let %1 = store #b, %b.addr
+  let %ret_val.addr = alloca i32, 1
+  let %c = alloca i32, 1
+  let %2 = load %a.addr
+  let %3 = load %b.addr
+  let %4 = add %2, %3
+  let %5 = load %c
+  let %6 = store %4, %5
+  jmp label %while_cond
+%while_cond:
+  let %8 = load %c
+  let %9 = lt %8, 75
+  br %9, label %while_body, label %while_end
+%while_body:
+  let %d = alloca i32, 1
+  let %11 = load %d
+  let %12 = store 42, %11
+  let %13 = load %c
+  let %14 = lt %13, 100
+  br %14, label %if_then, label %if_end
+%while_end:
+  let %16 = load %c
+  let %17 = store %16, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%if_then:
+  let %20 = load %c
+  let %21 = load %d
+  let %22 = add %20, %21
+  let %23 = load %c
+  let %24 = store %22, %23
+  let %25 = load %c
+  let %26 = gt %25, 99
+  br %26, label %if_then.1, label %if_end.1
+%if_end:
+  jmp label %while_cond
+%if_then.1:
+  let %e = alloca i32, 1
+  let %29 = load %d
+  let %30 = mul %29, 2
+  let %31 = load %e
+  let %32 = store %30, %31
+  let %33 = call @get_one, 0
+  let %34 = eq %33, 1
+  br %34, label %if_then.2, label %if_end.2
+%if_end.1:
+  jmp label %if_end
+%if_then.2:
+  let %37 = load %e
+  let %38 = mul %37, 2
+  let %39 = load %c
+  let %40 = store %38, %39
+  jmp label %if_end.2
+%if_end.2:
+  jmp label %if_end.1
+%after return:
+  jmp label %exit
+%exit:
+  let %44 = load %ret_val.addr
+  ret %44
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %p = alloca i32, 1
+  let %0 = load %p
+  let %1 = store 2, %0
+  let %2 = load %p
+  let %3 = load %p
+  let %4 = call @deepWhileBr, %2, %3
+  let %5 = load %p
+  let %6 = store %4, %5
+  let %7 = load %p
+  let %8 = call @putint, %7
+  let %9 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %13 = load %ret_val.addr
+  ret %13
+}

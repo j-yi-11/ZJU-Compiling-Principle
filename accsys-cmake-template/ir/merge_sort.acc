@@ -1,0 +1,398 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %n = alloca i32, 1
+  let %0 = store 5, %n
+  let %arr = alloca i32, 5
+  let %tmp = alloca i32, 5
+  let %i = alloca i32, 1
+  let %intv = alloca i32, 1
+  let %s1 = alloca i32, 1
+  let %e1 = alloca i32, 1
+  let %cur1 = alloca i32, 1
+  let %s2 = alloca i32, 1
+  let %e2 = alloca i32, 1
+  let %cur2 = alloca i32, 1
+  let %1 = load %i
+  let %2 = store 0, %1
+  jmp label %while_cond
+%while_cond:
+  let %4 = load %i
+  let %5 = load %n
+  let %6 = lt %4, %5
+  br %6, label %while_body, label %while_end
+%while_body:
+  let %8 = call @getint
+  let %9 = load %i
+  let %10 = offset i32, %arr, [%9< 5]
+  let %11 = load %10
+  let %12 = store %8, %11
+  let %13 = load %i
+  let %14 = add %13, 1
+  let %15 = load %i
+  let %16 = store %14, %15
+  jmp label %while_cond
+%while_end:
+  let %18 = load %intv
+  let %19 = store 1, %18
+  jmp label %while_cond.1
+%while_cond.1:
+  let %21 = load %intv
+  let %22 = load %n
+  let %23 = lt %21, %22
+  br %23, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %25 = load %i
+  let %26 = store 0, %25
+  jmp label %while_cond.2
+%while_end.1:
+  let %28 = load %i
+  let %29 = store 0, %28
+  jmp label %while_cond.11
+%while_cond.2:
+  let %31 = load %i
+  let %32 = load %n
+  let %33 = load %intv
+  let %34 = mul 2, %33
+  let %35 = sub %32, %34
+  let %36 = le %31, %35
+  br %36, label %while_body.2, label %while_end.2
+%while_body.2:
+  let %38 = load %i
+  let %39 = load %s1
+  let %40 = store %38, %39
+  let %41 = load %s1
+  let %42 = load %intv
+  let %43 = add %41, %42
+  let %44 = load %e1
+  let %45 = store %43, %44
+  let %46 = load %s1
+  let %47 = load %cur1
+  let %48 = store %46, %47
+  let %49 = load %e1
+  let %50 = load %s2
+  let %51 = store %49, %50
+  let %52 = load %s2
+  let %53 = load %intv
+  let %54 = add %52, %53
+  let %55 = load %e2
+  let %56 = store %54, %55
+  let %57 = load %s2
+  let %58 = load %cur2
+  let %59 = store %57, %58
+  jmp label %while_cond.3
+%while_end.2:
+  let %61 = load %i
+  let %62 = load %intv
+  let %63 = add %61, %62
+  let %64 = load %n
+  let %65 = lt %63, %64
+  br %65, label %if_then.1, label %if_else.1
+%while_cond.3:
+  let %67 = load %cur1
+  let %68 = load %e1
+  let %69 = lt %67, %68
+  let %70 = load %cur2
+  let %71 = load %e2
+  let %72 = lt %70, %71
+  let %73 = and %69, %72
+  br %73, label %while_body.3, label %while_end.3
+%while_body.3:
+  let %75 = load %cur1
+  let %76 = offset i32, %arr, [%75< 5]
+  let %77 = load %76
+  let %78 = load %cur2
+  let %79 = offset i32, %arr, [%78< 5]
+  let %80 = load %79
+  let %81 = lt %77, %80
+  br %81, label %if_then, label %if_else
+%while_end.3:
+  jmp label %while_cond.4
+%if_then:
+  let %84 = load %cur1
+  let %85 = offset i32, %arr, [%84< 5]
+  let %86 = load %85
+  let %87 = load %i
+  let %88 = offset i32, %tmp, [%87< 5]
+  let %89 = load %88
+  let %90 = store %86, %89
+  let %91 = load %cur1
+  let %92 = add %91, 1
+  let %93 = load %cur1
+  let %94 = store %92, %93
+  jmp label %if_end
+%if_end:
+  let %96 = load %i
+  let %97 = add %96, 1
+  let %98 = load %i
+  let %99 = store %97, %98
+  jmp label %while_cond.3
+%if_else:
+  let %101 = load %cur2
+  let %102 = offset i32, %arr, [%101< 5]
+  let %103 = load %102
+  let %104 = load %i
+  let %105 = offset i32, %tmp, [%104< 5]
+  let %106 = load %105
+  let %107 = store %103, %106
+  let %108 = load %cur2
+  let %109 = add %108, 1
+  let %110 = load %cur2
+  let %111 = store %109, %110
+  jmp label %if_end
+%while_cond.4:
+  let %113 = load %cur1
+  let %114 = load %e1
+  let %115 = lt %113, %114
+  br %115, label %while_body.4, label %while_end.4
+%while_body.4:
+  let %117 = load %cur1
+  let %118 = offset i32, %arr, [%117< 5]
+  let %119 = load %118
+  let %120 = load %i
+  let %121 = offset i32, %tmp, [%120< 5]
+  let %122 = load %121
+  let %123 = store %119, %122
+  let %124 = load %cur1
+  let %125 = add %124, 1
+  let %126 = load %cur1
+  let %127 = store %125, %126
+  let %128 = load %i
+  let %129 = add %128, 1
+  let %130 = load %i
+  let %131 = store %129, %130
+  jmp label %while_cond.4
+%while_end.4:
+  jmp label %while_cond.5
+%while_cond.5:
+  let %134 = load %cur2
+  let %135 = load %e2
+  let %136 = lt %134, %135
+  br %136, label %while_body.5, label %while_end.5
+%while_body.5:
+  let %138 = load %cur2
+  let %139 = offset i32, %arr, [%138< 5]
+  let %140 = load %139
+  let %141 = load %i
+  let %142 = offset i32, %tmp, [%141< 5]
+  let %143 = load %142
+  let %144 = store %140, %143
+  let %145 = load %cur2
+  let %146 = add %145, 1
+  let %147 = load %cur2
+  let %148 = store %146, %147
+  let %149 = load %i
+  let %150 = add %149, 1
+  let %151 = load %i
+  let %152 = store %150, %151
+  jmp label %while_cond.5
+%while_end.5:
+  jmp label %while_cond.1
+%if_then.1:
+  let %155 = load %i
+  let %156 = load %s1
+  let %157 = store %155, %156
+  let %158 = load %s1
+  let %159 = load %intv
+  let %160 = add %158, %159
+  let %161 = load %e1
+  let %162 = store %160, %161
+  let %163 = load %s1
+  let %164 = load %cur1
+  let %165 = store %163, %164
+  let %166 = load %e1
+  let %167 = load %s2
+  let %168 = store %166, %167
+  let %169 = load %n
+  let %170 = load %e2
+  let %171 = store %169, %170
+  let %172 = load %s2
+  let %173 = load %cur2
+  let %174 = store %172, %173
+  jmp label %while_cond.6
+%if_end.1:
+  let %176 = load %i
+  let %177 = store 0, %176
+  jmp label %while_cond.10
+%if_else.1:
+  jmp label %while_cond.9
+%while_cond.6:
+  let %180 = load %cur1
+  let %181 = load %e1
+  let %182 = lt %180, %181
+  let %183 = load %cur2
+  let %184 = load %e2
+  let %185 = lt %183, %184
+  let %186 = and %182, %185
+  br %186, label %while_body.6, label %while_end.6
+%while_body.6:
+  let %188 = load %cur1
+  let %189 = offset i32, %arr, [%188< 5]
+  let %190 = load %189
+  let %191 = load %cur2
+  let %192 = offset i32, %arr, [%191< 5]
+  let %193 = load %192
+  let %194 = lt %190, %193
+  br %194, label %if_then.2, label %if_else.2
+%while_end.6:
+  jmp label %while_cond.7
+%if_then.2:
+  let %197 = load %cur1
+  let %198 = offset i32, %arr, [%197< 5]
+  let %199 = load %198
+  let %200 = load %i
+  let %201 = offset i32, %tmp, [%200< 5]
+  let %202 = load %201
+  let %203 = store %199, %202
+  let %204 = load %cur1
+  let %205 = add %204, 1
+  let %206 = load %cur1
+  let %207 = store %205, %206
+  let %208 = load %i
+  let %209 = add %208, 1
+  let %210 = load %i
+  let %211 = store %209, %210
+  jmp label %if_end.2
+%if_end.2:
+  jmp label %while_cond.6
+%if_else.2:
+  let %214 = load %cur2
+  let %215 = offset i32, %arr, [%214< 5]
+  let %216 = load %215
+  let %217 = load %i
+  let %218 = offset i32, %tmp, [%217< 5]
+  let %219 = load %218
+  let %220 = store %216, %219
+  let %221 = load %cur2
+  let %222 = add %221, 1
+  let %223 = load %cur2
+  let %224 = store %222, %223
+  let %225 = load %i
+  let %226 = add %225, 1
+  let %227 = load %i
+  let %228 = store %226, %227
+  jmp label %if_end.2
+%while_cond.7:
+  let %230 = load %cur1
+  let %231 = load %e1
+  let %232 = lt %230, %231
+  br %232, label %while_body.7, label %while_end.7
+%while_body.7:
+  let %234 = load %cur1
+  let %235 = offset i32, %arr, [%234< 5]
+  let %236 = load %235
+  let %237 = load %i
+  let %238 = offset i32, %tmp, [%237< 5]
+  let %239 = load %238
+  let %240 = store %236, %239
+  let %241 = load %cur1
+  let %242 = add %241, 1
+  let %243 = load %cur1
+  let %244 = store %242, %243
+  let %245 = load %i
+  let %246 = add %245, 1
+  let %247 = load %i
+  let %248 = store %246, %247
+  jmp label %while_cond.7
+%while_end.7:
+  jmp label %while_cond.8
+%while_cond.8:
+  let %251 = load %cur2
+  let %252 = load %e2
+  let %253 = lt %251, %252
+  br %253, label %while_body.8, label %while_end.8
+%while_body.8:
+  let %255 = load %cur2
+  let %256 = offset i32, %arr, [%255< 5]
+  let %257 = load %256
+  let %258 = load %i
+  let %259 = offset i32, %tmp, [%258< 5]
+  let %260 = load %259
+  let %261 = store %257, %260
+  let %262 = load %cur2
+  let %263 = add %262, 1
+  let %264 = load %cur2
+  let %265 = store %263, %264
+  let %266 = load %i
+  let %267 = add %266, 1
+  let %268 = load %i
+  let %269 = store %267, %268
+  jmp label %while_cond.8
+%while_end.8:
+  jmp label %while_cond.1
+%while_cond.9:
+  let %272 = load %i
+  let %273 = load %n
+  let %274 = lt %272, %273
+  br %274, label %while_body.9, label %while_end.9
+%while_body.9:
+  let %276 = load %i
+  let %277 = offset i32, %arr, [%276< 5]
+  let %278 = load %277
+  let %279 = load %i
+  let %280 = offset i32, %tmp, [%279< 5]
+  let %281 = load %280
+  let %282 = store %278, %281
+  let %283 = load %i
+  let %284 = add %283, 1
+  let %285 = load %i
+  let %286 = store %284, %285
+  jmp label %while_cond.9
+%while_end.9:
+  jmp label %while_cond.1
+%while_cond.10:
+  let %289 = load %i
+  let %290 = load %n
+  let %291 = lt %289, %290
+  br %291, label %while_body.10, label %while_end.10
+%while_body.10:
+  let %293 = load %i
+  let %294 = offset i32, %tmp, [%293< 5]
+  let %295 = load %294
+  let %296 = load %i
+  let %297 = offset i32, %arr, [%296< 5]
+  let %298 = load %297
+  let %299 = store %295, %298
+  let %300 = load %i
+  let %301 = add %300, 1
+  let %302 = load %i
+  let %303 = store %301, %302
+  jmp label %while_cond.10
+%while_end.10:
+  let %305 = load %intv
+  let %306 = mul %305, 2
+  let %307 = load %intv
+  let %308 = store %306, %307
+  jmp label %while_cond.1
+%while_cond.11:
+  let %310 = load %i
+  let %311 = load %n
+  let %312 = lt %310, %311
+  br %312, label %while_body.11, label %while_end.11
+%while_body.11:
+  let %314 = load %i
+  let %315 = offset i32, %arr, [%314< 5]
+  let %316 = load %315
+  let %317 = call @putint, %316
+  let %318 = call @putch, 32
+  let %319 = load %i
+  let %320 = add %319, 1
+  let %321 = load %i
+  let %322 = store %320, %321
+  jmp label %while_cond.11
+%while_end.11:
+  let %324 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %328 = load %ret_val.addr
+  ret %328
+}

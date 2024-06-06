@@ -1,0 +1,116 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @factorial(#m: i32) -> i32 {
+%entry:
+  let %m.addr = alloca i32, 1
+  let %0 = store #m, %m.addr
+  let %ret_val.addr = alloca i32, 1
+  let %f_res = alloca i32, 1
+  let %1 = store 1, %f_res
+  jmp label %while_cond
+%while_cond:
+  let %3 = load %m.addr
+  let %4 = gt %3, 1
+  br %4, label %while_body, label %while_end
+%while_body:
+  let %6 = load %f_res
+  let %7 = load %m.addr
+  let %8 = mul %6, %7
+  let %9 = load %f_res
+  let %10 = store %8, %9
+  let %11 = load %m.addr
+  let %12 = sub %11, 1
+  let %13 = load %m.addr
+  let %14 = store %12, %13
+  jmp label %while_cond
+%while_end:
+  let %16 = load %f_res
+  let %17 = store %16, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %21 = load %ret_val.addr
+  ret %21
+}
+fn @cal_combiniation(#c_base: i32, #c_num: i32) -> i32 {
+%entry:
+  let %c_base.addr = alloca i32, 1
+  let %0 = store #c_base, %c_base.addr
+  let %c_num.addr = alloca i32, 1
+  let %1 = store #c_num, %c_num.addr
+  let %ret_val.addr = alloca i32, 1
+  let %2 = load %c_base.addr
+  let %3 = call @factorial, %2
+  let %4 = load %c_num.addr
+  let %5 = call @factorial, %4
+  let %6 = load %c_base.addr
+  let %7 = load %c_num.addr
+  let %8 = sub %6, %7
+  let %9 = call @factorial, %8
+  let %10 = mul %5, %9
+  let %11 = div %3, %10
+  let %12 = store %11, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %16 = load %ret_val.addr
+  ret %16
+}
+fn @cal_permutation(#p_base: i32, #p_num: i32) -> i32 {
+%entry:
+  let %p_base.addr = alloca i32, 1
+  let %0 = store #p_base, %p_base.addr
+  let %p_num.addr = alloca i32, 1
+  let %1 = store #p_num, %p_num.addr
+  let %ret_val.addr = alloca i32, 1
+  let %2 = load %p_base.addr
+  let %3 = call @factorial, %2
+  let %4 = load %p_base.addr
+  let %5 = load %p_num.addr
+  let %6 = sub %4, %5
+  let %7 = call @factorial, %6
+  let %8 = div %3, %7
+  let %9 = store %8, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %13 = load %ret_val.addr
+  ret %13
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %n = alloca i32, 1
+  let %0 = call @getint
+  let %1 = store %0, %n
+  let %k = alloca i32, 1
+  let %2 = call @getint
+  let %3 = store %2, %k
+  let %4 = load %n
+  let %5 = load %k
+  let %6 = call @cal_combiniation, %4, %5
+  let %7 = call @putint, %6
+  let %8 = call @putch, 32
+  let %9 = load %n
+  let %10 = load %k
+  let %11 = call @cal_permutation, %9, %10
+  let %12 = call @putint, %11
+  let %13 = store 0, %ret_val.addr
+  jmp label %exit
+  jmp label %exit
+%after return:
+  jmp label %exit
+%exit:
+  let %17 = load %ret_val.addr
+  ret %17
+}

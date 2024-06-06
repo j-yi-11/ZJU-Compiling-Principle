@@ -10,225 +10,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68b47869-04c7-4c20-a8a6-0d260245e663" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/accsys-cmake-template/hello.s" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/accsys-cmake-template/input" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/c_cpp_properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/c_cpp_properties.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/.github/workflows/accipit-build.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/.github/workflows/deploy.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/.gitlab-ci.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/Cargo.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/Cargo.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/accipit-spec.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/faq.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/index.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/quads2ssa.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/sysy-accipit-mapping.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/sysy-runtime.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/appendix/sysy-spec.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/backend.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/changelog.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/css/custom.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/environment.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/accipit.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/accsys.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/dfg01.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/dfg02.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/dfg03.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/dfg04.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/factorial.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/flow.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/frame.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/impl-value-instruction.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/shortcut_if_and.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/spec-value-instruction.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/images/while.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/index.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/javascripts/katex.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/javascripts/mathjax.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/middle-ir-gen.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/semantics.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/docs/syntax.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/add.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/array.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/array_parameter.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/factorial.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/global_array.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/if.acc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/toy-calculator/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/toy-calculator/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/toy-calculator/calculator.l" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/toy-calculator/calculator.y" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/examples/toy-calculator/input.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/mkdocs.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/apps/debugger.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/apps/executor.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/apps/mod.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/bin/accipit.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/frontend/lexer.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/frontend/mod.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/frontend/new_lexer.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/frontend/parser.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/frontend/token.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/ir/builders.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/ir/mod.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/ir/structures.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/ir/types.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/ir/values.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/lib.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/utils/display_helper.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/utils/mod.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/src/utils/unique_name.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/compiler" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/add.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/arr_defn1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/array1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/array2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/assign_rvalue.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/comment1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/comment2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/div.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error3.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error4.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error_comment.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/error_func_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/factorial.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/func_array1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/func_defn.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/func_name.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/if_complex_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/main.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/mul.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/op_priority1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/op_priority2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/op_priority3.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/rem.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/scope.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/stmt_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/unary_op.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/var_defn2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/void_return.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/while_if.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/while_if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/while_if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab1/while_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/add.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/arr_defn1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/array1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/array2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/array_lval_error.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/assign_mismatch.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/func_defn.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/func_name.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/func_param.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/func_recursion.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/if_complex_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/if_else_return.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/invalid_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/invalid_array2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/invalid_call.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/main.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/mul.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/op_priority.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/redef_fparam.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/redef_fun.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/redef_fun_var.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/redef_var.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/rem.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/return_mismatch.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/scope.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/stmt_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unary_op.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/undef_func.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/undef_variable.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unmatch_call_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unmatch_call_num.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unmatch_call_type.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unmatch_call_type2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/unmatch_op.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/var_defn.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/while_if.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab2/while_test.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/add.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/array1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/array2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/array_hard.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/array_parameter.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/binary_search.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/combinator.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/div.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/factorial.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/func_call.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/global_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/if_complex_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/if_test3.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/merge_sort.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/mul.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/op_priority1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/op_priority2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/op_priority3.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/quick_sort.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/rem.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/short_circuit1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/short_circuit2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/sort_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/stmt_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/sudoku.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/two_dimension_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/unary_op.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/while_if.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/while_if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/while_if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab3/while_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/add.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array_hard.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array_init1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array_init2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/array_parameter.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/binary_search.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/combinator.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/div.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/factorial.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/func_call.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/global_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/if_complex_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/merge_sort.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/mul.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/op_priority1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/op_priority2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/op_priority3.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/quick_sort.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/rem.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/short_circuit1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/short_circuit2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/sort_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/stmt_expr.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/sudoku.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/two_dimension_array.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/unary_op.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/while_if.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/while_if_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/while_if_test2.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/lab4/while_test1.sy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accipit/tests/test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/quick-test-lab3.sh" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/quick-test-lab3.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/reTest-one.sh" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/reTest-one.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/past.sy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/past.sy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/flex file before contain.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir_gen.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/pieceOFBUG.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/semantic/semantic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/semantic/semantic.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/sysy.y" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/sysy.y" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/test.sy" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/README.md" afterDir="false" />
@@ -821,6 +622,41 @@
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_if_test1.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_if_test1.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_if_test2.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_if_test2.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_test1.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_test1.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/add.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/add.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array_hard.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_hard.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array_init1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_init1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array_init2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_init2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/array_parameter.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_parameter.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/binary_search.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/binary_search.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/combinator.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/combinator.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/div.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/div.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/factorial.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/factorial.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/func_call.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/func_call.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/global_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/global_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/if_complex_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_complex_expr.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/if_test3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test3.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/merge_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/mul.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/mul.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority3.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/quick_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/quick_sort.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/rem.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/rem.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/short_circuit1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/short_circuit2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/sort_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sort_array.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/stmt_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/stmt_expr.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/sudoku.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/two_dimension_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/unary_op.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/unary_op.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/while_if.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/while_if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/while_if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ir/while_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/ircode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/ircode.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/old-test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/old-test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test.py" afterDir="false" />
@@ -848,30 +684,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "jiangyi",
-    "last_opened_file_path": "D:/accipit",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "CPPToolchains",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;jiangyi&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/accipit&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\accipit\tests" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\accipit\accsys-cmake-template" />
+      <recent name="D:\accipit\lab4-code" />
       <recent name="D:\accipit\tests" />
       <recent name="D:\accipit" />
       <recent name="D:\accipit\tests\result-lab2" />
@@ -934,6 +772,7 @@
       <workItem from="1717590309702" duration="6463000" />
       <workItem from="1717598071034" duration="6879000" />
       <workItem from="1717646539921" duration="770000" />
+      <workItem from="1717662651777" duration="4562000" />
     </task>
     <servers />
   </component>
