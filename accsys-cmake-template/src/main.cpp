@@ -58,6 +58,12 @@ int main(int argc, char **argv)
     M->genGlobalList(root);
     M->genFuncList(root);
     std::cout << "ir generation" << std::endl;
+
+
+    // std::string s = argv[2];
+    // std::ofstream os(s);
+    // M->print(os, false);
+
     std::ostream OS(std::cout.rdbuf());
     M->print(OS, false);
 

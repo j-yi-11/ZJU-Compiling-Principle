@@ -977,10 +977,10 @@ public:
     };
     
     TempBlockType type;
-    int if_index;
-    int else_index;
-    int while_index;
-    int depth;
+    int if_index = 0;
+    int else_index = 0;
+    int while_index = 0;
+    int depth = 0;
 
     enum BranchType {
         JMP,
@@ -992,12 +992,12 @@ public:
     bool is_last = false;
 
     std::vector<Instruction*> instructions;
-    BasicBlock *basic_block;
+    BasicBlock *basic_block = nullptr;
     std::optional<TempBlock *> next_block = nullptr;
 
 
-    TempBlock *parent;
-    Value *condition;
+    TempBlock *parent = nullptr;
+    Value *condition = nullptr;
 
     TempBlock(TempBlockType type, TempBlock *parent, int depth, int if_index = 0, int else_index = 0, int while_index = 0)
         : type(type), parent(parent), depth(depth), if_index(if_index), else_index(else_index), while_index(while_index) {}
@@ -1027,6 +1027,7 @@ public:
             case WHILE_END:
                 name = "while_end"+std::to_string(while_index);
                 break;
+            default:break;
         }
         std::string next_name = {};
         switch(next_block_type) {
@@ -1051,6 +1052,7 @@ public:
             case EXIT:
                 next_name = "exit";
                 break;
+            default:break;
         }
 
         if (is_last == true) {
