@@ -363,12 +363,12 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             while_cond_block->condition = conditionVal;
 
             // while_body
+            cur_depth++;
             TempBlock *while_body_block = new TempBlock(
-                    TempBlock::TempBlockType::WHILE_BODY, parent, cur_depth, 
+                    TempBlock::TempBlockType::WHILE_BODY, parent, cur_depth,
                     if_index, else_index, while_cond_block->while_index);
             block_exec_ordered.push_back(while_body_block);
 
-            cur_depth++;
             generateTempBlock(then_block, while_body_block);
             cur_depth--;
 
@@ -454,6 +454,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
                 if(debug) fmt::print("[generateTempBlock]: parent is nullptr\n");
             }
             // fmt::print("1\n");
+            cur_depth++;
             TempBlock *if_then_block = new TempBlock(
                     TempBlock::TempBlockType::IF_THEN, parent, cur_depth, 
                     if_index, else_index, while_index);
@@ -461,7 +462,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             // fmt::print("2\n");
             if_index++;
 
-            cur_depth++;
+
             generateTempBlock(then_block, if_then_block);
             cur_depth--;
             // fmt::print("3\n");
@@ -471,7 +472,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
                 // if_else
                 TempBlock *if_else_block = nullptr;
                 if_else_block = new TempBlock( 
-                    TempBlock::TempBlockType::IF_ELSE, parent, cur_depth, 
+                    TempBlock::TempBlockType::IF_ELSE, parent, if_then_block->depth, //cur_depth,
                     if_then_block->if_index, if_then_block->else_index, while_index);
                 block_exec_ordered.push_back(if_else_block);
                 // fmt::print("5\n");
@@ -498,7 +499,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             // fmt::print("6\n");
             
             TempBlock *if_end_block = new TempBlock(
-                    TempBlock::TempBlockType::IF_END, parent, cur_depth, 
+                    TempBlock::TempBlockType::IF_END, parent, if_then_block->depth - 1,
                     if_then_block->if_index, if_then_block->else_index, while_index);
             block_exec_ordered.push_back(if_end_block);
             // fmt::print("7\n");
@@ -554,8 +555,9 @@ void Function::AnalysisBlockOrder()
     if (debug) fmt::print("block_exec_ordered.size(): {}\n", block_exec_ordered.size());
     for (int i = 0; i < (int)block_exec_ordered.size(); i++)
     {
-        if (i == block_exec_ordered.size()-1) {
+        if (i == (int)block_exec_ordered.size()-1) {
             block_exec_ordered[i]->is_last = true;
+            block_exec_ordered[i]->next_block = std::nullopt;
             if(debug) fmt::print("[AnalysisBlockOrder]: last block\n");
             continue;
         }
@@ -565,120 +567,152 @@ void Function::AnalysisBlockOrder()
             continue;
         }
         switch(block_exec_ordered[i]->type) {
-            case TempBlock::TempBlockType::ENTRY:
+            case TempBlock::TempBlockType::ENTRY: // ok
                 if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN) {
                     block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
                     block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
-                } else if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                }
+                else if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
                     block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
                 }
                 break;
-            case TempBlock::TempBlockType::IF_THEN:
+            case TempBlock::TempBlockType::IF_THEN: // ok
                 if(debug) fmt::print("[AnalysisBlockOrder]: if_then\n");
-                if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
+                // if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
+                if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN ) {
                     // 内部又分裂出了新的block
-                    if(debug) fmt::print("[AnalysisBlockOrder]: split new block\n");
-                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
-                        // while_cond
-                        if(debug) fmt::print("[AnalysisBlockOrder]: if then jump to while cond\n");
-                        fmt::print("-------------------------------------------------------------------\n");
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
-                    } else {
-                        // if then
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
-                    }
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new if_then block\n");
+                    // if then
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
                     
-                } else {
+                }
+                else if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                    // while_cond
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new while block\n");
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                }
+                else {
                     // 内部没有分裂出新的block，跳转到end
                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
                     block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->if_index;
                 }
                 break;
-            case TempBlock::TempBlockType::IF_ELSE:
-                if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
-                    if(debug) fmt::print("[AnalysisBlockOrder]: split new block\n");
-                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
-                        // while_cond
-                        fmt::print("if then jump to while cond\n");
-                        fmt::print("-------------------------------------------------------------------\n");
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
-                    } else {
-                        // 内部又分裂出了新的block
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index; // 不是加1
-                    }
-                    
-                    
-                } else {
+            case TempBlock::TempBlockType::IF_ELSE: // ok
+                if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN ) {
+                    // 内部又分裂出了新的block
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new if_then block\n");
+                    // if then
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+
+                }
+                else if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                    // while_cond
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new while block\n");
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                }
+                else {
                     // 内部没有分裂出新的block，跳转到end
                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
                     block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->if_index;
                 }
+
                 break;
-            case TempBlock::TempBlockType::IF_END:
+            case TempBlock::TempBlockType::IF_END: // assume ok
                 // 1. 跳转到当前层数下的下一个block
-                if (block_exec_ordered[i]->depth == block_exec_ordered[i+1]->depth) {
-                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // while_cond
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
-                    } else {
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // 一定是If_then
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
-                    }
-                    
-                    
-                } else {
-                    // 这就不一定了，上一级如果是if，那就跳if_end，上一级如果是while，那就跳while_cond index -> parent的while index
-                    if (block_exec_ordered[i]->parent->type == TempBlock::TempBlockType::WHILE_BODY) {
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->parent->while_index;
-                    } else {
-                        // 要跳转到上一级的if_end
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                // if (block_exec_ordered[i]->depth == block_exec_ordered[i+1]->depth) {
+                if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN) {
+                    // 内部又分裂出了新的block
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                }
+                else if(block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                    // 内部又分裂出了新的block
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                }
+                else {
+                    // 要向上找
+                    TempBlock *temp_block = nullptr;
+                    temp_block = block_exec_ordered[i]->parent;
+                    fmt::print("[AnalysisBlockOrder]: if_end jump to the parent\n");
+                    bool found = false;
+                    while(temp_block != nullptr) {
+                        if(debug) fmt::print("[AnalysisBlockOrder]: while (temp_block != nullptr) loop\n");
+                        if (temp_block->depth <= block_exec_ordered[i]->depth &&
+                            temp_block->type != TempBlock::TempBlockType::IF_END &&
+                            temp_block->type != TempBlock::TempBlockType::WHILE_END) {
+                            if(debug) fmt::print("[AnalysisBlockOrder]: enter if\n");
+                            switch(temp_block->type) {
+                                case TempBlock::TempBlockType::ENTRY:
+                                    block_exec_ordered[i]->next_block = std::nullopt;
+                                    block_exec_ordered[i]->is_last = true;
+                                    found = true;
+                                    break;
+                                case TempBlock::TempBlockType::IF_THEN:
+                                case TempBlock::TempBlockType::IF_ELSE:
+                                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
+                                    block_exec_ordered[i]->next_block_index = temp_block->if_index;
+                                    found = true;
+                                    break;
+                                case TempBlock::TempBlockType::WHILE_BODY:
+                                    fmt::print("[AnalysisBlockOrder]: if_end's parent is while_body in the same level\n");
+                                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                                    block_exec_ordered[i]->next_block_index = temp_block->while_index;
+                                    found = true;
+                                    break;
+                                default:
+                                    fmt::print("[AnalysisBlockOrder]: ERROR: END block can't find out the next block\n");
+                                    break;
+                            }
+                        }
+
+                        if(debug) fmt::print("[AnalysisBlockOrder]: loop end\n");
+                        if (found) break;
+                        temp_block = temp_block->parent;
                     }
                 }
                 break;
 //
-            case TempBlock::TempBlockType::WHILE_COND:
+            case TempBlock::TempBlockType::WHILE_COND: // ok
                 block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
                 block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_BODY;
                 block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->while_index;
                 break;
-            case TempBlock::TempBlockType::WHILE_BODY:
-                if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
+            case TempBlock::TempBlockType::WHILE_BODY: // ok
+                if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN ) {
                     // 内部又分裂出了新的block
-                    fmt::print("split new block\n");
-                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
-                        // while_cond
-                        fmt::print("if then jump to while cond\n");
-                        fmt::print("-------------------------------------------------------------------\n");
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
-                    } else {
-                        // if then
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
-                    }
-                } else {
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new if_then block\n");
+                    // if then
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+
+                }
+                else if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                    // while_cond
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new while block\n");
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                }
+                else {
                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
                     block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->while_index;
@@ -687,30 +721,27 @@ void Function::AnalysisBlockOrder()
             case TempBlock::TempBlockType::WHILE_END:
                 if(debug) fmt::print("[AnalysisBlockOrder]: while_end\n");
                 // 1. 跳转到当前层数下的下一个block
-                if (block_exec_ordered[i]->depth == block_exec_ordered[i+1]->depth) {
-                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // while_cond
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
-                    } else {
-                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
-                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // 一定是If_then
-                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
-                    }
-                    
-                    
-                } else {
+                if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::IF_THEN) {
+                    // 内部又分裂出了新的block
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_THEN;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                }
+                else if(block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                    // 内部又分裂出了新的block
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                }
+                else {
                     // 要沿着parent链找，找到第一个上层节点
-                    // 如果是if_then -> if_end
-                    // 如果是if_else -> if_end
-                    // 如果是if_end -> (可能吗？) -> 忽略 -> 继续向上找 -> if_end->parent是if_then的parent
-                    // gttttttttttttttdrrr/
                     TempBlock *temp_block = nullptr;
                     temp_block = block_exec_ordered[i]->parent;
                     fmt::print("[AnalysisBlockOrder]: while_end jump to the parent\n");
+                    bool found = false;
                     while(temp_block != nullptr) {
                         if(debug) fmt::print("[AnalysisBlockOrder]: while (temp_block != nullptr) loop\n");
-                        if (temp_block->depth < block_exec_ordered[i]->depth && 
+                        if (temp_block->depth <= block_exec_ordered[i]->depth &&
                             temp_block->type != TempBlock::TempBlockType::IF_END && 
                             temp_block->type != TempBlock::TempBlockType::WHILE_END) {
                             if(debug) fmt::print("[AnalysisBlockOrder]: enter if\n");
@@ -718,17 +749,20 @@ void Function::AnalysisBlockOrder()
                                 case TempBlock::TempBlockType::ENTRY:
                                     block_exec_ordered[i]->next_block = std::nullopt;
                                     block_exec_ordered[i]->is_last = true;
+                                    found = true;
                                     break;
                                 case TempBlock::TempBlockType::IF_THEN:
                                 case TempBlock::TempBlockType::IF_ELSE:
                                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
                                     block_exec_ordered[i]->next_block_index = temp_block->if_index;
+                                    found = true;
                                     break;
                                 case TempBlock::TempBlockType::WHILE_BODY:
                                     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                                     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
                                     block_exec_ordered[i]->next_block_index = temp_block->while_index;
+                                    found = true;
                                     break;
                                 default: 
                                     fmt::print("[AnalysisBlockOrder]: ERROR: END block can't find out the next block\n");
@@ -737,6 +771,7 @@ void Function::AnalysisBlockOrder()
                         }
                         
                         if(debug) fmt::print("[AnalysisBlockOrder]: loop end\n");
+                        if (found) break;
                         temp_block = temp_block->parent;
                     }
                     

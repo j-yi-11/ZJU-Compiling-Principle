@@ -130,7 +130,7 @@ fn @main() -> i32 {
   let %98 = load %i
   let %99 = add %98, 1
   let %100 = store %99, %i
-  jmp label %while_cond.3
+  jmp label %while_cond.4
 %if_then:
   let %102 = load %i
   let %103 = load %k

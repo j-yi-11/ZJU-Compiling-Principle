@@ -170,7 +170,7 @@ fn @main() -> i32 {
   let %129 = store %128, %i
   jmp label %while_cond.5
 %while_end.5:
-  jmp label %while_cond.1
+  jmp label %while_cond.2
 %if_then.1:
   let %132 = load %i
   let %133 = store %132, %s1
@@ -283,7 +283,7 @@ fn @main() -> i32 {
   let %227 = store %226, %i
   jmp label %while_cond.8
 %while_end.8:
-  jmp label %while_cond.1
+  jmp label %if_end.1
 %while_cond.9:
   let %230 = load %i
   let %231 = load %n
@@ -301,7 +301,7 @@ fn @main() -> i32 {
   let %242 = store %241, %i
   jmp label %while_cond.9
 %while_end.9:
-  jmp label %while_cond.1
+  jmp label %if_end.1
 %while_cond.10:
   let %245 = load %i
   let %246 = load %n

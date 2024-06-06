@@ -201,7 +201,7 @@ fn @check_sudoku(#a: i32*) -> i32 {
   let %145 = load %j
   let %146 = add %145, 1
   let %147 = store %146, %j
-  jmp label %while_cond.6
+  jmp label %while_cond.7
 %while_cond.10:
   let %149 = load %l
   let %150 = lt %149, 3
@@ -225,7 +225,7 @@ fn @check_sudoku(#a: i32*) -> i32 {
   let %165 = load %k
   let %166 = add %165, 1
   let %167 = store %166, %k
-  jmp label %while_cond.6
+  jmp label %while_cond.9
 %if_then.4:
   let %169 = load %m
   let %170 = sub %169, 1
@@ -436,7 +436,7 @@ fn @main() -> i32 {
   let %58 = store 0, %j
   jmp label %while_cond.3
 %while_end.2:
-  jmp label %if_end.1
+  jmp label %if_end.2
 %while_cond.3:
   let %61 = load %j
   let %62 = lt %61, 9
@@ -456,7 +456,7 @@ fn @main() -> i32 {
   let %74 = load %i
   let %75 = add %74, 1
   let %76 = store %75, %i
-  jmp label %if_end.1
+  jmp label %while_cond.2
 %if_then.3:
   let %78 = call @putint, 1
   let %79 = call @putch, 32
