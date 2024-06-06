@@ -8,60 +8,53 @@ fn @ifWhile() -> i32 {
 %entry:
   let %ret_val.addr = alloca i32, 1
   let %a = alloca i32, 1
-  let %0 = load %a
-  let %1 = store 0, %0
+  let %0 = store 0, %a
   let %b = alloca i32, 1
-  let %2 = load %b
-  let %3 = store 3, %2
-  let %4 = load %a
-  let %5 = eq %4, 5
-  br %5, label %if_then, label %if_else
+  let %1 = store 3, %b
+  let %2 = load %a
+  let %3 = eq %2, 5
+  br %3, label %if_then, label %if_else
 %if_then:
   jmp label %while_cond
 %if_end:
-  let %8 = load %b
-  let %9 = store %8, %ret_val.addr
-  jmp label %exit
+  let %6 = load %b
+  let %7 = store %6, %ret_val.addr
   jmp label %exit
 %if_else:
   jmp label %while_cond.1
 %while_cond:
-  let %13 = load %b
-  let %14 = eq %13, 2
-  br %14, label %while_body, label %while_end
+  let %10 = load %b
+  let %11 = eq %10, 2
+  br %11, label %while_body, label %while_end
 %while_body:
-  let %16 = load %b
-  let %17 = add %16, 2
-  let %18 = load %b
-  let %19 = store %17, %18
+  let %13 = load %b
+  let %14 = add %13, 2
+  let %15 = store %14, %b
   jmp label %while_cond
 %while_end:
-  let %21 = load %b
-  let %22 = add %21, 25
-  let %23 = load %b
-  let %24 = store %22, %23
+  let %17 = load %b
+  let %18 = add %17, 25
+  let %19 = store %18, %b
   jmp label %if_end
 %while_cond.1:
-  let %26 = load %a
-  let %27 = lt %26, 5
-  br %27, label %while_body.1, label %while_end.1
+  let %21 = load %a
+  let %22 = lt %21, 5
+  br %22, label %while_body.1, label %while_end.1
 %while_body.1:
-  let %29 = load %b
-  let %30 = mul %29, 2
-  let %31 = load %b
-  let %32 = store %30, %31
-  let %33 = load %a
-  let %34 = add %33, 1
-  let %35 = load %a
-  let %36 = store %34, %35
+  let %24 = load %b
+  let %25 = mul %24, 2
+  let %26 = store %25, %b
+  let %27 = load %a
+  let %28 = add %27, 1
+  let %29 = store %28, %a
   jmp label %while_cond.1
 %while_end.1:
   jmp label %if_end
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %40 = load %ret_val.addr
-  ret %40
+  let %33 = load %ret_val.addr
+  ret %33
 }
 fn @main() -> i32 {
 %entry:
@@ -70,10 +63,9 @@ fn @main() -> i32 {
   let %1 = call @putint, %0
   let %2 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %6 = load %ret_val.addr
-  ret %6
+  let %5 = load %ret_val.addr
+  ret %5
 }

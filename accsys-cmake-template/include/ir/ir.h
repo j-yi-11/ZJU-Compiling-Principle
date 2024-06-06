@@ -845,10 +845,11 @@ public:
     void BasicBlockConnect();
 
 
-    Value *PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock); 
+    Value *PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock, bool isVal);
 
     Value *findEntryVariable(TempBlock *root, NodePtr variable);
     Value *findVariable(NodePtr variable, TempBlock *root);
+    Value *findVariableAddr(NodePtr variable, TempBlock* root);
 
 };
 

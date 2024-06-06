@@ -15,21 +15,19 @@ fn @factorial(#n: i32) -> i32 {
 %if_then:
   let %4 = store 1, %ret_val.addr
   jmp label %exit
-  jmp label %exit
 %if_end:
+  let %6 = load %n.addr
   let %7 = load %n.addr
-  let %8 = load %n.addr
-  let %9 = sub %8, 1
-  let %10 = call @factorial, %9
-  let %11 = mul %7, %10
-  let %12 = store %11, %ret_val.addr
+  let %8 = sub %7, 1
+  let %9 = call @factorial, %8
+  let %10 = mul %6, %9
+  let %11 = store %10, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %16 = load %ret_val.addr
-  ret %16
+  let %14 = load %ret_val.addr
+  ret %14
 }
 fn @main() -> i32 {
 %entry:
@@ -45,10 +43,9 @@ fn @main() -> i32 {
   let %6 = call @putint, %5
   let %7 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %11 = load %ret_val.addr
-  ret %11
+  let %10 = load %ret_val.addr
+  ret %10
 }

@@ -257,13 +257,13 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
                 std::vector<NodePtr> varDefs = varDeclStmt->VarDefs;
                 for (auto t : varDefs) {
                     fmt::print("createLocalVariable for {}\n", t->as<VarDef*>()->name);
-                    auto load_instr = createLocalVariable(t->as<VarDef*>(), parent); // alloca
+                    auto alloca_instr = createLocalVariable(t->as<VarDef*>(), parent); // alloca
                     // added
                     if (t->as<VarDef*>()->initialValue != nullptr) {
                         // assign statement
                         fmt::print("assign initial value for the local variable\n");
-                        Value *rv = PostOrderTraversal(t->as<VarDef*>()->initialValue, parent);
-                        Value *lv = load_instr;
+                        Value *rv = PostOrderTraversal(t->as<VarDef*>()->initialValue, parent, true);
+                        Value *lv = alloca_instr;
                         StoreInst *store = StoreInst::Create(rv, lv);
                         parent->instructions.push_back(store);
 
@@ -279,9 +279,9 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             Value * rv;
             fmt::print("find out an assign: \n");
             
-            rv = PostOrderTraversal(assignStmt->Exp, parent);
+            rv = PostOrderTraversal(assignStmt->Exp, parent, true);
             fmt::print("rVal generate successfully\n");
-            lv = findVariable(assignStmt->LVal->as<LVal*>(), parent);
+            lv = findVariableAddr(assignStmt->LVal->as<LVal*>(), parent);
             fmt::print("lVal generate successfully\n");
             
             StoreInst *store = StoreInst::Create(rv, lv);
@@ -306,7 +306,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             while_index++;
             
             // condition
-            Value *conditionVal = PostOrderTraversal(whileStmt->condition, while_cond_block);
+            Value *conditionVal = PostOrderTraversal(whileStmt->condition, while_cond_block, true);
             while_cond_block->condition = conditionVal;
 
             // while_body
@@ -333,7 +333,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
         // expStmt语句
         if (auto expStmt = statement->as<ExpStmt*>()) {
             fmt::print("find out an expStmt\n");
-            PostOrderTraversal(expStmt->Exp, parent);
+            PostOrderTraversal(expStmt->Exp, parent, true);
         }
         
         // return语句
@@ -353,7 +353,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
                     }
                 }
 
-                rv = PostOrderTraversal(returnStmt->result, parent);
+                rv = PostOrderTraversal(returnStmt->result, parent, true);
 
 
                 StoreInst *store_inst = StoreInst::Create(rv, lv);
@@ -392,7 +392,7 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             Block *then_block = then_block_stmt->Block->as<Block*>();
             fmt::print("0\n");
             // condition
-            Value *conditionVal = PostOrderTraversal(ifStmt->condition, parent);
+            Value *conditionVal = PostOrderTraversal(ifStmt->condition, parent, true);
             if (conditionVal == nullptr) 
                 assert("conditionVal is empty\n");
             parent->condition = conditionVal;
@@ -682,7 +682,7 @@ void Function::AnalysisBlockOrder()
                         fmt::print("loop end\n");
                         temp_block = temp_block->parent;
                     }
-                    
+
 
                     // // 这就不一定了，上一级如果是if，那就跳if_end，上一级如果是while，那就跳while_cond index -> parent的while index
                     // if (block_exec_ordered[i]->parent->type == TempBlock::TempBlockType::WHILE_BODY) {
@@ -858,6 +858,9 @@ void Function::BasicBlockConnect()
     fmt::print("BasicBlockConnect()\n");
     int index = 0;
     for (auto t : block_exec_ordered) {  
+        if (t->next_block == std::nullopt) {
+            continue;
+        }
         if (!((t->next_block).has_value())) {
             JumpInst::Create(&back(), t->basic_block);
             continue;
@@ -930,7 +933,7 @@ void Function::BasicBlockConnect()
     fmt::print("out\n");
 }
 
-Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
+Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent, bool isVal) {
     fmt::print("PostOrderTraversal()\n");
     bool debug = true;
     if(root == nullptr){
@@ -947,14 +950,19 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
         // variable
         if (auto var = root->as<LVal*>()) {
             if(debug) fmt::print("[PostOrderTraversal]: LVal\n");
-            return findVariable(root, parent);
+            if (isVal) {
+                return findVariable(root, parent);
+            } else {
+                return findVariableAddr(root, parent);
+            }
         }
     }
+    // x = f(1);
 
     if (auto t = root->as<addExp*>()) {
         fmt::print("addExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
 
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Add, val1, val2, Type::getIntegerTy());
@@ -962,96 +970,96 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
         return inst;
     } else if (auto t = root->as<subExp*>()) {
         fmt::print("subExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Sub, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<mulExp*>()) {
         fmt::print("mulExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Mul, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<divExp*>()) {
         fmt::print("divExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Div, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<modExp*>()) {
         fmt::print("modExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Mod, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<andExp*>()) {
         fmt::print("andExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::And, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<orExp*>()) {
         fmt::print("orExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Or, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<lessExp*>()) {
         fmt::print("lessExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Lt, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<greatExp*>()) {
         fmt::print("greatExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::BinaryOps::Gt, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<leqExp*>()) {
         fmt::print("leqExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Le, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<geqExp*>()) {
         fmt::print("geqExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Ge, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<eqExp*>()) {
         fmt::print("eq\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Eq, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<neqExp*>()) {
         fmt::print("neqExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
-        auto val2 = PostOrderTraversal(t->rhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
+        auto val2 = PostOrderTraversal(t->rhs, parent, true);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Ne, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
@@ -1062,7 +1070,7 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
     // 单目运算符
     else if (auto t = root->as<negExp*>()){
         fmt::print("negExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
         auto val2 = ConstantInt::Create((std::uint32_t)0);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Sub, val2, val1, Type::getIntegerTy());
@@ -1070,7 +1078,7 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
         return inst;
     } else if (auto t = root->as<notExp*>()){
         fmt::print("notExp\n");
-        auto val1 = PostOrderTraversal(t->lhs, parent);
+        auto val1 = PostOrderTraversal(t->lhs, parent, true);
         auto val2 = ConstantInt::Create((std::uint32_t)0);
         BinaryInst* inst;
         inst = BinaryInst::Create(Instruction::Eq, val2, val1, Type::getIntegerTy());
@@ -1078,15 +1086,21 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
         return inst;
     } else if (auto t = root->as<posExp*>()){
         fmt::print("posExp\n");
-        return PostOrderTraversal(t->lhs, parent);
+        return PostOrderTraversal(t->lhs, parent, true);
     } else if (auto t = root->as<funcallExp*>()){
         fmt::print("funcallExp name = {}\n", t->name);
         CallInst* inst = nullptr;
         Function *f = getParent()->getFunction(t->name);
         std::vector<Value *> Args;
+        int index = 0;
         for (auto param : t->params) {
-            auto arg = PostOrderTraversal(param, parent);
-            Args.push_back(arg);
+            if (f->getArg(index)->getType() == Type::getIntegerTy()) {
+                auto arg = PostOrderTraversal(param, parent, true);
+                Args.push_back(arg);
+            } else {
+                auto arg = PostOrderTraversal(param, parent, false);
+                Args.push_back(arg);
+            }
         }
         inst = CallInst::Create(f, Args);
         parent->instructions.push_back(inst);
@@ -1097,7 +1111,172 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
     }
 }
 
+Value *Function::findVariableAddr(NodePtr variable, TempBlock* root)
+{
+    fmt::print("findVariable()\n");
+    bool debug = true;
+    bool found = false;
+    auto var = variable->as<LVal*>();
+    if (root == nullptr) {
+        assert("findVariable(): root is empty\n");
+    }
 
+    // 在tempBlock中找匹配variable的变量
+    TempBlock *temp_block = root;
+    while (temp_block != nullptr) {
+        // if(debug) fmt::print("[findVariable]: temp_block->instructions.size = {}\n",temp_block->instructions.size());
+        for (auto t : temp_block->instructions) {
+            // if(debug) fmt::print("[findVariable]: loop\n");
+            if (AllocaInst::classof(t) && t->getName() == var->name) {
+                if(debug) fmt::print("[findVariable]: find out a local variable {}\n", var->name);
+                // 数组变量
+                if (var->isArray) {
+                    if(debug) fmt::print("[findVariable]: array name = {}\n",var->name);
+                    OffsetInst *offset = nullptr;
+                    std::vector<std::optional<std::size_t> > Bounds = ((AllocaInst*)t)->getBounds();
+                    if(debug) fmt::print("[findVariable]: Bounds.size = {}\n",Bounds.size());
+                    std::vector<Value *> Indices;
+                    if(debug) fmt::print("[findVariable]: var->position.size = {}\n",var->position.size());
+                    for (auto exp : var->position) {
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
+                    }
+                    // Indices的维数不足时需要补0
+                    if (Indices.size() < Bounds.size()) {
+                        fmt::print("补！\n");
+                        for (size_t j = Indices.size(); j < Bounds.size(); j++) {
+                            Indices.push_back(ConstantInt::Create(0));
+                        }
+                    }
+                    if(debug) fmt::print("[findVariable]: start to create offset\n");
+                    offset = OffsetInst::Create(Type::getIntegerTy(), t, Indices, Bounds);
+                    root->instructions.push_back(offset);
+                    // LoadInst *load_inst = LoadInst::Create(offset);
+                    // root->instructions.push_back(load_inst);
+                    found = true;
+                    return offset;
+                    break;
+                } else { // 整型
+                    if(debug) fmt::print("[findVariable]: single integer var name = {}\n",var->name);
+                    // LoadInst *load_inst = LoadInst::Create(t);
+                    // root->instructions.push_back(load_inst);
+                    found = true;
+                    return t;
+                    break;
+                }
+
+
+            }
+
+        }
+        // 说明不在这一层
+        temp_block = temp_block->parent;
+    }
+    // 找参数列表
+
+    if (!found) {
+        if(debug) fmt::print("[findVariable]: find the variable in the argument list\n");
+        for (int i = 0; i < getNumParams(); i++) {
+            if (var->name == getArg(i)->getName()) {
+                if(debug) fmt::print("[findVariable]: find out {} in the arg\n", var->name);
+                if (getArg(i)->getType() == Type::getIntegerTy()) {
+                    // if (!var->isArray) {
+                    fmt::print("[findVariable]: find out an integer variable in the arg\n");
+                    fmt::print("i={}\n", i);
+                    if (getArg(i)->pointer == nullptr) {
+                        fmt::print("empty\n");
+                    }
+                    // LoadInst *load_inst = LoadInst::Create(getArg(i)->pointer);
+                    // fmt::print("out1\n");
+                    // root->instructions.push_back(load_inst);
+                    fmt::print("out\n");
+                    return getArg(i)->pointer;
+                } else {
+                    fmt::print("[findVariable]: find out an array variable in the arg\n");
+                    OffsetInst *offset;
+                    // std::vector<std::size_t> Bounds = ((AllocaInst*)&t)->getBounds();
+                    std::vector<std::optional<std::size_t>> Bounds;
+                    // Bound 可以是空
+                    for (auto dimension : getArg(i)->dimensions) {
+                        fmt::print("{}\n", "di: " + std::to_string(dimension));
+                        if (dimension == -1) {
+                            fmt::print("empty dimension\n");
+                            Bounds.push_back(std::nullopt);
+                        } else {
+                            Bounds.push_back(dimension);
+                        }
+                    }
+                    std::vector<Value *> Indices;
+                    for (auto exp : var->position) {
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
+                    }
+                    if (Indices.size() == Bounds.size()) {
+                        fmt::print("eq\n");
+                    } else {
+                        fmt::print("{}\n", std::to_string(Indices.size()));
+                        fmt::print("{}\n", std::to_string(Bounds.size()));
+                        fmt::print("neq\n");
+                    }
+                    // Indices的维数不足时需要补0
+                    if (Indices.size() < Bounds.size()) {
+                        fmt::print("补！\n");
+                        for (size_t j = Indices.size(); j < Bounds.size(); j++) {
+                            Indices.push_back(ConstantInt::Create(0));
+                        }
+                    }
+                    fmt::print("start to create offset\n");
+
+                    fmt::print("create offset and load successfully\n");
+
+                    offset = OffsetInst::Create(Type::getIntegerTy(), getArg(i), Indices, Bounds);
+                    root->instructions.push_back(offset);
+                    // LoadInst *load_inst = LoadInst::Create(offset);
+                    // root->instructions.push_back(load_inst);
+                    return offset;
+
+                }
+
+
+
+                found = true;
+
+
+                break;
+            }
+        }
+    }
+    // 全局变量中找
+    if (!found) {
+        fmt::print("find in the global variable list\n");
+        for (auto &t : getParent()->getGlobalList()) {
+            if (t.getName() == var->name) {
+                if (var->isArray) {
+                    fmt::print("isArray\n");
+                    OffsetInst *offset;
+                    std::vector<std::optional<std::size_t> > Bounds = t.getBounds();
+                    std::vector<Value *> Indices;
+                    for (auto exp : var->position) {
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
+                    }
+                    fmt::print("start to create offset\n");
+
+                    offset = OffsetInst::Create(Type::getIntegerTy(), &t, Indices, Bounds);
+                    root->instructions.push_back(offset);
+                    // LoadInst *load_inst = LoadInst::Create(offset);
+                    // root->instructions.push_back(load_inst);
+                    return offset;
+                } else {
+                    fmt::print("integer\n");
+                    // LoadInst *load_inst = LoadInst::Create(&t);
+                    // root->instructions.push_back(load_inst);
+                    return &t;
+                }
+            }
+        }
+    }
+    if (!found) {
+        assert("can't find the variable anywhere\n");
+    }
+}
 
 Value * Function::findVariable(NodePtr variable, TempBlock* root)
 {
@@ -1126,7 +1305,7 @@ Value * Function::findVariable(NodePtr variable, TempBlock* root)
                     std::vector<Value *> Indices;
                     if(debug) fmt::print("[findVariable]: var->position.size = {}\n",var->position.size());
                     for (auto exp : var->position) {
-                        Indices.push_back(PostOrderTraversal(exp, root));
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
                     }
                     // Indices的维数不足时需要补0
                     if (Indices.size() < Bounds.size()) {
@@ -1195,7 +1374,7 @@ Value * Function::findVariable(NodePtr variable, TempBlock* root)
                     }
                     std::vector<Value *> Indices;
                     for (auto exp : var->position) {
-                        Indices.push_back(PostOrderTraversal(exp, root));
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
                     }
                     if (Indices.size() == Bounds.size()) {
                         fmt::print("eq\n"); 
@@ -1243,7 +1422,7 @@ Value * Function::findVariable(NodePtr variable, TempBlock* root)
                     std::vector<std::optional<std::size_t> > Bounds = t.getBounds();
                     std::vector<Value *> Indices;
                     for (auto exp : var->position) {
-                        Indices.push_back(PostOrderTraversal(exp, root));
+                        Indices.push_back(PostOrderTraversal(exp, root, true));
                     }
                     fmt::print("start to create offset\n");
                     
@@ -1265,71 +1444,6 @@ Value * Function::findVariable(NodePtr variable, TempBlock* root)
         assert("can't find the variable anywhere\n");
     }
 }
-
-
-// Value * Function::findEntryVariable(TempBlock* root, NodePtr variable)
-// {
-//     bool debug = true;
-//     if(debug) fmt::print("[findEntryVariable]:\n");
-//     bool found = false;
-//     auto var = variable->as<LVal*>();
-//     List<Instruction>& instr_list = getEntryBlock().getInstList();
-//     for (Instruction& tt : instr_list) {
-//         Instruction *t = &tt;
-//         if (AllocaInst::classof(t) && t->getName() == var->name) {
-//             fmt::print("[findEntryVariable]: find out a local variable\n");
-//             // 数组变量
-//             if (var->isArray) {
-//                 fmt::print("isArray\n");
-//                 OffsetInst *offset;
-//                 std::vector<std::optional<std::size_t>> Bounds = ((AllocaInst*)&t)->getBounds();
-//                 std::vector<Value *> Indices;
-//                 for (auto exp : var->position) {
-//                     Indices.push_back(PostOrderTraversal(exp, root));
-//                 }
-//                 // Indices的维数不足时需要补0
-//                 if (Indices.size() < Bounds.size()) {
-//                     fmt::print("补！\n");
-//                     for (size_t j = Indices.size(); j < Bounds.size(); j++) {
-//                         Indices.push_back(ConstantInt::Create(0));
-//                     }
-//                 }
-//                 fmt::print("start to create offset\n");
-//                 if (root == nullptr) {
-//                     offset = OffsetInst::Create(Type::getIntegerTy(), t, Indices, Bounds, &getEntryBlock());
-//                     LoadInst *load_inst = LoadInst::Create(offset, &getEntryBlock());
-//                     return load_inst;
-//                 } else {
-//                     offset = OffsetInst::Create(Type::getIntegerTy(), t, Indices, Bounds);
-//                     root->instructions.push_back(offset);
-//                     LoadInst *load_inst = LoadInst::Create(offset);
-//                     root->instructions.push_back(load_inst);
-//                     return load_inst;
-//                 }
-                
-//                 found = true;
-                
-//                 break;
-//             } else { // 整型
-//                 fmt::print("integer\n");
-//                 if (root == nullptr) {
-//                     LoadInst *load_inst = LoadInst::Create(t, &getEntryBlock());
-//                     return load_inst;
-//                 } else {
-//                     LoadInst *load_inst = LoadInst::Create(t);
-//                     root->instructions.push_back(load_inst);
-                    
-//                     return load_inst;
-//                 }
-//                 found = true;
-//                 break;
-//             }
-            
-            
-//         }
-//     }
-//     if (!found) return nullptr;
-// }
 
 
 

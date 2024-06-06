@@ -13,37 +13,33 @@ fn @main() -> i32 {
   let %c = alloca i32, 1
   let %1 = sub 0, 1
   let %2 = store %1, %c
-  let %3 = load %a
-  let %4 = store 1, %3
-  let %5 = load %a
-  let %6 = load %b
-  let %7 = add %5, %6
-  br %7, label %if_then, label %if_end
+  let %3 = store 1, %a
+  let %4 = load %a
+  let %5 = load %b
+  let %6 = add %4, %5
+  br %6, label %if_then, label %if_end
 %if_then:
-  let %9 = load %a
-  let %10 = store 3, %9
+  let %8 = store 3, %a
   jmp label %if_end
 %if_end:
-  let %12 = load %c
-  let %13 = sub 0, %12
-  br %13, label %if_then.1, label %if_end.1
+  let %10 = load %c
+  let %11 = sub 0, %10
+  br %11, label %if_then.1, label %if_end.1
 %if_then.1:
-  let %15 = load %b
-  let %16 = store 4, %15
+  let %13 = store 4, %b
   jmp label %if_end.1
 %if_end.1:
-  let %18 = load %a
-  let %19 = load %b
-  let %20 = add %18, %19
-  let %21 = load %c
-  let %22 = add %20, %21
-  let %23 = call @putint, %22
-  let %24 = store 0, %ret_val.addr
+  let %15 = load %a
+  let %16 = load %b
+  let %17 = add %15, %16
+  let %18 = load %c
+  let %19 = add %17, %18
+  let %20 = call @putint, %19
+  let %21 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %28 = load %ret_val.addr
-  ret %28
+  let %24 = load %ret_val.addr
+  ret %24
 }

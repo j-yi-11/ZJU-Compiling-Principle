@@ -8,40 +8,35 @@ fn @if_ifElse_() -> i32 {
 %entry:
   let %ret_val.addr = alloca i32, 1
   let %a = alloca i32, 1
-  let %0 = load %a
-  let %1 = store 5, %0
+  let %0 = store 5, %a
   let %b = alloca i32, 1
-  let %2 = load %b
-  let %3 = store 10, %2
-  let %4 = load %a
-  let %5 = eq %4, 5
-  br %5, label %if_then, label %if_end
+  let %1 = store 10, %b
+  let %2 = load %a
+  let %3 = eq %2, 5
+  br %3, label %if_then, label %if_end
 %if_then:
-  let %7 = load %b
-  let %8 = eq %7, 10
-  br %8, label %if_then.1, label %if_else
+  let %5 = load %b
+  let %6 = eq %5, 10
+  br %6, label %if_then.1, label %if_else
 %if_end:
-  let %10 = load %a
-  let %11 = store %10, %ret_val.addr
-  jmp label %exit
+  let %8 = load %a
+  let %9 = store %8, %ret_val.addr
   jmp label %exit
 %if_then.1:
-  let %14 = load %a
-  let %15 = store 25, %14
+  let %11 = store 25, %a
   jmp label %if_end.1
 %if_end.1:
   jmp label %if_end
 %if_else:
-  let %18 = load %a
-  let %19 = add %18, 15
-  let %20 = load %a
-  let %21 = store %19, %20
+  let %14 = load %a
+  let %15 = add %14, 15
+  let %16 = store %15, %a
   jmp label %if_end.1
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %24 = load %ret_val.addr
-  ret %24
+  let %19 = load %ret_val.addr
+  ret %19
 }
 fn @main() -> i32 {
 %entry:
@@ -50,10 +45,9 @@ fn @main() -> i32 {
   let %1 = call @putint, %0
   let %2 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %6 = load %ret_val.addr
-  ret %6
+  let %5 = load %ret_val.addr
+  ret %5
 }

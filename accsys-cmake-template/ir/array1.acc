@@ -9,17 +9,15 @@ fn @main() -> i32 {
   let %ret_val.addr = alloca i32, 1
   let %a = alloca i32, 10
   let %0 = offset i32, %a, [2< 10]
-  let %1 = load %0
-  let %2 = store 4, %1
-  let %3 = offset i32, %a, [2< 10]
-  let %4 = load %3
-  let %5 = call @putint, %4
-  let %6 = store 0, %ret_val.addr
+  let %1 = store 4, %0
+  let %2 = offset i32, %a, [2< 10]
+  let %3 = load %2
+  let %4 = call @putint, %3
+  let %5 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %10 = load %ret_val.addr
-  ret %10
+  let %8 = load %ret_val.addr
+  ret %8
 }

@@ -10,21 +10,18 @@ fn @main() -> i32 {
   let %a = alloca i32, 1
   let %b = alloca i32, 1
   let %0 = call @getint
-  let %1 = load %a
-  let %2 = store %0, %1
-  let %3 = call @getint
-  let %4 = load %b
-  let %5 = store %3, %4
-  let %6 = load %a
-  let %7 = load %b
-  let %8 = div %6, %7
-  let %9 = call @putint, %8
-  let %10 = store 0, %ret_val.addr
+  let %1 = store %0, %a
+  let %2 = call @getint
+  let %3 = store %2, %b
+  let %4 = load %a
+  let %5 = load %b
+  let %6 = div %4, %5
+  let %7 = call @putint, %6
+  let %8 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %14 = load %ret_val.addr
-  ret %14
+  let %11 = load %ret_val.addr
+  ret %11
 }

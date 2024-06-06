@@ -8,48 +8,42 @@ fn @doubleWhile() -> i32 {
 %entry:
   let %ret_val.addr = alloca i32, 1
   let %i = alloca i32, 1
-  let %0 = load %i
-  let %1 = store 5, %0
+  let %0 = store 5, %i
   let %j = alloca i32, 1
-  let %2 = load %j
-  let %3 = store 7, %2
+  let %1 = store 7, %j
   jmp label %while_cond
 %while_cond:
-  let %5 = load %i
-  let %6 = lt %5, 100
-  br %6, label %while_body, label %while_end
+  let %3 = load %i
+  let %4 = lt %3, 100
+  br %4, label %while_body, label %while_end
 %while_body:
-  let %8 = load %i
-  let %9 = add %8, 30
-  let %10 = load %i
-  let %11 = store %9, %10
+  let %6 = load %i
+  let %7 = add %6, 30
+  let %8 = store %7, %i
   jmp label %while_cond.1
 %while_end:
-  let %13 = load %j
-  let %14 = store %13, %ret_val.addr
-  jmp label %exit
+  let %10 = load %j
+  let %11 = store %10, %ret_val.addr
   jmp label %exit
 %while_cond.1:
-  let %17 = load %j
-  let %18 = lt %17, 100
-  br %18, label %while_body.1, label %while_end.1
+  let %13 = load %j
+  let %14 = lt %13, 100
+  br %14, label %while_body.1, label %while_end.1
 %while_body.1:
-  let %20 = load %j
-  let %21 = add %20, 6
-  let %22 = load %j
-  let %23 = store %21, %22
+  let %16 = load %j
+  let %17 = add %16, 6
+  let %18 = store %17, %j
   jmp label %while_cond.1
 %while_end.1:
-  let %25 = load %j
-  let %26 = sub %25, 100
-  let %27 = load %j
-  let %28 = store %26, %27
+  let %20 = load %j
+  let %21 = sub %20, 100
+  let %22 = store %21, %j
   jmp label %while_cond
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %31 = load %ret_val.addr
-  ret %31
+  let %25 = load %ret_val.addr
+  ret %25
 }
 fn @main() -> i32 {
 %entry:
@@ -58,10 +52,9 @@ fn @main() -> i32 {
   let %1 = call @putint, %0
   let %2 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %6 = load %ret_val.addr
-  ret %6
+  let %5 = load %ret_val.addr
+  ret %5
 }

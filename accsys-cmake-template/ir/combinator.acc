@@ -20,23 +20,20 @@ fn @factorial(#m: i32) -> i32 {
   let %6 = load %f_res
   let %7 = load %m.addr
   let %8 = mul %6, %7
-  let %9 = load %f_res
-  let %10 = store %8, %9
-  let %11 = load %m.addr
-  let %12 = sub %11, 1
-  let %13 = load %m.addr
-  let %14 = store %12, %13
+  let %9 = store %8, %f_res
+  let %10 = load %m.addr
+  let %11 = sub %10, 1
+  let %12 = store %11, %m.addr
   jmp label %while_cond
 %while_end:
-  let %16 = load %f_res
-  let %17 = store %16, %ret_val.addr
+  let %14 = load %f_res
+  let %15 = store %14, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %21 = load %ret_val.addr
-  ret %21
+  let %18 = load %ret_val.addr
+  ret %18
 }
 fn @cal_combiniation(#c_base: i32, #c_num: i32) -> i32 {
 %entry:
@@ -57,12 +54,11 @@ fn @cal_combiniation(#c_base: i32, #c_num: i32) -> i32 {
   let %11 = div %3, %10
   let %12 = store %11, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %16 = load %ret_val.addr
-  ret %16
+  let %15 = load %ret_val.addr
+  ret %15
 }
 fn @cal_permutation(#p_base: i32, #p_num: i32) -> i32 {
 %entry:
@@ -80,12 +76,11 @@ fn @cal_permutation(#p_base: i32, #p_num: i32) -> i32 {
   let %8 = div %3, %7
   let %9 = store %8, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %13 = load %ret_val.addr
-  ret %13
+  let %12 = load %ret_val.addr
+  ret %12
 }
 fn @main() -> i32 {
 %entry:
@@ -107,10 +102,9 @@ fn @main() -> i32 {
   let %12 = call @putint, %11
   let %13 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %17 = load %ret_val.addr
-  ret %17
+  let %16 = load %ret_val.addr
+  ret %16
 }

@@ -11,125 +11,127 @@ fn @main() -> i32 {
   let %i = alloca i32, 1
   let %j = alloca i32, 1
   let %k = alloca i32, 1
-  let %0 = load %i
-  let %1 = store 0, %0
+  let %0 = store 0, %i
   jmp label %while_cond
 %while_cond:
-  let %3 = load %i
-  let %4 = lt %3, 4
-  br %4, label %while_body, label %while_end
+  let %2 = load %i
+  let %3 = lt %2, 4
+  br %3, label %while_body, label %while_end
 %while_body:
-  let %6 = load %j
-  let %7 = store 0, %6
+  let %5 = store 0, %j
   jmp label %while_cond.1
 %while_end:
-  let %9 = load %i
-  let %10 = store 0, %9
+  let %7 = store 0, %i
   jmp label %while_cond.2
 %while_cond.1:
-  let %12 = load %j
-  let %13 = lt %12, 4
-  br %13, label %while_body.1, label %while_end.1
+  let %9 = load %j
+  let %10 = lt %9, 4
+  br %10, label %while_body.1, label %while_end.1
 %while_body.1:
-  let %15 = load %i
+  let %12 = load %i
+  let %13 = load %j
+  let %14 = offset i32, %mat, [%12< 4], [%13< 4]
+  let %15 = store 999, %14
   let %16 = load %j
-  let %17 = offset i32, %mat, [%15< 4], [%16< 4]
-  let %18 = load %17
-  let %19 = store 999, %18
-  let %20 = load %j
-  let %21 = add %20, 1
-  let %22 = load %j
-  let %23 = store %21, %22
+  let %17 = add %16, 1
+  let %18 = store %17, %j
   jmp label %while_cond.1
 %while_end.1:
-  let %25 = load %i
-  let %26 = add %25, 1
-  let %27 = load %i
-  let %28 = store %26, %27
+  let %20 = load %i
+  let %21 = add %20, 1
+  let %22 = store %21, %i
   jmp label %while_cond
 %while_cond.2:
-  let %30 = load %i
-  let %31 = lt %30, 4
-  br %31, label %while_body.2, label %while_end.2
+  let %24 = load %i
+  let %25 = lt %24, 4
+  br %25, label %while_body.2, label %while_end.2
 %while_body.2:
-  let %33 = load %i
-  let %34 = load %i
-  let %35 = offset i32, %mat, [%33< 4], [%34< 4]
-  let %36 = load %35
-  let %37 = store 0, %36
-  let %38 = load %i
-  let %39 = add %38, 1
-  let %40 = load %i
-  let %41 = store %39, %40
+  let %27 = load %i
+  let %28 = load %i
+  let %29 = offset i32, %mat, [%27< 4], [%28< 4]
+  let %30 = store 0, %29
+  let %31 = load %i
+  let %32 = add %31, 1
+  let %33 = store %32, %i
   jmp label %while_cond.2
 %while_end.2:
-  let %43 = offset i32, %mat, [0< 4], [1< 4]
-  let %44 = load %43
-  let %45 = store 3, %44
-  let %46 = offset i32, %mat, [0< 4], [3< 4]
-  let %47 = load %46
-  let %48 = store 5, %47
-  let %49 = offset i32, %mat, [1< 4], [0< 4]
-  let %50 = load %49
-  let %51 = store 2, %50
-  let %52 = offset i32, %mat, [1< 4], [3< 4]
-  let %53 = load %52
-  let %54 = store 4, %53
-  let %55 = offset i32, %mat, [2< 4], [1< 4]
-  let %56 = load %55
-  let %57 = store 1, %56
-  let %58 = offset i32, %mat, [3< 4], [2< 4]
-  let %59 = load %58
-  let %60 = store 2, %59
-  let %61 = load %k
-  let %62 = store 0, %61
+  let %35 = offset i32, %mat, [0< 4], [1< 4]
+  let %36 = store 3, %35
+  let %37 = offset i32, %mat, [0< 4], [3< 4]
+  let %38 = store 5, %37
+  let %39 = offset i32, %mat, [1< 4], [0< 4]
+  let %40 = store 2, %39
+  let %41 = offset i32, %mat, [1< 4], [3< 4]
+  let %42 = store 4, %41
+  let %43 = offset i32, %mat, [2< 4], [1< 4]
+  let %44 = store 1, %43
+  let %45 = offset i32, %mat, [3< 4], [2< 4]
+  let %46 = store 2, %45
+  let %47 = store 0, %k
   jmp label %while_cond.3
 %while_cond.3:
-  let %64 = load %k
-  let %65 = lt %64, 4
-  br %65, label %while_body.3, label %while_end.3
+  let %49 = load %k
+  let %50 = lt %49, 4
+  br %50, label %while_body.3, label %while_end.3
 %while_body.3:
-  let %67 = load %i
-  let %68 = store 0, %67
+  let %52 = store 0, %i
   jmp label %while_cond.4
 %while_end.3:
-  let %70 = offset i32, %mat, [0< 4], [3< 4]
-  let %71 = load %70
-  let %72 = call @putint, %71
-  let %73 = call @putch, 32
-  let %74 = offset i32, %mat, [1< 4], [2< 4]
-  let %75 = load %74
-  let %76 = call @putint, %75
-  let %77 = call @putch, 32
-  let %78 = offset i32, %mat, [2< 4], [1< 4]
-  let %79 = load %78
-  let %80 = call @putint, %79
-  let %81 = call @putch, 32
-  let %82 = offset i32, %mat, [3< 4], [0< 4]
-  let %83 = load %82
-  let %84 = call @putint, %83
-  let %85 = store 0, %ret_val.addr
-  jmp label %exit
+  let %54 = offset i32, %mat, [0< 4], [3< 4]
+  let %55 = load %54
+  let %56 = call @putint, %55
+  let %57 = call @putch, 32
+  let %58 = offset i32, %mat, [1< 4], [2< 4]
+  let %59 = load %58
+  let %60 = call @putint, %59
+  let %61 = call @putch, 32
+  let %62 = offset i32, %mat, [2< 4], [1< 4]
+  let %63 = load %62
+  let %64 = call @putint, %63
+  let %65 = call @putch, 32
+  let %66 = offset i32, %mat, [3< 4], [0< 4]
+  let %67 = load %66
+  let %68 = call @putint, %67
+  let %69 = store 0, %ret_val.addr
   jmp label %exit
 %while_cond.4:
-  let %88 = load %i
-  let %89 = lt %88, 4
-  br %89, label %while_body.4, label %while_end.4
+  let %71 = load %i
+  let %72 = lt %71, 4
+  br %72, label %while_body.4, label %while_end.4
 %while_body.4:
-  let %91 = load %j
-  let %92 = store 0, %91
+  let %74 = store 0, %j
   jmp label %while_cond.5
 %while_end.4:
-  let %94 = load %k
-  let %95 = add %94, 1
-  let %96 = load %k
-  let %97 = store %95, %96
+  let %76 = load %k
+  let %77 = add %76, 1
+  let %78 = store %77, %k
   jmp label %while_cond.3
 %while_cond.5:
-  let %99 = load %j
-  let %100 = lt %99, 4
-  br %100, label %while_body.5, label %while_end.5
+  let %80 = load %j
+  let %81 = lt %80, 4
+  br %81, label %while_body.5, label %while_end.5
 %while_body.5:
+  let %83 = load %i
+  let %84 = load %k
+  let %85 = offset i32, %mat, [%83< 4], [%84< 4]
+  let %86 = load %85
+  let %87 = load %k
+  let %88 = load %j
+  let %89 = offset i32, %mat, [%87< 4], [%88< 4]
+  let %90 = load %89
+  let %91 = add %86, %90
+  let %92 = load %i
+  let %93 = load %j
+  let %94 = offset i32, %mat, [%92< 4], [%93< 4]
+  let %95 = load %94
+  let %96 = lt %91, %95
+  br %96, label %if_then, label %if_end
+%while_end.5:
+  let %98 = load %i
+  let %99 = add %98, 1
+  let %100 = store %99, %i
+  jmp label %while_cond.3
+%if_then:
   let %102 = load %i
   let %103 = load %k
   let %104 = offset i32, %mat, [%102< 4], [%103< 4]
@@ -142,40 +144,16 @@ fn @main() -> i32 {
   let %111 = load %i
   let %112 = load %j
   let %113 = offset i32, %mat, [%111< 4], [%112< 4]
-  let %114 = load %113
-  let %115 = lt %110, %114
-  br %115, label %if_then, label %if_end
-%while_end.5:
-  let %117 = load %i
-  let %118 = add %117, 1
-  let %119 = load %i
-  let %120 = store %118, %119
-  jmp label %while_cond.3
-%if_then:
-  let %122 = load %i
-  let %123 = load %k
-  let %124 = offset i32, %mat, [%122< 4], [%123< 4]
-  let %125 = load %124
-  let %126 = load %k
-  let %127 = load %j
-  let %128 = offset i32, %mat, [%126< 4], [%127< 4]
-  let %129 = load %128
-  let %130 = add %125, %129
-  let %131 = load %i
-  let %132 = load %j
-  let %133 = offset i32, %mat, [%131< 4], [%132< 4]
-  let %134 = load %133
-  let %135 = store %130, %134
+  let %114 = store %110, %113
   jmp label %if_end
 %if_end:
-  let %137 = load %j
-  let %138 = add %137, 1
-  let %139 = load %j
-  let %140 = store %138, %139
+  let %116 = load %j
+  let %117 = add %116, 1
+  let %118 = store %117, %j
   jmp label %while_cond.5
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %143 = load %ret_val.addr
-  ret %143
+  let %121 = load %ret_val.addr
+  ret %121
 }

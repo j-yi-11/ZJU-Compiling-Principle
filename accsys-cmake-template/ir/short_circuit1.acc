@@ -11,16 +11,14 @@ fn @add(#array: i32*) -> i32 {
   let %1 = load %0
   let %2 = add %1, 1
   let %3 = offset i32, #array, [0< none]
-  let %4 = load %3
-  let %5 = store %2, %4
-  let %6 = store 1, %ret_val.addr
+  let %4 = store %2, %3
+  let %5 = store 1, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %10 = load %ret_val.addr
-  ret %10
+  let %8 = load %ret_val.addr
+  ret %8
 }
 fn @main() -> i32 {
 %entry:
@@ -29,31 +27,28 @@ fn @main() -> i32 {
   let %0 = store 10, %a
   let %array = alloca i32, 10
   let %1 = offset i32, %array, [0< 10]
-  let %2 = load %1
-  let %3 = store 10, %2
-  let %4 = load %a
-  let %5 = gt %4, 10
-  let %6 = load %array
-  let %7 = call @add, %6
-  let %8 = and %5, %7
-  br %8, label %if_then, label %if_else
+  let %2 = store 10, %1
+  let %3 = load %a
+  let %4 = gt %3, 10
+  let %5 = call @add, %array
+  let %6 = and %4, %5
+  br %6, label %if_then, label %if_else
 %if_then:
-  let %10 = offset i32, %array, [0< 10]
-  let %11 = load %10
-  let %12 = call @putint, %11
+  let %8 = offset i32, %array, [0< 10]
+  let %9 = load %8
+  let %10 = call @putint, %9
   jmp label %if_end
 %if_end:
-  let %14 = store 0, %ret_val.addr
-  jmp label %exit
+  let %12 = store 0, %ret_val.addr
   jmp label %exit
 %if_else:
-  let %17 = offset i32, %array, [0< 10]
-  let %18 = load %17
-  let %19 = call @putint, %18
+  let %14 = offset i32, %array, [0< 10]
+  let %15 = load %14
+  let %16 = call @putint, %15
   jmp label %if_end
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %22 = load %ret_val.addr
-  ret %22
+  let %19 = load %ret_val.addr
+  ret %19
 }

@@ -10,26 +10,56 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68b47869-04c7-4c20-a8a6-0d260245e663" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/accsys-cmake-template/hello.s" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/accsys-cmake-template/input" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/c_cpp_properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/c_cpp_properties.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/hello.s" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/hello.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/add.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/add.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/array1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/array2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/array_hard.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_hard.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/array_parameter.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_parameter.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/binary_search.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/binary_search.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/combinator.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/combinator.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/div.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/div.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/factorial.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/factorial.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/func_call.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/func_call.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/global_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/global_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/if_complex_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_complex_expr.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test3.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/mul.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/mul.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority3.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/quick_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/quick_sort.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/rem.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/rem.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/sort_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sort_array.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/stmt_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/stmt_expr.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/unary_op.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/unary_op.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/output.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/past.sy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/past.sy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/flex file before contain.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir_gen.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir_gen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir_gen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/pieceOFBUG.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/semantic/semantic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/semantic/semantic.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/sysy.y" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/sysy.y" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/test.sy" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-rs-master/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-rs-master/README.md" afterDir="false" />
@@ -622,41 +652,6 @@
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_if_test1.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_if_test1.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_if_test2.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_if_test2.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/assembly/while_test1.s" beforeDir="false" afterPath="$PROJECT_DIR$/tests/assembly/while_test1.s" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/add.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/add.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array_hard.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_hard.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array_init1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_init1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array_init2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_init2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/array_parameter.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/array_parameter.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/binary_search.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/binary_search.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/combinator.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/combinator.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/div.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/div.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/factorial.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/factorial.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/func_call.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/func_call.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/global_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/global_test1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/if_complex_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_complex_expr.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/if_test3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/if_test3.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/merge_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/mul.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/mul.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/op_priority3.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/op_priority3.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/quick_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/quick_sort.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/rem.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/rem.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/short_circuit1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/short_circuit2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/short_circuit2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/sort_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sort_array.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/stmt_expr.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/stmt_expr.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/sudoku.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/two_dimension_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/unary_op.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/unary_op.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/while_if.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/while_if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/while_if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/ir/while_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/ircode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/ircode.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/old-test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/old-test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test.py" afterDir="false" />
@@ -772,7 +767,7 @@
       <workItem from="1717590309702" duration="6463000" />
       <workItem from="1717598071034" duration="6879000" />
       <workItem from="1717646539921" duration="770000" />
-      <workItem from="1717662651777" duration="4562000" />
+      <workItem from="1717662651777" duration="10877000" />
     </task>
     <servers />
   </component>

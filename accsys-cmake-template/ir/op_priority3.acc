@@ -54,18 +54,16 @@ fn @main() -> i32 {
   let %38 = or %26, %37
   br %38, label %if_then, label %if_end
 %if_then:
-  let %40 = load %flag
-  let %41 = store 1, %40
+  let %40 = store 1, %flag
   jmp label %if_end
 %if_end:
-  let %43 = load %flag
-  let %44 = call @putint, %43
-  let %45 = store 0, %ret_val.addr
+  let %42 = load %flag
+  let %43 = call @putint, %42
+  let %44 = store 0, %ret_val.addr
   jmp label %exit
-  jmp label %exit
-%after return:
+%after_return:
   jmp label %exit
 %exit:
-  let %49 = load %ret_val.addr
-  ret %49
+  let %47 = load %ret_val.addr
+  ret %47
 }
