@@ -844,7 +844,7 @@ public:
     void CreateBlocks();
     void BasicBlockConnect();
 
-
+    void globalValInitial();
     Value *PostOrderTraversal(NodePtr root, TempBlock *rootTempBlock, bool isVal);
 
     Value *findEntryVariable(TempBlock *root, NodePtr variable);

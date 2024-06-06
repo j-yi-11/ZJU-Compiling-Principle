@@ -16,6 +16,8 @@
       <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/.clang-tidy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/buf" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/buf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/debug.sy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/debug.sy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/hello.s" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/hello.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" afterDir="false" />
@@ -53,6 +55,7 @@
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test1.acc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_if_test2.acc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/while_test1.acc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/output" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/output" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/output.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/past.sy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/past.sy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/src/ir/ir.cpp" afterDir="false" />
@@ -767,7 +770,7 @@
       <workItem from="1717590309702" duration="6463000" />
       <workItem from="1717598071034" duration="6879000" />
       <workItem from="1717646539921" duration="770000" />
-      <workItem from="1717662651777" duration="10877000" />
+      <workItem from="1717662651777" duration="16865000" />
     </task>
     <servers />
   </component>
