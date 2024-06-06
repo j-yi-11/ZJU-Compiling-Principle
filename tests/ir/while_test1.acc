@@ -1,0 +1,68 @@
+fn @putint(#x: i32) -> ();
+
+fn @putch(#x: i32) -> ();
+
+fn @putarray(#n: i32, #arr: i32*) -> ();
+
+fn @getint() -> i32;
+
+fn @getch() -> i32;
+
+fn @getarray(#n: i32, #arr: i32*) -> ();
+
+fn @doubleWhile() -> i32 {
+%entry:
+  let %ret_val.addr: i32* = alloca i32, 1
+  let %i: i32* = alloca i32, 1
+  let %4: () = store 5, %i: i32*
+  let %j: i32* = alloca i32, 1
+  let %6: () = store 7, %j: i32*
+  jmp label %while_cond
+%while_cond:
+  let %10: i32 = load %i: i32*
+  let %11: i32 = lt %10: i32, 100
+  br %11: i32, label %while_body, label %while_end
+%while_body:
+  let %12: i32 = load %i: i32*
+  let %13: i32 = add %12: i32, 30
+  let %14: () = store %13: i32, %i: i32*
+  jmp label %while_cond.1
+%while_end:
+  let %26: i32 = load %j: i32*
+  let %27: () = store %26: i32, %ret_val.addr: i32*
+  jmp label %exit
+%while_cond.1:
+  let %18: i32 = load %j: i32*
+  let %19: i32 = lt %18: i32, 100
+  br %19: i32, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %20: i32 = load %j: i32*
+  let %21: i32 = add %20: i32, 6
+  let %22: () = store %21: i32, %j: i32*
+  jmp label %while_cond.1
+%while_end.1:
+  let %23: i32 = load %j: i32*
+  let %24: i32 = sub %23: i32, 100
+  let %25: () = store %24: i32, %j: i32*
+  jmp label %while_cond
+%after_return:
+  jmp label %exit
+%exit:
+  let %30: i32 = load %ret_val.addr: i32*
+  ret %30: i32
+}
+
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr: i32* = alloca i32, 1
+  let %3: i32 = call @doubleWhile
+  let %4: () = call @putint, %3: i32
+  let %5: () = store 0, %ret_val.addr: i32*
+  jmp label %exit
+%after_return:
+  jmp label %exit
+%exit:
+  let %8: i32 = load %ret_val.addr: i32*
+  ret %8: i32
+}
+

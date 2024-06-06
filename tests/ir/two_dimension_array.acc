@@ -1,0 +1,166 @@
+fn @putint(#x: i32) -> ();
+
+fn @putch(#x: i32) -> ();
+
+fn @putarray(#n: i32, #arr: i32*) -> ();
+
+fn @getint() -> i32;
+
+fn @getch() -> i32;
+
+fn @getarray(#n: i32, #arr: i32*) -> ();
+
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr: i32* = alloca i32, 1
+  let %mat: i32* = alloca i32, 16
+  let %i: i32* = alloca i32, 1
+  let %j: i32* = alloca i32, 1
+  let %k: i32* = alloca i32, 1
+  let %7: () = store 0, %i: i32*
+  jmp label %while_cond
+%while_cond:
+  let %11: i32 = load %i: i32*
+  let %12: i32 = lt %11: i32, 4
+  br %12: i32, label %while_body, label %while_end
+%while_body:
+  let %13: () = store 0, %j: i32*
+  jmp label %while_cond.1
+%while_end:
+  let %29: () = store 0, %i: i32*
+  jmp label %while_cond.2
+%while_cond.1:
+  let %17: i32 = load %j: i32*
+  let %18: i32 = lt %17: i32, 4
+  br %18: i32, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %19: i32 = load %i: i32*
+  let %20: i32 = load %j: i32*
+  let %21: i32* = offset i32, %mat: i32*, [%19: i32 < 4], [%20: i32 < 4]
+  let %22: () = store 999, %21: i32*
+  let %23: i32 = load %j: i32*
+  let %24: i32 = add %23: i32, 1
+  let %25: () = store %24: i32, %j: i32*
+  jmp label %while_cond.1
+%while_end.1:
+  let %26: i32 = load %i: i32*
+  let %27: i32 = add %26: i32, 1
+  let %28: () = store %27: i32, %i: i32*
+  jmp label %while_cond
+%while_cond.2:
+  let %33: i32 = load %i: i32*
+  let %34: i32 = lt %33: i32, 4
+  br %34: i32, label %while_body.2, label %while_end.2
+%while_body.2:
+  let %35: i32 = load %i: i32*
+  let %36: i32 = load %i: i32*
+  let %37: i32* = offset i32, %mat: i32*, [%35: i32 < 4], [%36: i32 < 4]
+  let %38: () = store 0, %37: i32*
+  let %39: i32 = load %i: i32*
+  let %40: i32 = add %39: i32, 1
+  let %41: () = store %40: i32, %i: i32*
+  jmp label %while_cond.2
+%while_end.2:
+  let %42: i32* = offset i32, %mat: i32*, [0 < 4], [1 < 4]
+  let %43: () = store 3, %42: i32*
+  let %44: i32* = offset i32, %mat: i32*, [0 < 4], [3 < 4]
+  let %45: () = store 5, %44: i32*
+  let %46: i32* = offset i32, %mat: i32*, [1 < 4], [0 < 4]
+  let %47: () = store 2, %46: i32*
+  let %48: i32* = offset i32, %mat: i32*, [1 < 4], [3 < 4]
+  let %49: () = store 4, %48: i32*
+  let %50: i32* = offset i32, %mat: i32*, [2 < 4], [1 < 4]
+  let %51: () = store 1, %50: i32*
+  let %52: i32* = offset i32, %mat: i32*, [3 < 4], [2 < 4]
+  let %53: () = store 2, %52: i32*
+  let %54: () = store 0, %k: i32*
+  jmp label %while_cond.3
+%while_cond.3:
+  let %58: i32 = load %k: i32*
+  let %59: i32 = lt %58: i32, 4
+  br %59: i32, label %while_body.3, label %while_end.3
+%while_body.3:
+  let %60: () = store 0, %i: i32*
+  jmp label %while_cond.4
+%while_end.3:
+  let %110: i32* = offset i32, %mat: i32*, [0 < 4], [3 < 4]
+  let %111: i32 = load %110: i32*
+  let %112: () = call @putint, %111: i32
+  let %113: () = call @putch, 32
+  let %114: i32* = offset i32, %mat: i32*, [1 < 4], [2 < 4]
+  let %115: i32 = load %114: i32*
+  let %116: () = call @putint, %115: i32
+  let %117: () = call @putch, 32
+  let %118: i32* = offset i32, %mat: i32*, [2 < 4], [1 < 4]
+  let %119: i32 = load %118: i32*
+  let %120: () = call @putint, %119: i32
+  let %121: () = call @putch, 32
+  let %122: i32* = offset i32, %mat: i32*, [3 < 4], [0 < 4]
+  let %123: i32 = load %122: i32*
+  let %124: () = call @putint, %123: i32
+  let %125: () = store 0, %ret_val.addr: i32*
+  jmp label %exit
+%while_cond.4:
+  let %64: i32 = load %i: i32*
+  let %65: i32 = lt %64: i32, 4
+  br %65: i32, label %while_body.4, label %while_end.4
+%while_body.4:
+  let %66: () = store 0, %j: i32*
+  jmp label %while_cond.5
+%while_end.4:
+  let %107: i32 = load %k: i32*
+  let %108: i32 = add %107: i32, 1
+  let %109: () = store %108: i32, %k: i32*
+  jmp label %while_cond.3
+%while_cond.5:
+  let %70: i32 = load %j: i32*
+  let %71: i32 = lt %70: i32, 4
+  br %71: i32, label %while_body.5, label %while_end.5
+%while_body.5:
+  let %72: i32 = load %i: i32*
+  let %73: i32 = load %k: i32*
+  let %74: i32* = offset i32, %mat: i32*, [%72: i32 < 4], [%73: i32 < 4]
+  let %75: i32 = load %74: i32*
+  let %76: i32 = load %k: i32*
+  let %77: i32 = load %j: i32*
+  let %78: i32* = offset i32, %mat: i32*, [%76: i32 < 4], [%77: i32 < 4]
+  let %79: i32 = load %78: i32*
+  let %80: i32 = add %75: i32, %79: i32
+  let %81: i32 = load %i: i32*
+  let %82: i32 = load %j: i32*
+  let %83: i32* = offset i32, %mat: i32*, [%81: i32 < 4], [%82: i32 < 4]
+  let %84: i32 = load %83: i32*
+  let %85: i32 = lt %80: i32, %84: i32
+  br %85: i32, label %if_then, label %if_end
+%while_end.5:
+  let %104: i32 = load %i: i32*
+  let %105: i32 = add %104: i32, 1
+  let %106: () = store %105: i32, %i: i32*
+  jmp label %while_cond.4
+%if_then:
+  let %88: i32 = load %i: i32*
+  let %89: i32 = load %k: i32*
+  let %90: i32* = offset i32, %mat: i32*, [%88: i32 < 4], [%89: i32 < 4]
+  let %91: i32 = load %90: i32*
+  let %92: i32 = load %k: i32*
+  let %93: i32 = load %j: i32*
+  let %94: i32* = offset i32, %mat: i32*, [%92: i32 < 4], [%93: i32 < 4]
+  let %95: i32 = load %94: i32*
+  let %96: i32 = add %91: i32, %95: i32
+  let %97: i32 = load %i: i32*
+  let %98: i32 = load %j: i32*
+  let %99: i32* = offset i32, %mat: i32*, [%97: i32 < 4], [%98: i32 < 4]
+  let %100: () = store %96: i32, %99: i32*
+  jmp label %if_end
+%if_end:
+  let %101: i32 = load %j: i32*
+  let %102: i32 = add %101: i32, 1
+  let %103: () = store %102: i32, %j: i32*
+  jmp label %while_cond.5
+%after_return:
+  jmp label %exit
+%exit:
+  let %128: i32 = load %ret_val.addr: i32*
+  ret %128: i32
+}
+

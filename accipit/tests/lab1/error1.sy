@@ -1,6 +1,0 @@
-// Syntax Error Line 5: "@"
-
-int main () {
-  int a = 1;
-  int b = a@2;
-}

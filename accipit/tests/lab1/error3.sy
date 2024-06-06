@@ -1,9 +1,0 @@
-// Syntax Error Line 3
-
-int test(int len,) {
-  return len;
-}
-
-int main(){
-  return 0;
-}

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 TIMEOUT = 5
 PYTHON_PATH = sys.executable  # always use the current python
 IR_PATH = "./ir"
-EXECUTOR_PATH = "../accipit"
+EXECUTOR_PATH = "../accipit-binary"
 
 ### Color Utils ###
 

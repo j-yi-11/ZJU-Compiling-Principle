@@ -1,7 +1,0 @@
-// Syntax Error: rvalue cannot be assigned to
-
-int main() {
-    int a = 5;
-    3 = a;
-    return 0;
-}
