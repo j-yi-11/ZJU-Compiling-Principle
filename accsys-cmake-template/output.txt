@@ -4,198 +4,51 @@ fn @putarray(#n: i32, #arr: i32*) -> ();
 fn @getint() -> i32;
 fn @getch() -> i32;
 fn @getarray(#n: i32, #arr: i32*) -> ();
-fn @Swap(#a: i32*, #l: i32, #h: i32) -> i32 {
+fn @add(#array: i32*) -> i32 {
 %entry:
-  let %l.addr = alloca i32, 1
-  let %0 = store #l, %l.addr
-  let %h.addr = alloca i32, 1
-  let %1 = store #h, %h.addr
   let %ret_val.addr = alloca i32, 1
-  let %temp = alloca i32, 1
-  let %2 = load %l.addr
-  let %3 = offset i32, #a, [%2< none]
-  let %4 = load %3
-  let %5 = store %4, %temp
-  let %6 = load %h.addr
-  let %7 = offset i32, #a, [%6< none]
-  let %8 = load %7
-  let %9 = load %l.addr
-  let %10 = offset i32, #a, [%9< none]
-  let %11 = store %8, %10
-  let %12 = load %temp
-  let %13 = load %h.addr
-  let %14 = offset i32, #a, [%13< none]
-  let %15 = store %12, %14
-  let %16 = store 0, %ret_val.addr
+  let %0 = offset i32, #array, [0< none]
+  let %1 = load %0
+  let %2 = add %1, 1
+  let %3 = offset i32, #array, [0< none]
+  let %4 = store %2, %3
+  let %5 = store 1, %ret_val.addr
   jmp label %exit
+%after_return:
+  jmp label %exit
+%exit:
+  let %8 = load %ret_val.addr
+  ret %8
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %a = alloca i32, 1
+  let %0 = store 10, %a
+  let %array = alloca i32, 10
+  let %1 = offset i32, %array, [0< 10]
+  let %2 = store 10, %1
+  let %3 = load %a
+  let %4 = gt %3, 10
+  let %5 = call @add, %array
+  let %6 = and %4, %5
+  br %6, label %if_then, label %if_else
+%if_then:
+  let %8 = offset i32, %array, [0< 10]
+  let %9 = load %8
+  let %10 = call @putint, %9
+  jmp label %if_end
+%if_end:
+  let %12 = store 0, %ret_val.addr
+  jmp label %exit
+%if_else:
+  let %14 = offset i32, %array, [0< 10]
+  let %15 = load %14
+  let %16 = call @putint, %15
+  jmp label %if_end
 %after_return:
   jmp label %exit
 %exit:
   let %19 = load %ret_val.addr
   ret %19
-}
-fn @Partition(#b: i32*, #low: i32, #high: i32) -> i32 {
-%entry:
-  let %low.addr = alloca i32, 1
-  let %0 = store #low, %low.addr
-  let %high.addr = alloca i32, 1
-  let %1 = store #high, %high.addr
-  let %ret_val.addr = alloca i32, 1
-  let %base = alloca i32, 1
-  let %2 = load %low.addr
-  let %3 = offset i32, #b, [%2< none]
-  let %4 = load %3
-  let %5 = store %4, %base
-  jmp label %while_cond
-%while_cond:
-  let %7 = load %low.addr
-  let %8 = load %high.addr
-  let %9 = lt %7, %8
-  br %9, label %while_body, label %while_end
-%while_body:
-  jmp label %while_cond.1
-%while_end:
-  let %12 = load %low.addr
-  let %13 = store %12, %ret_val.addr
-  jmp label %exit
-%while_cond.1:
-  let %15 = load %low.addr
-  let %16 = load %high.addr
-  let %17 = lt %15, %16
-  let %18 = load %high.addr
-  let %19 = offset i32, #b, [%18< none]
-  let %20 = load %19
-  let %21 = load %base
-  let %22 = ge %20, %21
-  let %23 = and %17, %22
-  br %23, label %while_body.1, label %while_end.1
-%while_body.1:
-  let %25 = load %high.addr
-  let %26 = sub %25, 1
-  let %27 = store %26, %high.addr
-  jmp label %while_cond.1
-%while_end.1:
-  let %29 = offset i32, #b, [0< none]
-  let %30 = load %low.addr
-  let %31 = load %high.addr
-  let %32 = call @Swap, %29, %30, %31
-  jmp label %while_cond.2
-%while_cond.2:
-  let %34 = load %low.addr
-  let %35 = load %high.addr
-  let %36 = lt %34, %35
-  let %37 = load %low.addr
-  let %38 = offset i32, #b, [%37< none]
-  let %39 = load %38
-  let %40 = load %base
-  let %41 = le %39, %40
-  let %42 = and %36, %41
-  br %42, label %while_body.2, label %while_end.2
-%while_body.2:
-  let %44 = load %low.addr
-  let %45 = add %44, 1
-  let %46 = store %45, %low.addr
-  jmp label %while_cond.2
-%while_end.2:
-  let %48 = offset i32, #b, [0< none]
-  let %49 = load %low.addr
-  let %50 = load %high.addr
-  let %51 = call @Swap, %48, %49, %50
-  jmp label %while_cond
-%after_return:
-  jmp label %exit
-%exit:
-  let %54 = load %ret_val.addr
-  ret %54
-}
-fn @QuickSort(#c: i32*, #low1: i32, #high1: i32) -> i32 {
-%entry:
-  let %low1.addr = alloca i32, 1
-  let %0 = store #low1, %low1.addr
-  let %high1.addr = alloca i32, 1
-  let %1 = store #high1, %high1.addr
-  let %ret_val.addr = alloca i32, 1
-  let %2 = load %low1.addr
-  let %3 = load %high1.addr
-  let %4 = lt %2, %3
-  br %4, label %if_then, label %if_end
-%if_then:
-  let %base1 = alloca i32, 1
-  let %6 = offset i32, #c, [0< none]
-  let %7 = load %low1.addr
-  let %8 = load %high1.addr
-  let %9 = call @Partition, %6, %7, %8
-  let %10 = store %9, %base1
-  let %11 = offset i32, #c, [0< none]
-  let %12 = load %low1.addr
-  let %13 = load %base1
-  let %14 = sub %13, 1
-  let %15 = call @QuickSort, %11, %12, %14
-  let %16 = offset i32, #c, [0< none]
-  let %17 = load %base1
-  let %18 = add %17, 1
-  let %19 = load %high1.addr
-  let %20 = call @QuickSort, %16, %18, %19
-  jmp label %if_end
-%if_end:
-  let %22 = store 0, %ret_val.addr
-  jmp label %exit
-%after_return:
-  jmp label %exit
-%exit:
-  let %25 = load %ret_val.addr
-  ret %25
-}
-fn @main() -> i32 {
-%entry:
-  let %ret_val.addr = alloca i32, 1
-  let %n = alloca i32, 1
-  let %0 = store 8, %n
-  let %arr = alloca i32, 8
-  let %i = alloca i32, 1
-  let %1 = store 0, %i
-  jmp label %while_cond
-%while_cond:
-  let %3 = load %i
-  let %4 = load %n
-  let %5 = lt %3, %4
-  br %5, label %while_body, label %while_end
-%while_body:
-  let %7 = call @getint
-  let %8 = load %i
-  let %9 = offset i32, %arr, [%8< 8]
-  let %10 = store %7, %9
-  let %11 = load %i
-  let %12 = add %11, 1
-  let %13 = store %12, %i
-  jmp label %while_cond
-%while_end:
-  let %15 = load %n
-  let %16 = sub %15, 1
-  let %17 = call @QuickSort, %arr, 0, %16
-  let %18 = store 0, %i
-  jmp label %while_cond.1
-%while_cond.1:
-  let %20 = load %i
-  let %21 = load %n
-  let %22 = lt %20, %21
-  br %22, label %while_body.1, label %while_end.1
-%while_body.1:
-  let %24 = load %i
-  let %25 = offset i32, %arr, [%24< 8]
-  let %26 = load %25
-  let %27 = call @putint, %26
-  let %28 = call @putch, 32
-  let %29 = load %i
-  let %30 = add %29, 1
-  let %31 = store %30, %i
-  jmp label %while_cond.1
-%while_end.1:
-  let %33 = store 0, %ret_val.addr
-  jmp label %exit
-%after_return:
-  jmp label %exit
-%exit:
-  let %36 = load %ret_val.addr
-  ret %36
 }

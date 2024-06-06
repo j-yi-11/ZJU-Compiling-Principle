@@ -149,12 +149,15 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
     if (auto *ifstmt = exp->as<IfStmt *>()) {
         fmt::print(prefix);
         fmt::print("IfStmt\n");
-        fmt::print(" condition:");
+        fmt::print("condition:\n");
         printAST(ifstmt->condition, prefix+" ", ident);
-        fmt::print(" then:");
+        fmt::print("then:\n");
         printAST(ifstmt->then, prefix+" ", ident);
-        fmt::print(" els:");
-        printAST(ifstmt->els, prefix+" ", ident);
+
+        if(ifstmt->matched==true) {
+            fmt::print("els matched:\n");
+            printAST(ifstmt->els, prefix + " ", ident);
+        }
         return;
     }
     // while statement
@@ -174,7 +177,7 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         return;
     }
     if (auto *blockstmt = exp->as<BlockStmt *>()) {
-        fmt::print(prefix);
+//        fmt::print(prefix);
         fmt::print("BlockStmt\n");
         printAST(blockstmt->Block, prefix, ident);
         return;
@@ -260,7 +263,7 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
     }
     if (auto *block = exp->as<Block *>()) {
         fmt::print(prefix);
-        fmt::print("Block\n");
+//        fmt::print("Block\n");
         for (auto &blockitem : block->BlockItems) {
             printAST(blockitem, prefix, ident);
         }

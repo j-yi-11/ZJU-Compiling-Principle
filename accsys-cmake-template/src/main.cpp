@@ -59,7 +59,6 @@ int main(int argc, char **argv)
     M->genFuncList(root);
     fmt::print(fmt::emphasis::bold | fg(fmt::color::green), "ir generation success\n");
     // argv[2] is output file name
-//    std::string filename = argv[2];
     std::ofstream file;
     file.open(std::string(argv[2]), std::ios::trunc);
     M->print(file, false);

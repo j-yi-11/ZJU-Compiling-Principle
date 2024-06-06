@@ -372,7 +372,7 @@ fn @main() -> i32 {
   jmp label %while_cond.1
 %while_end:
   let %9 = load %solve
-  br %9, label %if_then.1, label %if_else
+  br %9, label %if_then.2, label %if_else.1
 %while_cond.1:
   let %11 = load %j
   let %12 = lt %11, 9
@@ -394,7 +394,7 @@ fn @main() -> i32 {
   let %27 = load %26
   let %28 = gt %27, 9
   let %29 = or %23, %28
-  br %29, label %if_then, label %if_end
+  br %29, label %if_then, label %if_else
 %while_end.1:
   let %31 = load %i
   let %32 = add %31, 1
@@ -410,66 +410,78 @@ fn @main() -> i32 {
   let %40 = add %39, 1
   let %41 = store %40, %j
   jmp label %while_cond.1
-%if_then.1:
-  let %43 = call @solve_sudoku
-  br %43, label %if_then.2, label %if_else.1
-%if_end.1:
-  let %45 = store 0, %ret_val.addr
-  jmp label %exit
 %if_else:
-  let %47 = call @check_sudoku, @a
-  br %47, label %if_then.3, label %if_else.2
-%if_then.2:
-  let %49 = store 0, %i
-  jmp label %while_cond.2
-%if_end.2:
+  let %43 = load %i
+  let %44 = load %j
+  let %45 = offset i32, @a, [%43< 9], [%44< 9]
+  let %46 = load %45
+  let %47 = eq %46, 0
+  br %47, label %if_then.1, label %if_end.1
+%if_then.1:
+  let %49 = store 1, %solve
   jmp label %if_end.1
+%if_end.1:
+  jmp label %if_end
+%if_then.2:
+  let %52 = call @solve_sudoku
+  br %52, label %if_then.3, label %if_else.2
+%if_end.2:
+  let %54 = store 0, %ret_val.addr
+  jmp label %exit
 %if_else.1:
-  let %52 = call @putint, 0
-  let %53 = call @putch, 32
+  let %56 = call @check_sudoku, @a
+  br %56, label %if_then.4, label %if_else.3
+%if_then.3:
+  let %58 = store 0, %i
+  jmp label %while_cond.2
+%if_end.3:
   jmp label %if_end.2
+%if_else.2:
+  let %61 = call @putint, 0
+  let %62 = call @putch, 32
+  jmp label %if_end.3
 %while_cond.2:
-  let %55 = load %i
-  let %56 = lt %55, 9
-  br %56, label %while_body.2, label %while_end.2
+  let %64 = load %i
+  let %65 = lt %64, 9
+  br %65, label %while_body.2, label %while_end.2
 %while_body.2:
-  let %58 = store 0, %j
+  let %67 = store 0, %j
   jmp label %while_cond.3
 %while_end.2:
-  jmp label %if_end.2
+  jmp label %if_end.3
 %while_cond.3:
-  let %61 = load %j
-  let %62 = lt %61, 9
-  br %62, label %while_body.3, label %while_end.3
-%while_body.3:
-  let %64 = load %i
-  let %65 = load %j
-  let %66 = offset i32, @a, [%64< 9], [%65< 9]
-  let %67 = load %66
-  let %68 = call @putint, %67
-  let %69 = call @putch, 32
   let %70 = load %j
-  let %71 = add %70, 1
-  let %72 = store %71, %j
+  let %71 = lt %70, 9
+  br %71, label %while_body.3, label %while_end.3
+%while_body.3:
+  let %73 = load %i
+  let %74 = load %j
+  let %75 = offset i32, @a, [%73< 9], [%74< 9]
+  let %76 = load %75
+  let %77 = call @putint, %76
+  let %78 = call @putch, 32
+  let %79 = load %j
+  let %80 = add %79, 1
+  let %81 = store %80, %j
   jmp label %while_cond.3
 %while_end.3:
-  let %74 = load %i
-  let %75 = add %74, 1
-  let %76 = store %75, %i
+  let %83 = load %i
+  let %84 = add %83, 1
+  let %85 = store %84, %i
   jmp label %while_cond.2
-%if_then.3:
-  let %78 = call @putint, 1
-  let %79 = call @putch, 32
-  jmp label %if_end.3
-%if_end.3:
-  jmp label %if_end.1
-%if_else.2:
-  let %82 = call @putint, 0
-  let %83 = call @putch, 32
-  jmp label %if_end.3
+%if_then.4:
+  let %87 = call @putint, 1
+  let %88 = call @putch, 32
+  jmp label %if_end.4
+%if_end.4:
+  jmp label %if_end.2
+%if_else.3:
+  let %91 = call @putint, 0
+  let %92 = call @putch, 32
+  jmp label %if_end.4
 %after_return:
   jmp label %exit
 %exit:
-  let %86 = load %ret_val.addr
-  ret %86
+  let %95 = load %ret_val.addr
+  ret %95
 }
