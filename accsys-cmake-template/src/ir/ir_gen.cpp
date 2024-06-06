@@ -1,14 +1,15 @@
 #include "ir/ir.h"
 #include "ir/type.h"
 #include <string>
-
+#include <vector>
 void Module::genGlobalList(NodePtr root)
 {
     fmt::print("genGlobalList()\n");
     bool debug = false;
     if(root == nullptr) return;
     if(auto *comp_unit = root->as<CompUnit*>()) {
-        if(debug) fmt::print("comp_unit->all.size() = {}\n",comp_unit->all.size());
+        if(debug) 
+            fmt::print("comp_unit->all.size() = {}\n",comp_unit->all.size());
         for(size_t i = 0; i < comp_unit->all.size(); i++) {
             auto decl = comp_unit->all[i]->as<Decl*>();
             if (decl == nullptr) 
@@ -47,7 +48,8 @@ void Module::genGlobalList(NodePtr root)
 
 void Module::declExLinkFunction()
 {
-    fmt::print("declExLinkFunction()\n");
+    bool debug = false;
+    if(debug) fmt::print("declExLinkFunction()\n");
     // putint
     Type *Result_putint = Type::getUnitTy();
     std::vector<Type *> Params_putint;
@@ -76,12 +78,14 @@ void Module::declExLinkFunction()
     Type *Result_getint = Type::getIntegerTy();
     std::vector<Type *> Params_getint;  // empty
     FunctionType *FTy_getint = new FunctionType(Result_getint, Params_getint);
-    auto f_getint = Function::Create(FTy_getint, true, "getint", this);
+    Function::Create(FTy_getint, true, "getint", this);
+    // auto f_getint = Function::Create(FTy_getint, true, "getint", this);
     // getch
     Type *Result_getch = Type::getIntegerTy();
     std::vector<Type *> Params_getch;  // empty
     FunctionType *FTy_getch = new FunctionType(Result_getch, Params_getch);
-    auto f_getch = Function::Create(FTy_getch, true, "getch", this);
+    Function::Create(FTy_getch, true, "getch", this);
+    // auto f_getch = Function::Create(FTy_getch, true, "getch", this);
     // getarray
     Type *Result_getarray = Type::getUnitTy();
     std::vector<Type *> Params_getarray;
@@ -96,6 +100,7 @@ void Module::declExLinkFunction()
 
 void Module::genFuncList(NodePtr root)
 {
+    bool debug = true;
     fmt::print("genFuncList()\n");
     // Step1: 外部库函数的声明
     declExLinkFunction();
@@ -108,7 +113,7 @@ void Module::genFuncList(NodePtr root)
             if (funcDef == nullptr)
                 continue;
             // ----------------------------------------------------
-            fmt::print("Create a local function\n");
+            if(debug) fmt::print("[genFuncList]: Create local function name {}\n",funcDef->name);
             Type *Result = funcDef->ReturnType == FuncDef::Type::INT ? Type::getIntegerTy() : Type::getUnitTy();
             std::vector<Type *> Params;
             for (auto arg : funcDef->argList) {
@@ -125,7 +130,7 @@ void Module::genFuncList(NodePtr root)
             FunctionType *FTy = new FunctionType(Result, Params);
             auto f = Function::Create(FTy, false, funcDef->name, this);
             // 传递参数的dimension
-            for (int i = 0; i < f->getNumParams(); i++) {
+            for (size_t i = 0; i < f->getNumParams(); i++) {
                 if (auto arg = funcDef->argList[i]->as<FuncFParam*>()) {
                     f->getArg(i)->setName(arg->name);
                     if (arg->isArray) {
@@ -152,16 +157,17 @@ void Module::genFuncList(NodePtr root)
             // fmt::print("0.0\n");
             // 生成temp block
             f->generateTempBlock(funcDef->block->as<Block*>(), nullptr);
-            // fmt::print("1\n");
+            if(debug) fmt::print("[genFuncList]: f->generateTempBlock\n");
             f->AnalysisBlockOrder();
-            // fmt::print("2\n");
+            if(debug) fmt::print("[genFuncList]: f->AnalysisBlockOrder\n");
             f->TempBlockConnect();
-            // fmt::print("3\n");
+            if(debug) fmt::print("[genFuncList]: f->TempBlockConnect\n");
             f->CreateBlocks();
-            // fmt::print("4\n");
+            if(debug) fmt::print("[genFuncList]: f->CreateBlocks\n");
             f->BasicBlockConnect();
-            // fmt::print("5\n");
+            if(debug) fmt::print("[genFuncList]: f->BasicBlockConnect\n");
             f->generateReturnBlock();
+            if(debug) fmt::print("[genFuncList]: f->generateReturnBlock\n");
         }
     }
 
@@ -182,7 +188,7 @@ TempBlock *Function::generateEntryBlock()
     block_exec_ordered.push_back(entry_block);
     // fmt::print("block_exec_ordered.size = {}\n",block_exec_ordered.size());
     // 分配参数的空间
-    for (int i = 0; i < getNumParams(); i++) {
+    for (size_t i = 0; i < getNumParams(); i++) {
         Argument *arg = getArg(i);
         if (arg->getType() == Type::getIntegerTy()) {
             auto alloca_param = AllocaInst::Create(Type::getIntegerTy(), 1);
@@ -239,15 +245,16 @@ Value *Function::createLocalVariable(VarDef *varDef, TempBlock *root)
 // ok
 void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
 {
-    fmt::print("generateTempBlock: \n");
+    bool debug = false;
+    if(debug) fmt::print("generateTempBlock: \n");
     // generate Entry block
     if (parent == nullptr) {
         parent = generateEntryBlock();
     }
     // return;
-    
+    if(debug) fmt::print("[generateTempBlock]: rootBlock->BlockItems.size() = {}\n",rootBlock->BlockItems.size());
     for (auto blockItem : rootBlock->BlockItems) {
-        fmt::print("blockItem:\n");
+        if(debug) fmt::print("[generateTempBlock]: blockItem:\n");
         auto statement = blockItem->as<BlockItem*>()->Stmt;
         auto declare = blockItem->as<BlockItem*>()->Decl;
         // decl语句
@@ -275,26 +282,26 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
             
         // assign语句
         if (auto assignStmt = statement->as<AssignStmt*>()) {
-            Value * lv;
-            Value * rv;
+            Value * lv = nullptr;
+            Value * rv = nullptr;
             fmt::print("find out an assign: \n");
             
             rv = PostOrderTraversal(assignStmt->Exp, parent, true);
             fmt::print("rVal generate successfully\n");
-            lv = findVariableAddr(assignStmt->LVal->as<LVal*>(), parent);
+            lv = findVariable(assignStmt->LVal->as<LVal*>(), parent);
             fmt::print("lVal generate successfully\n");
             
             StoreInst *store = StoreInst::Create(rv, lv);
             parent->instructions.push_back(store);
 
-            fmt::print("create success\n");
+            fmt::print("create assignment success\n");
             
             continue;
         }
         
         // while语句
         if (auto whileStmt = statement->as<WhileStmt*>()) {
-            fmt::print("find out a while: \n");
+            if(debug) fmt::print("[generateTempBlock]: find out a while: \n");
             BlockStmt *then_block_stmt = whileStmt->then->as<BlockStmt*>();
             Block *then_block = then_block_stmt->Block->as<Block*>();
             
@@ -327,18 +334,18 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
 
             // 需要修改parent
             parent = while_end_block;
-            fmt::print("while : parent changed\n");
+            if(debug) fmt::print("[generateTempBlock]: while : parent changed\n");
         }
 
         // expStmt语句
         if (auto expStmt = statement->as<ExpStmt*>()) {
-            fmt::print("find out an expStmt\n");
+            if(debug) fmt::print("[generateTempBlock]: find out expStmt\n");
             PostOrderTraversal(expStmt->Exp, parent, true);
         }
         
         // return语句
         if (auto returnStmt = statement->as<ReturnStmt*>()) {
-            fmt::print("return---------------------------------------------------------------------\n");
+            if(debug) fmt::print("[generateTempBlock]: returnStmt\n");
             Value *lv = nullptr;
             Value *rv = nullptr;
             if (returnStmt->result == nullptr) {
@@ -368,13 +375,13 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
         
         // if语句
         if (auto ifStmt = statement->as<IfStmt*>()) {
-            fmt::print("find out an if: \n");
-            if(ifStmt->then==nullptr){
-                fmt::print("ifStmt->then==nullptr\n");
-            }
-            if(ifStmt->then->as<BlockStmt*>()==nullptr){
-                fmt::print("ifStmt->then->as<BlockStmt*>()==nullptr\n");
-            }
+            if(debug) fmt::print("[generateTempBlock]: find out ifStmt: \n");
+            // if(ifStmt->then==nullptr){
+            //     fmt::print("ifStmt->then==nullptr\n");
+            // }
+            // if(ifStmt->then->as<BlockStmt*>()==nullptr){
+            //     fmt::print("ifStmt->then->as<BlockStmt*>()==nullptr\n");
+            // }
             BlockStmt *then_block_stmt = ifStmt->then->as<BlockStmt*>();
             if (then_block_stmt == nullptr) {
                 then_block_stmt = new BlockStmt();
@@ -383,50 +390,54 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
                 blockItem->Stmt = ifStmt->then;
                 then_block_stmt->Block->as<Block*>()->BlockItems.emplace_back(blockItem);
             }
-            if(then_block_stmt->Block==nullptr){
-                fmt::print("then_block_stmt->Block==nullptr\n");
-            }
-            if(then_block_stmt->Block->as<Block*>()==nullptr){
-                fmt::print("then_block_stmt->Block->as<Block*>()==nullptr\n");
-            }
+            // if(then_block_stmt->Block==nullptr){
+            //     fmt::print("then_block_stmt->Block==nullptr\n");
+            // }
+            // if(then_block_stmt->Block->as<Block*>()==nullptr){
+            //     fmt::print("then_block_stmt->Block->as<Block*>()==nullptr\n");
+            // }
             Block *then_block = then_block_stmt->Block->as<Block*>();
             fmt::print("0\n");
             // condition
             Value *conditionVal = PostOrderTraversal(ifStmt->condition, parent, true);
             if (conditionVal == nullptr) 
                 assert("conditionVal is empty\n");
-            parent->condition = conditionVal;
-            fmt::print("1\n");
+            if(parent != nullptr) 
+                parent->condition = conditionVal;
+            else{
+                if(debug) fmt::print("[generateTempBlock]: parent is nullptr\n");
+            }
+            // fmt::print("1\n");
             TempBlock *if_then_block = new TempBlock(
                     TempBlock::TempBlockType::IF_THEN, parent, cur_depth, 
                     if_index, else_index, while_index);
             block_exec_ordered.push_back(if_then_block);
-            fmt::print("2\n");
+            // fmt::print("2\n");
             if_index++;
 
             cur_depth++;
             generateTempBlock(then_block, if_then_block);
             cur_depth--;
-            fmt::print("3\n");
+            // fmt::print("3\n");
             // matched if
             if(ifStmt->matched) {
-                fmt::print("4\n");
+                // fmt::print("4\n");
                 // if_else
-                TempBlock *if_else_block;
+                TempBlock *if_else_block = nullptr;
                 if_else_block = new TempBlock( 
                     TempBlock::TempBlockType::IF_ELSE, parent, cur_depth, 
                     if_then_block->if_index, if_then_block->else_index, while_index);
                 block_exec_ordered.push_back(if_else_block);
-                fmt::print("5\n");
-                Block *els_block;
+                // fmt::print("5\n");
+                Block *els_block = nullptr;
                 // 三种可能性 IfStmt / BlockStmt / WhileStmt
                 if (BlockStmt* els_block_stmt = ifStmt->els->as<BlockStmt*>()) {
-                    fmt::print("the last else \n");
+                    if(debug) fmt::print("[generateTempBlock]: last else \n");
                     els_block = els_block_stmt->Block->as<Block*>();
 
                 } else {
                     // 不是一个block，那就创建一个
-                    fmt::print("create an els_block\n");
+                    if(debug) fmt::print("[generateTempBlock]: create els_block\n");
                     els_block = new Block();
                     BlockItem *temp_blockItem = new BlockItem();
                     temp_blockItem->as<BlockItem*>()->Stmt = ifStmt->els;
@@ -438,16 +449,16 @@ void Function::generateTempBlock(Block *rootBlock, TempBlock *parent)
 
                 else_index++;
             }
-            fmt::print("6\n");
+            // fmt::print("6\n");
             
             TempBlock *if_end_block = new TempBlock(
                     TempBlock::TempBlockType::IF_END, parent, cur_depth, 
                     if_then_block->if_index, if_then_block->else_index, while_index);
             block_exec_ordered.push_back(if_end_block);
-            fmt::print("7\n");
+            // fmt::print("7\n");
             // 需要修改parent
             parent = if_end_block;
-            fmt::print("parent changed\n");
+            if(debug) fmt::print("[generateTempBlock]: parent changed\n");
         }
     }
 }
@@ -499,7 +510,7 @@ void Function::AnalysisBlockOrder()
     {
         if (i == block_exec_ordered.size()-1) {
             block_exec_ordered[i]->is_last = true;
-            if(debug) fmt::print("[AnalysisBlockOrder]: is last block\n");
+            if(debug) fmt::print("[AnalysisBlockOrder]: last block\n");
             continue;
         }
         if (!((block_exec_ordered[i]->next_block).has_value())) {
@@ -520,13 +531,13 @@ void Function::AnalysisBlockOrder()
                 }
                 break;
             case TempBlock::TempBlockType::IF_THEN:
-                fmt::print("if_then\n");
+                if(debug) fmt::print("[AnalysisBlockOrder]: if_then\n");
                 if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
                     // 内部又分裂出了新的block
-                    fmt::print("split new block\n");
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new block\n");
                     if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
                         // while_cond
-                        fmt::print("if then jump to while cond\n");
+                        if(debug) fmt::print("[AnalysisBlockOrder]: if then jump to while cond\n");
                         fmt::print("-------------------------------------------------------------------\n");
                         block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
                         block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
@@ -547,8 +558,7 @@ void Function::AnalysisBlockOrder()
                 break;
             case TempBlock::TempBlockType::IF_ELSE:
                 if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
-                    
-                    fmt::print("split new block\n");
+                    if(debug) fmt::print("[AnalysisBlockOrder]: split new block\n");
                     if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
                         // while_cond
                         fmt::print("if then jump to while cond\n");
@@ -697,6 +707,105 @@ void Function::AnalysisBlockOrder()
                     // }
                 }
                 break;
+            case TempBlock::TempBlockType::WHILE_COND:
+                block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_BODY;
+                block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->while_index;
+                break;
+            case TempBlock::TempBlockType::WHILE_BODY:
+                if (block_exec_ordered[i+1]->depth > block_exec_ordered[i]->depth) {
+                    // 内部又分裂出了新的block
+                    fmt::print("split new block\n");
+                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                        // while_cond
+                        fmt::print("if then jump to while cond\n");
+                        fmt::print("-------------------------------------------------------------------\n");
+                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
+                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                    } else {
+                        // if then
+                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type;
+                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                    }
+                } else {
+                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->while_index;
+                }
+                break;
+            case TempBlock::TempBlockType::WHILE_END:
+                if(debug) fmt::print("[AnalysisBlockOrder]: while_end\n");
+                // 1. 跳转到当前层数下的下一个block
+                if (block_exec_ordered[i]->depth == block_exec_ordered[i+1]->depth) {
+                    if (block_exec_ordered[i+1]->type == TempBlock::TempBlockType::WHILE_COND) {
+                        block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // while_cond
+                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->while_index;
+                    } else {
+                        block_exec_ordered[i]->branch = TempBlock::BranchType::BR;
+                        block_exec_ordered[i]->next_block_type = block_exec_ordered[i+1]->type; // 一定是If_then
+                        block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                    }
+                    
+                    
+                } else {
+                    // 要沿着parent链找，找到第一个上层节点
+                    // 如果是if_then -> if_end
+                    // 如果是if_else -> if_end
+                    // 如果是if_end -> (可能吗？) -> 忽略 -> 继续向上找 -> if_end->parent是if_then的parent
+                    // gttttttttttttttdrrr/
+                    TempBlock *temp_block = nullptr;
+                    temp_block = block_exec_ordered[i]->parent;
+                    fmt::print("[AnalysisBlockOrder]: while_end jump to the parent\n");
+                    while(temp_block != nullptr) {
+                        if(debug) fmt::print("[AnalysisBlockOrder]: while (temp_block != nullptr) loop\n");
+                        if (temp_block->depth < block_exec_ordered[i]->depth && 
+                            temp_block->type != TempBlock::TempBlockType::IF_END && 
+                            temp_block->type != TempBlock::TempBlockType::WHILE_END) {
+                            if(debug) fmt::print("[AnalysisBlockOrder]: enter if\n");
+                            switch(temp_block->type) {
+                                case TempBlock::TempBlockType::ENTRY:
+                                    block_exec_ordered[i]->next_block = std::nullopt;
+                                    block_exec_ordered[i]->is_last = true;
+                                    break;
+                                case TempBlock::TempBlockType::IF_THEN:
+                                case TempBlock::TempBlockType::IF_ELSE:
+                                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
+                                    block_exec_ordered[i]->next_block_index = temp_block->if_index;
+                                    break;
+                                case TempBlock::TempBlockType::WHILE_BODY:
+                                    block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                                    block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                                    block_exec_ordered[i]->next_block_index = temp_block->while_index;
+                                    break;
+                                default: 
+                                    fmt::print("[AnalysisBlockOrder]: ERROR: END block can't find out the next block\n");
+                                    break;
+                            }
+                        }
+                        
+                        if(debug) fmt::print("[AnalysisBlockOrder]: loop end\n");
+                        temp_block = temp_block->parent;
+                    }
+                    
+
+                    // // 这就不一定了，上一级如果是if，那就跳if_end，上一级如果是while，那就跳while_cond index -> parent的while index
+                    // if (block_exec_ordered[i]->parent->type == TempBlock::TempBlockType::WHILE_BODY) {
+                    //     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    //     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::WHILE_COND;
+                    //     block_exec_ordered[i]->next_block_index = block_exec_ordered[i]->parent->while_index;
+                    // } else {
+                    //     // 要跳转到上一级的if_end
+                    //     block_exec_ordered[i]->branch = TempBlock::BranchType::JMP;
+                    //     block_exec_ordered[i]->next_block_type = TempBlock::TempBlockType::IF_END;
+                    //     block_exec_ordered[i]->next_block_index = block_exec_ordered[i+1]->if_index;
+                    // }
+                }
+                break;
+            default: break;
         }
         // switch-case end
     }
@@ -705,8 +814,11 @@ void Function::AnalysisBlockOrder()
 void Function::TempBlockConnect()
 {
     fmt::print("TempBlockConnect()\n");
-    fmt::print("size: {}\n", std::to_string(block_exec_ordered.size()));
+    fmt::print("size: {}\n", block_exec_ordered.size());
     for (auto t : block_exec_ordered) {
+        if(t==nullptr){
+            fmt::print("[TempBlockConnect]: t is nullptr\n");
+        }
         t->print();
     }
     for (auto t : block_exec_ordered) {
@@ -714,6 +826,9 @@ void Function::TempBlockConnect()
             t->next_block = std::nullopt;
         }
         for (auto next : block_exec_ordered) {
+            if(t==nullptr){
+                fmt::print("[TempBlockConnect]: next is nullptr\n");
+            }
             if (next->type == t->next_block_type) {
                 switch (t->next_block_type) {
                     case TempBlock::TempBlockType::IF_THEN:
@@ -736,6 +851,8 @@ void Function::TempBlockConnect()
                         }
                             
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -750,25 +867,29 @@ void Function::CreateBlocks()
     bool debug = true;
     if (debug) {
         // output the block_exec_ordered
-        fmt::print("{}\n", "size: " + std::to_string(block_exec_ordered.size()));
-        
-        for (int i = 0; i < block_exec_ordered.size(); i++)
+        fmt::print("[CreateBlocks]: size = {}\n", block_exec_ordered.size());
+        for (size_t i = 0; i < block_exec_ordered.size(); i++)
         {
             block_exec_ordered[i]->print();
         }
     }
     int else_index = 0;
-    if ((int)block_exec_ordered.size() == 0) return;
+    if (block_exec_ordered.size() == 0) return;
 
 
     for (auto t : block_exec_ordered) {
-        
+        if(t==nullptr){
+            if(debug) fmt::print("[CreateBlocks]: t is nullptr\n");
+        }
         if (t->type == TempBlock::TempBlockType::ENTRY) {
             BasicBlock *entry_block = BasicBlock::Create(this, &back());
+            if(entry_block==nullptr){
+                if(debug) fmt::print("[CreateBlocks]: entry_block is nullptr\n");
+            }
             entry_block->setName("entry");
             t->basic_block = entry_block;
             BasicBlock::iterator it = entry_block->begin();
-            for (int i = (int)t->instructions.size() - 1; i >= 0; i--) {
+            for (size_t i = t->instructions.size() - 1; i >= 0; i--) {
                 it = t->instructions[i]->insertInto(entry_block, it);
             }
         }
@@ -780,7 +901,7 @@ void Function::CreateBlocks()
             t->basic_block = block0;
 
             BasicBlock::iterator it = block0->begin();
-            for (int i = (int)t->instructions.size() - 1; i >= 0; i--) {
+            for (size_t i = t->instructions.size() - 1; i >= 0; i--) {
                 it = t->instructions[i]->insertInto(block0, it);
             }
 
@@ -792,7 +913,7 @@ void Function::CreateBlocks()
                     t_->basic_block = block1;
 
                     BasicBlock::iterator it = block1->begin();
-                    for (int i = (int)t_->instructions.size() - 1; i >= 0; i--) {
+                    for (size_t i = t_->instructions.size() - 1; i >= 0; i--) {
                         it = t_->instructions[i]->insertInto(block1, it);
                     }
                 }
@@ -806,7 +927,7 @@ void Function::CreateBlocks()
                     else_index++;
 
                     BasicBlock::iterator it = block2->begin();
-                    for (int i = (int)t_->instructions.size() - 1; i >= 0; i--) {
+                    for (size_t i = t_->instructions.size() - 1; i >= 0; i--) {
                         it = t_->instructions[i]->insertInto(block2, it);
                     }
                 }
@@ -819,7 +940,7 @@ void Function::CreateBlocks()
             t->basic_block = block0;
 
             BasicBlock::iterator it = block0->begin();
-            for (int i = (int)t->instructions.size() - 1; i >= 0; i--) {
+            for (size_t i = t->instructions.size() - 1; i >= 0; i--) {
                 it = t->instructions[i]->insertInto(block0, it);
             }
             // find out while body
@@ -830,7 +951,7 @@ void Function::CreateBlocks()
                     t_->basic_block = block1;
 
                     BasicBlock::iterator it = block1->begin();
-                    for (int i = (int)t_->instructions.size() - 1; i >= 0; i--) {
+                    for (size_t i = t_->instructions.size() - 1; i >= 0; i--) {
                         it = t_->instructions[i]->insertInto(block1, it);
                     }
                 }
@@ -843,7 +964,7 @@ void Function::CreateBlocks()
                     t_->basic_block = block1;
 
                     BasicBlock::iterator it = block1->begin();
-                    for (int i = (int)t_->instructions.size() - 1; i >= 0; i--) {
+                    for (size_t i = t_->instructions.size() - 1; i >= 0; i--) {
                         it = t_->instructions[i]->insertInto(block1, it);
                     }
                 }
@@ -855,31 +976,29 @@ void Function::CreateBlocks()
 // ok
 void Function::BasicBlockConnect()
 {
+    bool debug = false;
     fmt::print("BasicBlockConnect()\n");
-    int index = 0;
+    // int index = 0;
     for (auto t : block_exec_ordered) {  
-        if (t->next_block == std::nullopt) {
-            continue;
-        }
         if (!((t->next_block).has_value())) {
             JumpInst::Create(&back(), t->basic_block);
             continue;
         }      
         if (t->branch == TempBlock::BranchType::JMP) {
-            fmt::print("which block?\n");
+            if(debug) fmt::print("[BasicBlockConnect]: which block?\n");
             t->print();
-            fmt::print("next block is?\n");
+            if(debug) fmt::print("[BasicBlockConnect]: next block is?\n");
             t->next_block.value()->print();
-            fmt::print("jmp\n");
+            if(debug) fmt::print("[BasicBlockConnect]: jmp\n");
             if(t->basic_block == nullptr) fmt::print("basic_block is empty\n");
             if((t->next_block).value() == nullptr) fmt::print("next_block is empty\n");
             JumpInst::Create((t->next_block).value()->basic_block, t->basic_block);
-            fmt::print("create jump finished\n");
+            if(debug) fmt::print("[BasicBlockConnect]: create jump finished\n");
         }
         if (t->branch == TempBlock::BranchType::BR) {
-            fmt::print("br\n");
+            if(debug) fmt::print("[BasicBlockConnect]: br\n");
             BasicBlock *next_block1 = (t->next_block).value()->basic_block;
-            BasicBlock *next_block2;
+            BasicBlock *next_block2 = nullptr;
             if ((t->next_block).value()->type == TempBlock::TempBlockType::IF_THEN) {
                 // IF_ELSE or IF_END
                 bool found = false;
@@ -901,7 +1020,7 @@ void Function::BasicBlockConnect()
                     }
                 }
                 if (!found) {
-                    fmt::print("Can not found the next block\n");
+                    if(debug) fmt::print("[BasicBlockConnect]: Can not found next block\n");
                 }
             }
 
@@ -917,7 +1036,7 @@ void Function::BasicBlockConnect()
                     }
                 }
                 if (!found) {
-                    fmt::print("Can not found the next block\n");
+                    if(debug) fmt::print("[BasicBlockConnect]: Can not found next block\n");
                 }
             }
             
@@ -926,14 +1045,14 @@ void Function::BasicBlockConnect()
             if (t->condition == nullptr) fmt::print("condition empty\n");
 
             BranchInst::Create(next_block1, next_block2, t->condition, t->basic_block);
-            fmt::print("br_end\n");
+            if(debug) fmt::print("[BasicBlockConnect]: br_end\n");
         }
         
     }
-    fmt::print("out\n");
+    fmt::print("[BasicBlockConnect]: out\n");
 }
 
-Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent, bool isVal) {
+Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent) {
     fmt::print("PostOrderTraversal()\n");
     bool debug = true;
     if(root == nullptr){
@@ -969,10 +1088,10 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent, bool isVal)
         parent->instructions.push_back(inst);
         return inst;
     } else if (auto t = root->as<subExp*>()) {
-        fmt::print("subExp\n");
+        if(debug) fmt::print("[PostOrderTraversal]: subExp\n");
         auto val1 = PostOrderTraversal(t->lhs, parent, true);
         auto val2 = PostOrderTraversal(t->rhs, parent, true);
-        BinaryInst* inst;
+        BinaryInst* inst = nullptr;
         inst = BinaryInst::Create(Instruction::BinaryOps::Sub, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
@@ -1064,6 +1183,9 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent, bool isVal)
         inst = BinaryInst::Create(Instruction::Ne, val1, val2, Type::getIntegerTy());
         parent->instructions.push_back(inst);
         return inst;
+    } else if (root->as<assignExp*>()) { // auto t = root->as<assignExp*>()
+        if(debug) fmt::print("[PostOrderTraversal]: assignExp is not implemented. \n");
+        // 还剩assignExp没有处理
     }
 
 
@@ -1364,9 +1486,9 @@ Value * Function::findVariable(NodePtr variable, TempBlock* root)
                     std::vector<std::optional<std::size_t>> Bounds;
                     // Bound 可以是空
                     for (auto dimension : getArg(i)->dimensions) {
-                        fmt::print("{}\n", "di: " + std::to_string(dimension));
+                        if(debug) fmt::print("[findVariable]:{}\n", "di: " + std::to_string(dimension));
                         if (dimension == -1) {
-                            fmt::print("empty dimension\n");
+                            if(debug) fmt::print("[findVariable]:empty dimension\n");
                             Bounds.push_back(std::nullopt);
                         } else {
                             Bounds.push_back(dimension);
