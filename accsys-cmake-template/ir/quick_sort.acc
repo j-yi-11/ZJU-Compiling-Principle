@@ -76,33 +76,37 @@ fn @Partition(#b: i32*, #low: i32, #high: i32) -> i32 {
   jmp label %while_cond.1
 %while_end.1:
   let %29 = offset i32, #b, [0< none]
-  let %30 = call @Swap, %29, %low.addr, %high.addr
+  let %30 = load %low.addr
+  let %31 = load %high.addr
+  let %32 = call @Swap, %29, %30, %31
   jmp label %while_cond.2
 %while_cond.2:
-  let %32 = load %low.addr
-  let %33 = load %high.addr
-  let %34 = lt %32, %33
-  let %35 = load %low.addr
-  let %36 = offset i32, #b, [%35< none]
-  let %37 = load %36
-  let %38 = load %base
-  let %39 = le %37, %38
-  let %40 = and %34, %39
-  br %40, label %while_body.2, label %while_end.2
+  let %34 = load %low.addr
+  let %35 = load %high.addr
+  let %36 = lt %34, %35
+  let %37 = load %low.addr
+  let %38 = offset i32, #b, [%37< none]
+  let %39 = load %38
+  let %40 = load %base
+  let %41 = le %39, %40
+  let %42 = and %36, %41
+  br %42, label %while_body.2, label %while_end.2
 %while_body.2:
-  let %42 = load %low.addr
-  let %43 = add %42, 1
-  let %44 = store %43, %low.addr
+  let %44 = load %low.addr
+  let %45 = add %44, 1
+  let %46 = store %45, %low.addr
   jmp label %while_cond.2
 %while_end.2:
-  let %46 = offset i32, #b, [0< none]
-  let %47 = call @Swap, %46, %low.addr, %high.addr
+  let %48 = offset i32, #b, [0< none]
+  let %49 = load %low.addr
+  let %50 = load %high.addr
+  let %51 = call @Swap, %48, %49, %50
   jmp label %while_cond
 %after_return:
   jmp label %exit
 %exit:
-  let %50 = load %ret_val.addr
-  ret %50
+  let %54 = load %ret_val.addr
+  ret %54
 }
 fn @QuickSort(#c: i32*, #low1: i32, #high1: i32) -> i32 {
 %entry:
@@ -118,25 +122,29 @@ fn @QuickSort(#c: i32*, #low1: i32, #high1: i32) -> i32 {
 %if_then:
   let %base1 = alloca i32, 1
   let %6 = offset i32, #c, [0< none]
-  let %7 = call @Partition, %6, %low1.addr, %high1.addr
-  let %8 = store %7, %base1
-  let %9 = offset i32, #c, [0< none]
-  let %10 = load %base1
-  let %11 = sub %10, 1
-  let %12 = call @QuickSort, %9, %low1.addr, %11
-  let %13 = offset i32, #c, [0< none]
-  let %14 = load %base1
-  let %15 = add %14, 1
-  let %16 = call @QuickSort, %13, %15, %high1.addr
+  let %7 = load %low1.addr
+  let %8 = load %high1.addr
+  let %9 = call @Partition, %6, %7, %8
+  let %10 = store %9, %base1
+  let %11 = offset i32, #c, [0< none]
+  let %12 = load %low1.addr
+  let %13 = load %base1
+  let %14 = sub %13, 1
+  let %15 = call @QuickSort, %11, %12, %14
+  let %16 = offset i32, #c, [0< none]
+  let %17 = load %base1
+  let %18 = add %17, 1
+  let %19 = load %high1.addr
+  let %20 = call @QuickSort, %16, %18, %19
   jmp label %if_end
 %if_end:
-  let %18 = store 0, %ret_val.addr
+  let %22 = store 0, %ret_val.addr
   jmp label %exit
 %after_return:
   jmp label %exit
 %exit:
-  let %21 = load %ret_val.addr
-  ret %21
+  let %25 = load %ret_val.addr
+  ret %25
 }
 fn @main() -> i32 {
 %entry:

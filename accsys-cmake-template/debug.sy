@@ -1,10 +1,63 @@
-// Input: 10 -1
-// Output: 9
-
 int main(){
-    int a, b;
-    a = getint();
-    b = getint();
-    putint(a+b);
+    int a = getint();
+    while(a != 111){ // while.cond -> while_body, while_end
+        // while_body -> if_then, if_else
+        if(a < 111){
+            // if_then -> while_cond.1
+            while(a / 222){ // while_cond.1 while_body.1, while_end.1
+                // while_body.1 -> while_cond.2
+                while(a / 333){ // while_cond.2 -> while_body.2, while_end.2
+                    // while_body.2 -> if_then.1, if_end.1
+                    if(a - 444)
+                        // if_then.1 -> if_end.1
+                        a = a + 5;
+                    // if_end.1 -> while_cond.2
+                }
+                // while_end.2 -> if_then.2, if_else.1
+                if(a - 333)
+                    // if_then.2 -> if_end.2
+                    a = a + 4;
+                else{
+                    // if_else.1 -> while_cond.3
+                    while(a != 444){ // while_cond.3 -> while_body.3, while_end.3
+                        // while_body.3 -> while_cond.3
+                        a = a + 5;
+                    }
+                    // while_end.3 -> if_end.2
+                }
+                // if_end.2 -> while_cond.1
+            }
+            // while_end.1 -> if_then.3, if_end.3
+            if(a != 222){
+                // if_then.3 -> if_end.3
+            }
+            // if_end.3 -> while_cond.4
+            while(a - 222){ // while_cond.4 -> while_body.4, while_end.4
+                // while_body.4 -> while_cond.4
+                a = a - 3;
+            }
+            // while_end.4 -> if_end
+        }else
+            // if_else -> if_end
+            a = a * 100;
+        // if_end -> while_cond
+        a = a - 1;
+    }
+    // while_end -> exit
+
+    if(a == 1){
+        while(a == 2){
+
+        }
+
+    }else if(a == 3){
+
+    }else if(a == 4){
+
+    }else{
+
+    }
+
+
     return 0;
 }

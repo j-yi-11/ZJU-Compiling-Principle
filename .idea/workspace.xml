@@ -22,9 +22,6 @@
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/common/common.def" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/ir/ir.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/include/semantic/semantic.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/merge_sort.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/sudoku.acc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/ir/two_dimension_array.acc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/output" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/output" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/output.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accsys-cmake-template/past.sy" beforeDir="false" afterPath="$PROJECT_DIR$/accsys-cmake-template/past.sy" afterDir="false" />
@@ -740,7 +737,7 @@
       <workItem from="1717590309702" duration="6463000" />
       <workItem from="1717598071034" duration="6879000" />
       <workItem from="1717646539921" duration="770000" />
-      <workItem from="1717662651777" duration="27717000" />
+      <workItem from="1717662651777" duration="29435000" />
     </task>
     <servers />
   </component>

@@ -1220,6 +1220,7 @@ Value* Function::PostOrderTraversal(NodePtr root, TempBlock *parent, bool isVal)
                 auto arg = PostOrderTraversal(param, parent, false);
                 Args.push_back(arg);
             }
+            index++;
         }
         inst = CallInst::Create(f, Args);
         parent->instructions.push_back(inst);
