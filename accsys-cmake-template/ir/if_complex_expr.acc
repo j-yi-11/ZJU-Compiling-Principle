@@ -1,0 +1,69 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %a = alloca i32, 1
+  let %b = alloca i32, 1
+  let %c = alloca i32, 1
+  let %d = alloca i32, 1
+  let %result = alloca i32, 1
+  let %0 = store 5, %a
+  let %1 = store 5, %b
+  let %2 = store 1, %c
+  let %3 = sub 0, 2
+  let %4 = store %3, %d
+  let %5 = store 2, %result
+  let %6 = load %d
+  let %7 = mul %6, 1
+  let %8 = div %7, 2
+  let %9 = lt %8, 0
+  let %10 = load %a
+  let %11 = load %b
+  let %12 = sub %10, %11
+  let %13 = ne %12, 0
+  let %14 = load %c
+  let %15 = add %14, 3
+  let %16 = rem %15, 2
+  let %17 = ne %16, 0
+  let %18 = and %13, %17
+  let %19 = or %9, %18
+  br %19, label %if_then, label %if_end
+%if_then:
+  let %21 = load %result
+  let %22 = call @putint, %21
+  jmp label %if_end
+%if_end:
+  let %24 = load %d
+  let %25 = rem %24, 2
+  let %26 = add %25, 67
+  let %27 = lt %26, 0
+  let %28 = load %a
+  let %29 = load %b
+  let %30 = sub %28, %29
+  let %31 = ne %30, 0
+  let %32 = load %c
+  let %33 = add %32, 2
+  let %34 = rem %33, 2
+  let %35 = ne %34, 0
+  let %36 = and %31, %35
+  let %37 = or %27, %36
+  br %37, label %if_then.1, label %if_end.1
+%if_then.1:
+  let %39 = store 4, %result
+  let %40 = load %result
+  let %41 = call @putint, %40
+  jmp label %if_end.1
+%if_end.1:
+  let %43 = store 0, %ret_val.addr
+  jmp label %exit
+%after_return:
+  jmp label %exit
+%exit:
+  let %46 = load %ret_val.addr
+  ret %46
+}

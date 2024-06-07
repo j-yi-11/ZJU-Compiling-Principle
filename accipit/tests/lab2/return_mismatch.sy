@@ -1,3 +1,0 @@
-// Semantic Error at Line 3: Return type mismatch
-
-int main() { return; }

@@ -1,0 +1,71 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @ifWhile() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %a = alloca i32, 1
+  let %0 = store 0, %a
+  let %b = alloca i32, 1
+  let %1 = store 3, %b
+  let %2 = load %a
+  let %3 = eq %2, 5
+  br %3, label %if_then, label %if_else
+%if_then:
+  jmp label %while_cond
+%if_end:
+  let %6 = load %b
+  let %7 = store %6, %ret_val.addr
+  jmp label %exit
+%if_else:
+  jmp label %while_cond.1
+%while_cond:
+  let %10 = load %b
+  let %11 = eq %10, 2
+  br %11, label %while_body, label %while_end
+%while_body:
+  let %13 = load %b
+  let %14 = add %13, 2
+  let %15 = store %14, %b
+  jmp label %while_cond
+%while_end:
+  let %17 = load %b
+  let %18 = add %17, 25
+  let %19 = store %18, %b
+  jmp label %if_end
+%while_cond.1:
+  let %21 = load %a
+  let %22 = lt %21, 5
+  br %22, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %24 = load %b
+  let %25 = mul %24, 2
+  let %26 = store %25, %b
+  let %27 = load %a
+  let %28 = add %27, 1
+  let %29 = store %28, %a
+  jmp label %while_cond.1
+%while_end.1:
+  jmp label %if_end
+%after_return:
+  jmp label %exit
+%exit:
+  let %33 = load %ret_val.addr
+  ret %33
+}
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %0 = call @ifWhile
+  let %1 = call @putint, %0
+  let %2 = store 0, %ret_val.addr
+  jmp label %exit
+%after_return:
+  jmp label %exit
+%exit:
+  let %5 = load %ret_val.addr
+  ret %5
+}

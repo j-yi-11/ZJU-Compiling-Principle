@@ -1,0 +1,124 @@
+#ifndef ConstantDefine
+#define ConstantDefine(subclass) ValueTypeDefine(subclass)
+#endif
+#ifndef ConstantMarker
+#define ConstantMarker(markname, subclass)
+#endif
+
+#ifndef ValueTypeDefine
+#define ValueTypeDefine(subclass)
+#endif
+
+#ifndef FirstBinaryInst
+#define FirstBinaryInst(num)
+#endif
+#ifndef BinaryInstDefine
+#define BinaryInstDefine(num, opcode, subclass)
+#endif
+#ifndef LastBinaryInst
+#define LastBinaryInst(num)
+#endif
+
+#ifndef FirstMemoryInst
+#define FirstMemoryInst(num)
+#endif
+#ifndef MemoryInstDefine
+#define MemoryInstDefine(num, opcode, subclass)
+#endif
+#ifndef LastMemoryInst
+#define LastMemoryInst(num)
+#endif
+
+#ifndef FirstOtherInst
+#define FirstOtherInst(num)
+#endif
+#ifndef OtherInstDefine
+#define OtherInstDefine(num, opcode, subclass)
+#endif
+#ifndef LastOtherInst
+#define LastOtherInst(num)
+#endif
+
+
+#ifndef FirstTerminator
+#define FirstTerminator(num)
+#endif
+#ifndef TerminatorDefine
+#define TerminatorDefine(num, opcode, subclass)
+#endif
+#ifndef LastTerminator
+#define LastTerminator(num)
+#endif
+
+// Constant data
+ConstantDefine(ConstantInt)
+ConstantDefine(ConstantUnit)
+
+ConstantMarker(ConstantFirstVal, ConstantInt)
+ConstantMarker(ConstantLastVal, ConstantUnit)
+
+// Other Value class
+ValueTypeDefine(Argument)
+ValueTypeDefine(GlobalVariable)
+// Instruction must be the last Value.
+ValueTypeDefine(Instruction)
+// Binary instructions
+  FirstBinaryInst(1)
+BinaryInstDefine( 1, Add, BinaryInst)
+BinaryInstDefine( 2, Sub, BinaryInst)
+BinaryInstDefine( 3, Mul, BinaryInst)
+BinaryInstDefine( 4, Div, BinaryInst)
+BinaryInstDefine( 5, Mod, BinaryInst)
+BinaryInstDefine( 6, And, BinaryInst)
+BinaryInstDefine( 7, Or,  BinaryInst)
+BinaryInstDefine( 8, Xor, BinaryInst)
+BinaryInstDefine( 9, Lt,  BinaryInst)
+BinaryInstDefine( 10, Gt, BinaryInst)
+BinaryInstDefine( 11, Le, BinaryInst)
+BinaryInstDefine( 12, Ge, BinaryInst)
+BinaryInstDefine( 13, Eq, BinaryInst)
+BinaryInstDefine( 14, Ne, BinaryInst)
+  LastBinaryInst( 14)
+
+// Memory related operations
+  FirstMemoryInst(15)
+MemoryInstDefine( 15, Alloca, AllocaInst)
+MemoryInstDefine( 16, Load, LoadInst)
+MemoryInstDefine( 17, Store, StoreInst)
+MemoryInstDefine( 18, Offset, OffsetInst)
+  LastMemoryInst( 18)
+
+// Terminator
+  FirstTerminator(19)
+TerminatorDefine( 19, Ret, RetInst)
+TerminatorDefine( 20, Br, BranchInst)
+TerminatorDefine( 21, Jump, JumpInst)
+TerminatorDefine( 22, Panic, PanicInst)
+  LastTerminator( 22)
+
+// Other operations
+  FirstOtherInst(23)
+OtherInstDefine( 23, Call, CallInst)
+  LastOtherInst( 23)
+
+
+#undef ValueTypeDefine
+
+#undef ConstantDefine
+#undef ConstantMarker
+
+#undef FirstBinaryInst
+#undef BinaryInstDefine
+#undef LastBinaryInst
+
+#undef FirstMemoryInst
+#undef MemoryInstDefine
+#undef LastMemoryInst
+
+#undef FirstOtherInst
+#undef OtherInstDefine
+#undef LastOtherInst
+
+#undef FirstTerminator
+#undef TerminatorDefine
+#undef LastTerminator

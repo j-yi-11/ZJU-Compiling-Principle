@@ -149,16 +149,24 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
     if (auto *ifstmt = exp->as<IfStmt *>()) {
         fmt::print(prefix);
         fmt::print("IfStmt\n");
+        fmt::print("condition:\n");
         printAST(ifstmt->condition, prefix+" ", ident);
+        fmt::print("then:\n");
         printAST(ifstmt->then, prefix+" ", ident);
-        printAST(ifstmt->els, prefix+" ", ident);
+
+        if(ifstmt->matched==true) {
+            fmt::print("els matched:\n");
+            printAST(ifstmt->els, prefix + " ", ident);
+        }
         return;
     }
     // while statement
     if (auto *whilestmt = exp->as<WhileStmt *>()) {
         fmt::print(prefix);
         fmt::print("WhileStmt\n");
+        fmt::print(" condition:");
         printAST(whilestmt->condition, prefix+" ", ident);
+        fmt::print(" body(then):");
         printAST(whilestmt->then, prefix+" ", ident);
         return;
     }
@@ -169,12 +177,14 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         return;
     }
     if (auto *blockstmt = exp->as<BlockStmt *>()) {
-        fmt::print(prefix);
+//        fmt::print(prefix);
+        fmt::print("BlockStmt\n");
         printAST(blockstmt->Block, prefix, ident);
         return;
     }
     // exp statement
     if (auto *stmt = exp->as<ExpStmt *>()) {
+        fmt::print("ExpStmt\n");
         printAST(stmt->Exp, prefix, ident);
         return;
     }
@@ -187,6 +197,7 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
         return;
     }
     if (auto *decl = exp->as<Decl *>()) {
+        fmt::print("Decl\n");
         printAST(decl->VarDecl, prefix, ident);
         return;
     }
@@ -252,7 +263,7 @@ void printAST(NodePtr exp, std::string prefix, std::string ident) {
     }
     if (auto *block = exp->as<Block *>()) {
         fmt::print(prefix);
-        fmt::print("Block\n");
+//        fmt::print("Block\n");
         for (auto &blockitem : block->BlockItems) {
             printAST(blockitem, prefix, ident);
         }

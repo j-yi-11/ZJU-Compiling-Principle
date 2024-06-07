@@ -20,18 +20,13 @@ extern NodePtr root;
     OpType opVal;
 }
 
-%token <ival> CONSTINT 
-// %token <ival> UNARYOP BINARYOP
+%token <ival> CONSTINT
 %token <sval> IDENTIFIER
-// jy comment 5.14
-// %token <opVal> AND OR NOT
-// %token <opVal> NEQ EQ GEQ LEQ GREAT LESS
-%type <nodeVal> FuncDef Block Stmt  Exp 
-// %type <nodeVal> UnaryExp PrimaryExp Number AddExp MulExp
-// %type <nodeVal> LOrExp LAndExp EqExp RelExp
+// jy add 6.7
+%type <nodeVal> IfStmt
+%type <nodeVal> FuncDef Block Stmt  Exp
 %type <nodeVal> Decl BlockItem LVal
 %type <nodeVal> VarDecl VarDef
-// %type <nodeVal> InitVal
 %type <nodeVal> FuncFParam
 %type <nodeVal> Matched Unmatched
 %type <vecVal> BlockItems VarDefs
@@ -46,7 +41,9 @@ extern NodePtr root;
         COMMA SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
 %start CompUnit
-
+// jy add 6.7
+%nonassoc IF
+%nonassoc ELSE
 // jy add 5.14
 %right ASSIGN
 %left OR
@@ -66,7 +63,7 @@ CompUnit : CompUnits {
                         comp_unit->all.emplace_back(a);
                 root = comp_unit;
         };
-CompUnits: //{}|
+CompUnits:
         CompUnits Decl {
                 $1->emplace_back($2);
                 $$ = $1;
@@ -269,6 +266,82 @@ BlockItem: Decl {
         $$ = item;  
     };
 
+// jy add 6.7
+
+IfStmt: IF LPAREN Exp RPAREN Stmt ELSE Stmt {
+		auto stmt = new IfStmt();
+		stmt->matched = true;
+		stmt->condition = ($3);
+		stmt->then = ($5);
+		stmt->els = ($7);
+		$$ = stmt;
+	}
+	| IF LPAREN Exp RPAREN Stmt {
+		auto stmt = new IfStmt();
+		stmt->matched = false;
+		stmt->condition = ($3);
+		stmt->then = ($5);
+		$$ = stmt;
+	}
+	;
+
+Stmt: IfStmt
+			|
+			LVal ASSIGN Exp SEMI {
+      		    auto stmt = new AssignStmt();
+      		    stmt->LVal = $1;
+      		    stmt->matched = true;
+      		    stmt->Exp = $3;
+      		    $$ = stmt;
+      		}
+      		| Exp SEMI {
+      		    auto stmt = new ExpStmt();
+      		    stmt->matched = true;
+      		    stmt->Exp = $1;
+      		    $$ = stmt;
+      		}
+      		| SEMI { // include " ;"
+      		    auto stmt = new ExpStmt();
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		}
+      		| Block {
+      		    auto stmt = new BlockStmt();
+      		    stmt->Block = $1;
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		 }
+      		| WHILE LPAREN Exp RPAREN Stmt {
+      		    auto stmt = new WhileStmt();
+      		    stmt->condition = ($3);
+      		    stmt->matched = true;
+      		    stmt->then = ($5);
+      		    $$ = stmt;
+      		 }
+      		| BREAK SEMI {
+      		    auto stmt = new BreakStmt();
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		}
+      		| CONTINUE SEMI {
+      		    auto stmt = new ContinueStmt();
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		 }
+      		| RETURN Exp SEMI {
+      		    auto stmt = new ReturnStmt();
+      		    stmt->result = $2;
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		 }
+      		| RETURN SEMI {
+      		    auto stmt = new ReturnStmt();
+      		    stmt->matched = true;
+      		    $$ = stmt;
+      		}
+      		;
+
+/*
 Stmt:
 	Matched {
 				$$ = $1;
@@ -355,6 +428,8 @@ Unmatched:
 		    $$ = stmt;
 		}
 		;
+*/
+
 LVal :
 	IDENTIFIER {
 			auto l_val = new LVal();

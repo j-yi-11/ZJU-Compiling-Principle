@@ -1,6 +1,0 @@
-// Semantic Error at Line 4: 'a' is not defined
-
-int main() {
-    putint(a);
-    return 0;
-}

@@ -1,10 +1,19 @@
-// Input: 10 -1
-// Output: 9
+// Input: None
+// Output: 10
 
-int main(){
-    int a, b;
-    a = getint();
-    b = getint();
-    putint(a+b);
+int add(int array[]) {
+    array[0] = array[0] + 1;
+    return 1;
+}
+
+int main() {
+    int a = 10;
+    int array[10];
+    array[0] = 10;
+    if (a > 10 && add(array)) {
+        putint(array[0]);
+    } else {
+        putint(array[0]);
+    }
     return 0;
 }

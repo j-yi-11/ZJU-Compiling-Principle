@@ -1,0 +1,101 @@
+fn @putint(#x: i32) -> ();
+fn @putch(#x: i32) -> ();
+fn @putarray(#n: i32, #arr: i32*) -> ();
+fn @getint() -> i32;
+fn @getch() -> i32;
+fn @getarray(#n: i32, #arr: i32*) -> ();
+fn @main() -> i32 {
+%entry:
+  let %ret_val.addr = alloca i32, 1
+  let %num = alloca i32, 1
+  let %arr = alloca i32, 10
+  let %key = alloca i32, 1
+  let %i = alloca i32, 1
+  let %res = alloca i32, 1
+  let %left = alloca i32, 1
+  let %right = alloca i32, 1
+  let %0 = call @getint
+  let %1 = store %0, %num
+  let %2 = load %num
+  let %3 = gt %2, 10
+  br %3, label %if_then, label %if_end
+%if_then:
+  let %5 = store 10, %num
+  jmp label %if_end
+%if_end:
+  let %7 = store 0, %i
+  jmp label %while_cond
+%while_cond:
+  let %9 = load %i
+  let %10 = load %num
+  let %11 = lt %9, %10
+  br %11, label %while_body, label %while_end
+%while_body:
+  let %13 = call @getint
+  let %14 = load %i
+  let %15 = offset i32, %arr, [%14< 10]
+  let %16 = store %13, %15
+  let %17 = load %i
+  let %18 = add %17, 1
+  let %19 = store %18, %i
+  jmp label %while_cond
+%while_end:
+  let %21 = call @getint
+  let %22 = store %21, %key
+  let %23 = store 0, %left
+  let %24 = load %num
+  let %25 = sub %24, 1
+  let %26 = store %25, %right
+  jmp label %while_cond.1
+%while_cond.1:
+  let %28 = load %left
+  let %29 = load %right
+  let %30 = lt %28, %29
+  br %30, label %while_body.1, label %while_end.1
+%while_body.1:
+  let %32 = load %left
+  let %33 = load %right
+  let %34 = add %32, %33
+  let %35 = div %34, 2
+  let %36 = store %35, %i
+  let %37 = load %i
+  let %38 = offset i32, %arr, [%37< 10]
+  let %39 = load %38
+  let %40 = load %key
+  let %41 = eq %39, %40
+  br %41, label %if_then.1, label %if_else
+%while_end.1:
+  let %43 = store 0, %ret_val.addr
+  jmp label %exit
+%if_then.1:
+  let %45 = load %i
+  let %46 = call @putint, %45
+  let %47 = store 0, %ret_val.addr
+  jmp label %exit
+%if_end.1:
+  jmp label %while_cond.1
+%if_else:
+  let %50 = load %i
+  let %51 = offset i32, %arr, [%50< 10]
+  let %52 = load %51
+  let %53 = load %key
+  let %54 = gt %52, %53
+  br %54, label %if_then.2, label %if_else.1
+%if_then.2:
+  let %56 = load %i
+  let %57 = sub %56, 1
+  let %58 = store %57, %right
+  jmp label %if_end.2
+%if_end.2:
+  jmp label %if_end.1
+%if_else.1:
+  let %61 = load %i
+  let %62 = add %61, 1
+  let %63 = store %62, %left
+  jmp label %if_end.2
+%after_return:
+  jmp label %exit
+%exit:
+  let %66 = load %ret_val.addr
+  ret %66
+}

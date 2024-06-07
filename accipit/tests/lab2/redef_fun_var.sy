@@ -1,4 +1,0 @@
-void f() { return; }
-int f;
-
-int main() { return 0; }
